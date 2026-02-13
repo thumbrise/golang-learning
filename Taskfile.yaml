@@ -1,0 +1,23 @@
+#schema: https://taskfile.dev/schema.json
+version: '3.17'
+
+tasks:
+  run:
+    desc: RUN
+    cmds:
+      - go run . {{.CLI_ARGS}}
+
+  lint:
+    desc: Линт
+    cmds:
+      - golangci-lint run
+
+  test:
+    desc: Запустить тесты
+    cmds:
+      - echo 'NO TESTS'
+
+  bench:
+    desc: Запустить бенчмарки
+    cmds:
+      - echo 'NO BENCHS'
