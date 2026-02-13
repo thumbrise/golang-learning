@@ -2,11 +2,6 @@
 version: '3.17'
 
 tasks:
-  run:
-    desc: RUN
-    cmds:
-      - go run . {{.CLI_ARGS}}
-
   lint:
     desc: Линт
     cmds:
@@ -15,7 +10,7 @@ tasks:
   test:
     desc: Запустить тесты
     cmds:
-      - echo 'NO TESTS'
+      - go test ./... {{.CLI_ARGS}}
 
   bench:
     desc: Запустить бенчмарки
