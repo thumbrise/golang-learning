@@ -15,4 +15,4 @@ tasks:
   bench:
     desc: Запустить бенчмарки
     cmds:
-      - echo 'NO BENCHS'
+      - go test ./... -bench . -benchmem
