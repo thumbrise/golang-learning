@@ -1,7 +1,7 @@
-package test
+package fixtures
 
 import (
-	"math/rand"
+	"github.com/thumbrise/indexes/pkg/random"
 )
 
 var PossibleColors = []string{
@@ -25,15 +25,16 @@ var PossibleColors = []string{
 }
 
 func GetRandomColor() string {
-	colorIndex := rand.Intn(len(PossibleColors))
-	return PossibleColors[colorIndex]
+	return PossibleColors[random.Int64(int64(len(PossibleColors)))]
 }
 
 func GetRandomColors() []string {
-	colorCount := rand.Intn(len(PossibleColors))
+	colorCount := random.Int64(int64(len(PossibleColors) / 2))
+
 	colors := make([]string, 0, colorCount)
 	for range colorCount {
 		colors = append(colors, GetRandomColor())
 	}
+
 	return colors
 }
