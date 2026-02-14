@@ -1,4 +1,4 @@
-package algorithms_and_data_structures
+package tower_of_hanoi
 
 import (
 	"fmt"
