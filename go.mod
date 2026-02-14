@@ -1,4 +1,4 @@
-module github.com/thumbrise/indexes
+module github.com/thumbrise/golang-learning
 
 go 1.25
 

@@ -8,6 +8,7 @@ import (
 
 type User struct {
 	Email          string
+	Age            int
 	FavoriteColors []string
 	LastAccessTime int64
 }
@@ -24,3 +25,19 @@ func GenerateTestUsers(count int) []User {
 
 	return users
 }
+
+// CREATE INDEX users(LAST_ACCESS_IP) USING BRIN;
+
+// AGE = 30 - 98
+// CHILDREN_COUNT = 2
+
+// |[AGE] -> * [CHILDREN_COUNT]
+// [root] -> [
+//			[
+//				2 -> [3, 4, 5, 6],
+//				7 -> [8, 9, 10, 11],
+//				12 -> [13, 14, 15, 16],
+//			]
+//	]
+//
+// [CHILDREN_COUNT] -> * [AGE]

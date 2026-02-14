@@ -3,8 +3,8 @@ package indexes_test
 import (
 	"testing"
 
-	"github.com/thumbrise/indexes/internal/indexes"
-	"github.com/thumbrise/indexes/internal/indexes/test/fixtures"
+	"github.com/thumbrise/golang-learning/internal/indexes"
+	"github.com/thumbrise/golang-learning/internal/indexes/test/fixtures"
 )
 
 func linearSearchEmail(users []fixtures.User, email string) []*fixtures.User {
@@ -50,13 +50,14 @@ func prepareSearchables(users []fixtures.User, searchable fixtures.User) {
 	searchUser.Email = searchable.Email
 }
 
-func Benchmark_FindAll(b *testing.B) {
+func Benchmark_Search(b *testing.B) {
 	const usersCount = 100000
 
 	users := fixtures.GenerateTestUsers(usersCount)
 
 	searchable := fixtures.User{
 		Email:          "searchable@example.com",
+		Age:            0,   // todo
 		FavoriteColors: nil, // todo
 		LastAccessTime: 0,   // todo
 	}
