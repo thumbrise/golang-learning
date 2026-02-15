@@ -141,6 +141,9 @@ linters:
       - linters:
           - gochecknoinits
         path: .*cmd.*
+      - linters:
+          - funlen
+        path: .*_test\.go
 
     paths:
       - third_party$
