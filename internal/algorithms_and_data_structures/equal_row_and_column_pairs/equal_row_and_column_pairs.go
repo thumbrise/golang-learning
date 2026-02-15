@@ -1,7 +1,6 @@
 package equal_row_and_column_pairs
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -22,31 +21,13 @@ func EqualPairs(grid [][]int) int {
 		cols[col]++
 	}
 
-	matches := make(map[string]int)
+	result := 0
 
 	for k, v := range rows {
 		if cols[k] > 0 {
-			matches[k] = v * cols[k]
+			result += v * cols[k]
 		}
 	}
 
-	result := 0
-	for _, v := range matches {
-		result += v
-	}
-
-	prnt("rows", rows)
-	prnt("cols", cols)
-	prnt("matches", matches)
-
 	return result
-}
-
-func prnt(label string, entries map[string]int) {
-	jsn, err := json.MarshalIndent(entries, "", "\t")
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("%s:\n%s\n", label, jsn)
 }
