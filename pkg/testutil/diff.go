@@ -4,11 +4,25 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/thumbrise/golang-learning/pkg/diff"
+	"github.com/andreyvit/diff"
 )
 
 func ErrorDiff(t *testing.T, msg string, got, want interface{}) {
-	aJSON, _ := json.MarshalIndent(got, "", "\t")
-	bJSON, _ := json.MarshalIndent(want, "", "\t")
-	t.Errorf("%s\ngot:%s\nwant:%s\ndiff:\n%s\n", msg, string(aJSON), string(bJSON), diff.Any(aJSON, bJSON))
+	t.Helper()
+
+	gotJSON, err := json.MarshalIndent(got, "", "\t")
+	if err != nil {
+		t.Fatalf("failed to marshal got: %v", err)
+	}
+
+	wantJSON, err := json.MarshalIndent(want, "", "\t")
+	if err != nil {
+		t.Fatalf("failed to marshal want: %v", err)
+	}
+
+	t.Errorf("%s\ngot:%s\nwant:%s\ndiff:\n%s\n", msg, string(gotJSON), string(wantJSON), dif(wantJSON, gotJSON))
+}
+
+func dif(a, b []byte) string {
+	return diff.LineDiff(string(a), string(b))
 }

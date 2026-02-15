@@ -4,83 +4,51 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/emirpasic/gods/stacks/arraystack"
 	"github.com/thumbrise/golang-learning/internal/algorithms_and_data_structures/tower_of_hanoi"
 	"github.com/thumbrise/golang-learning/pkg/testutil"
 )
 
+type towerSet struct {
+	Origin      *tower_of_hanoi.Tower
+	Auxiliary   *tower_of_hanoi.Tower
+	Destination *tower_of_hanoi.Tower
+}
+
+func (ts towerSet) toSlice() []*tower_of_hanoi.Tower {
+	return []*tower_of_hanoi.Tower{ts.Origin, ts.Auxiliary, ts.Destination}
+}
+
 func TestTowerOfHanoi(t *testing.T) {
 	t.Parallel()
 
-	type towersSet struct {
-		origin      *tower_of_hanoi.Tower
-		destination *tower_of_hanoi.Tower
-		auxiliary   *tower_of_hanoi.Tower
+	const n = 3
+
+	given := towerSet{
+		Origin:      tower_of_hanoi.NewTower("A", n),
+		Auxiliary:   tower_of_hanoi.NewTower("B", 0),
+		Destination: tower_of_hanoi.NewTower("C", 0),
 	}
-	tests := []struct {
-		name string
-		args towersSet
-		want towersSet
-	}{
-		{
-			name: "Classic",
-			args: towersSet{
-				origin: &tower_of_hanoi.Tower{
-					Name: "A",
-					Disks: (func() *arraystack.Stack {
-						d := arraystack.New()
-						_ = d.FromJSON([]byte("[1,2,3]"))
-						return d
-					})(),
-				},
-				destination: &tower_of_hanoi.Tower{
-					Name:  "B",
-					Disks: arraystack.New(),
-				},
-				auxiliary: &tower_of_hanoi.Tower{
-					Name:  "C",
-					Disks: arraystack.New(),
-				},
-			},
-			want: towersSet{
-				origin: &tower_of_hanoi.Tower{
-					Name:  "A",
-					Disks: arraystack.New(),
-				},
-				destination: &tower_of_hanoi.Tower{
-					Name:  "B",
-					Disks: arraystack.New(),
-				},
-				auxiliary: &tower_of_hanoi.Tower{
-					Name: "C",
-					Disks: (func() *arraystack.Stack {
-						d := arraystack.New()
-						_ = d.FromJSON([]byte("[1,2,3]"))
-						return d
-					})(),
-				},
-			},
-		},
+
+	want := towerSet{
+		Origin:      tower_of_hanoi.NewTower("A", 0),
+		Auxiliary:   tower_of_hanoi.NewTower("B", 0),
+		Destination: tower_of_hanoi.NewTower("C", n),
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tower_of_hanoi.TowerOfHanoi(tt.args.origin, tt.args.destination, tt.args.auxiliary)
-			got := []*tower_of_hanoi.Tower{
-				tt.args.origin,
-				tt.args.destination,
-				tt.args.auxiliary,
-			}
-			want := []*tower_of_hanoi.Tower{
-				tt.want.origin,
-				tt.want.destination,
-				tt.want.auxiliary,
-			}
-			for i := range got {
-				if !reflect.DeepEqual(got[i], want[i]) {
-					testutil.ErrorDiff(t, "TowerOfHanoi()", got, want)
-					break
-				}
-			}
-		})
+
+	tower_of_hanoi.TowerOfHanoi(
+		n,
+		given.Origin,      // A
+		given.Destination, // C
+		given.Auxiliary,   // B
+	)
+
+	got := given
+
+	t.Logf("Origin disks: %v", given.Origin.Disks.Values())
+	t.Logf("Auxiliary disks: %v", given.Auxiliary.Disks.Values())
+	t.Logf("Destination disks: %v", given.Destination.Disks.Values())
+
+	if !reflect.DeepEqual(got.toSlice(), want.toSlice()) {
+		testutil.ErrorDiff(t, "TowerOfHanoi()", got.toSlice(), want.toSlice())
 	}
 }
