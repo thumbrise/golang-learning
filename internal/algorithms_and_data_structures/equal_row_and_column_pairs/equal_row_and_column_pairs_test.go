@@ -2,6 +2,7 @@ package equal_row_and_column_pairs_test
 
 import (
 	"math/rand"
+	_ "runtime/pprof"
 	"testing"
 
 	"github.com/thumbrise/golang-learning/internal/algorithms_and_data_structures/equal_row_and_column_pairs"
@@ -115,26 +116,29 @@ func generateLargeGrid(size int) [][]int {
 	grid := make([][]int, size)
 	r := rand.New(rand.NewSource(42)) // фиксированный seed для воспроизводимости
 
-	for i := 0; i < size; i++ {
+	for i := range size {
 		row := make([]int, size)
-		for j := 0; j < size; j++ {
+		for j := range size {
 			// числа от 1 до 10^5 как в условии
 			row[j] = r.Intn(100000) + 1
 		}
+
 		grid[i] = row
 	}
+
 	return grid
 }
 
 func BenchmarkEqualPairs(b *testing.B) {
 	grid := generateLargeGrid(200)
+
 	b.Run("String Version", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			equal_row_and_column_pairs.EqualPairs(grid)
 		}
 	})
 	b.Run("Slice Version", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			equal_row_and_column_pairs.EqualPairs2(grid)
 		}
 	})
