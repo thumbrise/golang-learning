@@ -1,26 +1,20 @@
 package tower_of_hanoi
 
-import (
-	"fmt"
-	"strings"
-)
+import "github.com/emirpasic/gods/stacks/arraystack"
 
-func TowerOfHanoi(n int, from, to, aux string, result *strings.Builder) string {
-	if n == 1 {
-		step(result, from, to, n)
-		return result.String()
+type Tower struct {
+	Name  string
+	Disks *arraystack.Stack
+}
+
+func TowerOfHanoi(origin, destination, auxiliary *Tower) {
+	value, _ := origin.Disks.Pop()
+	if origin.Disks.Size() <= 1 {
+		destination.Disks.Push(value)
+		return
 	}
 
-	TowerOfHanoi(n-1, from, aux, to, result)
-	step(result, from, to, n)
-	TowerOfHanoi(n-1, aux, to, from, result)
-
-	return result.String()
+	TowerOfHanoi(origin, auxiliary, destination)
+	destination.Disks.Push(value)
+	TowerOfHanoi(destination, origin, auxiliary)
 }
-
-func step(b *strings.Builder, from, to string, n int) {
-	b.WriteString(fmt.Sprintf("%s, %s, %d\n", from, to, n))
-}
-
-// TowerOfHanoi(3, A, B, C)
-//
