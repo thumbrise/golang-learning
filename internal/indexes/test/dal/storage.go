@@ -1,4 +1,4 @@
-package fixtures
+package dal
 
 import (
 	"sync"
@@ -7,25 +7,22 @@ import (
 )
 
 type UserStorage struct {
-	data        map[int]User
-	dataDynamic map[int]map[string]interface{}
-	mu          sync.RWMutex
-	indexes     []indexes.Index
+	data    map[int]User
+	mu      sync.RWMutex
+	indexes map[string]map[string][]int
 }
 
-func NewUserStorage(data []User, indexes []indexes.Index) *UserStorage {
+func NewUserStorage(data []User) *UserStorage {
 	dataMap := make(map[int]User)
 	for _, user := range data {
 		dataMap[user.ID] = user
 	}
 	return &UserStorage{
-		data:        dataMap,
-		dataDynamic: make(map[int]map[string]interface{}),
-		indexes:     indexes,
+		data: dataMap,
 	}
 }
 
-func (s *UserStorage) CreateIndex(fieldName string) map[string][]int {
+func (s *UserStorage) CreateIndex(fieldName string, index indexes.Index) map[string][]int {
 	return nil
 }
 

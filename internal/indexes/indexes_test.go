@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/thumbrise/golang-learning/internal/indexes/indexes/hash"
+	"github.com/thumbrise/golang-learning/internal/indexes/test/dal"
 	"github.com/thumbrise/golang-learning/internal/indexes/test/fixtures"
 )
 
-func linearSearchEmail(users []fixtures.User, email string) []*fixtures.User {
-	result := make([]*fixtures.User, 0)
+func linearSearchEmail(users []dal.User, email string) []*dal.User {
+	result := make([]*dal.User, 0)
 
 	for i, user := range users {
 		if user.Email == email {
@@ -19,7 +20,7 @@ func linearSearchEmail(users []fixtures.User, email string) []*fixtures.User {
 	return result
 }
 
-func BuildHash(users []fixtures.User, fieldName string) *hash.Hash {
+func BuildHash(users []dal.User, fieldName string) *hash.Hash {
 	values := map[string]hash.FieldValue{}
 
 	for i, user := range users {
@@ -44,7 +45,7 @@ func BuildHash(users []fixtures.User, fieldName string) *hash.Hash {
 	return btree
 }
 
-func prepareSearchables(users []fixtures.User, searchable fixtures.User) {
+func prepareSearchables(users []dal.User, searchable dal.User) {
 	searchUser := &users[len(users)-1]
 
 	searchUser.Email = searchable.Email
@@ -55,7 +56,7 @@ func Benchmark_Search(b *testing.B) {
 
 	users := fixtures.GenerateTestUsers(usersCount)
 
-	searchable := fixtures.User{
+	searchable := dal.User{
 		Email:          "searchable@example.com",
 		Age:            0,   // todo
 		FavoriteColors: nil, // todo
