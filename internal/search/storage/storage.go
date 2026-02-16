@@ -1,25 +1,33 @@
 package storage
 
 import (
-	"github.com/thumbrise/golang-learning/internal/search/indexes"
+	"github.com/thumbrise/golang-learning/internal/search/storage/core"
+	"github.com/thumbrise/golang-learning/internal/search/storage/planner"
+	"github.com/thumbrise/golang-learning/internal/search/storage/search"
 )
 
-type Storage[TRecord Record] struct {
-	heap    *Heap[TRecord]
-	indexes map[string]indexes.Index
+type Storage[TRecord core.Record] struct {
+	heap    *core.Heap[TRecord]
+	indexes map[string]search.Index
+	planner *planner.Planner[TRecord]
 }
 
-func NewStorage[TRecord Record](data []TRecord) *Storage[TRecord] {
-	heap := NewHeap(data)
+func NewStorage[TRecord core.Record](data []TRecord) *Storage[TRecord] {
+	heap := core.NewHeap(data)
+
+	idxs := make(map[string]search.Index)
+	seqSearcher := search.NewSeqSearcher(heap)
+	idxs[seqSearcher.Type()] = seqSearcher
 
 	return &Storage[TRecord]{
 		heap:    heap,
-		indexes: make(map[string]indexes.Index),
+		indexes: idxs,
+		planner: planner.NewPlanner(heap, idxs),
 	}
 }
 
-func (s *Storage[TRecord]) CreateIndex(field string, index indexes.Index) {
-	indexer := NewIndexer()
+func (s *Storage[TRecord]) CreateIndex(field string, index search.Index) {
+	indexer := search.NewIndexer()
 
 	s.heap.Iterate(func(rec TRecord) {
 		indexer.CreateIndex(rec.PK(), field, rec.Get(field), index)
@@ -29,22 +37,20 @@ func (s *Storage[TRecord]) CreateIndex(field string, index indexes.Index) {
 }
 
 func (s *Storage[TRecord]) SearchEqual(field string, value string) []TRecord {
-	result := make([]TRecord, 0)
+	conds := []search.Condition{{Field: field, Value: value, Op: search.OpEqual}}
+	idx := s.planner.SuggestIndex(conds)
 
-	// TODO: Нужен планировщик
-	if len(s.indexes) > 0 {
-		for _, index := range s.indexes {
-			ctids := index.Search(field, value)
-			for _, ctid := range ctids {
-				result = append(result, s.heap.Get(ctid))
-			}
-		}
-	} else {
-		s.heap.Iterate(func(rec TRecord) {
-			if rec.Get(field) == value {
-				result = append(result, rec)
-			}
-		})
+	ctids := idx.Search(field, value)
+
+	result := s.records(ctids)
+
+	return result
+}
+
+func (s *Storage[TRecord]) records(ctids []string) []TRecord {
+	result := make([]TRecord, 0)
+	for _, ctid := range ctids {
+		result = append(result, s.heap.Get(ctid))
 	}
 
 	return result

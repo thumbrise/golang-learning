@@ -6,14 +6,14 @@ import (
 
 	"github.com/go-faker/faker/v4"
 	"github.com/thumbrise/golang-learning/internal/search/dal"
-	"github.com/thumbrise/golang-learning/internal/search/indexes"
 	"github.com/thumbrise/golang-learning/internal/search/indexes/hash"
 	"github.com/thumbrise/golang-learning/internal/search/storage"
+	"github.com/thumbrise/golang-learning/internal/search/storage/search"
 	"github.com/thumbrise/golang-learning/internal/search/test/fixtures"
 )
 
 //nolint:ireturn //matrix polymorphism
-func BuildHash() indexes.Index {
+func BuildHash() search.Index {
 	return hash.NewHash()
 }
 
@@ -29,7 +29,7 @@ func Benchmark_Search(b *testing.B) {
 	const usersCount = 100000
 
 	testFields := (&dal.User{}).Fields()
-	testIndexes := []func() indexes.Index{
+	testIndexes := []func() search.Index{
 		nil,
 		BuildHash,
 		// TODO: BTree
@@ -55,13 +55,13 @@ func Benchmark_Search(b *testing.B) {
 			b.Run(testField, func(b *testing.B) {
 				users := fixtures.GenerateTestUsers(usersCount)
 				prepareSearchables(users, searchable)
-				storage := storage.NewStorage(users)
+				store := storage.NewStorage(users)
 				idxType := "Linear"
 
 				if testIndex != nil {
 					idx := testIndex()
 					idxType = idx.String()
-					storage.CreateIndex(testField, idx)
+					store.CreateIndex(testField, idx)
 				}
 
 				v, err := searchable.GetString(testField)
@@ -72,7 +72,7 @@ func Benchmark_Search(b *testing.B) {
 				b.Run(idxType, func(b *testing.B) {
 					b.Run("SearchEqual", func(b *testing.B) {
 						for range b.N {
-							results := storage.SearchEqual(testField, v)
+							results := store.SearchEqual(testField, v)
 							if len(results) == 0 {
 								b.Errorf("no results v = %s", v)
 

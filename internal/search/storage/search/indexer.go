@@ -1,6 +1,4 @@
-package storage
-
-import "github.com/thumbrise/golang-learning/internal/search/indexes"
+package search
 
 type Indexer struct{}
 
@@ -8,7 +6,7 @@ func NewIndexer() *Indexer {
 	return &Indexer{}
 }
 
-func (i *Indexer) CreateIndex(ctid string, fieldName string, fieldValue any, index indexes.Index) {
+func (i *Indexer) CreateIndex(ctid string, fieldName string, fieldValue any, index Index) {
 	vstr := i.parseString(fieldValue)
 	if vstr != "" {
 		i.index(ctid, fieldName, vstr, index)
@@ -26,7 +24,7 @@ func (i *Indexer) CreateIndex(ctid string, fieldName string, fieldValue any, ind
 	}
 }
 
-func (i *Indexer) index(ctid string, fieldName string, fieldValue string, index indexes.Index) {
+func (i *Indexer) index(ctid string, fieldName string, fieldValue string, index Index) {
 	index.Insert(ctid, fieldName, fieldValue)
 }
 

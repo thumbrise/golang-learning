@@ -1,4 +1,4 @@
-package storage
+package search
 
 type Condition struct {
 	Field interface{}
