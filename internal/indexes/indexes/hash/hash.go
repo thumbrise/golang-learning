@@ -1,12 +1,20 @@
 package hash
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
-type CTIDs = []int
-type Values = map[string]CTIDs
-type Keys = map[string]Values
+type (
+	CTIDs  = []int
+	Values = map[string]CTIDs
+	Keys   = map[string]Values
+)
 
 type Hash struct {
+	// Why RWMutex? Because we have multiple readers and a single writer?
+	// TODO: Consider using a more specific locking strategy if needed.
+	mu    sync.RWMutex
 	table Keys
 }
 
@@ -21,6 +29,9 @@ func (h *Hash) Type() string {
 }
 
 func (h *Hash) Insert(ctid int, fieldName string, value string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if h.table[fieldName] == nil {
 		h.table[fieldName] = make(Values)
 	}
@@ -35,27 +46,67 @@ func (h *Hash) Insert(ctid int, fieldName string, value string) {
 func (h *Hash) Search(fieldName string, value string) []int {
 	result := make([]int, 0)
 
-	b3field, ok := h.table[fieldName]
+	vals, ok := h.table[fieldName]
 	if !ok {
 		return result
 	}
 
-	b3value, ok := b3field[value]
+	v, ok := vals[value]
 	if !ok {
 		return result
 	}
 
-	return b3value
+	return v
 }
 
-func (h *Hash) Delete(ctid int, fieldName string, value string) {
-	// TODO implement me
-	panic("implement me")
+func (h *Hash) Delete(fieldName string, value string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	if h.table[fieldName] == nil {
+		return
+	}
+
+	if h.table[fieldName][value] == nil {
+		return
+	}
+
+	delete(h.table[fieldName], value)
+
+	h.cleanup(fieldName, value)
+}
+
+// Full list scan on delete: Instead of marking deletions lazily or using a map for O(1) removal, Delete performs a full scan to filter out the target ctid. This implies performance degrades linearly with the number of duplicated values per key.
+// TODO: Consider using a more efficient deletion strategy if performance becomes an issue.
+func (h *Hash) DeleteCTID(ctid int, fieldName string, value string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	if h.table[fieldName] == nil {
+		return
+	}
+
+	if h.table[fieldName][value] == nil {
+		return
+	}
+	// Delete all occurrences of ctid, even if it appears multiple times
+	original := h.table[fieldName][value]
+
+	filtered := make([]int, 0, len(original))
+	for _, ctidStored := range original {
+		if ctidStored != ctid {
+			filtered = append(filtered, ctidStored)
+		}
+	}
+
+	h.table[fieldName][value] = filtered
+
+	h.cleanup(fieldName, value)
 }
 
 func (h *Hash) Update(ctid int, fieldName string, oldValue string, newValue string) {
-	// TODO implement me
-	panic("implement me")
+	h.DeleteCTID(ctid, fieldName, oldValue)
+	h.Insert(ctid, fieldName, newValue)
 }
 
 func (h *Hash) SizeBytes() int {
@@ -75,4 +126,22 @@ func (h *Hash) Stats() map[string]any {
 
 func (h *Hash) String() string {
 	return fmt.Sprintf("%T", h)
+}
+
+func (h *Hash) cleanup(fieldName string, value string) {
+	if h.table[fieldName] == nil {
+		return
+	}
+
+	if h.table[fieldName][value] == nil {
+		return
+	}
+	// Clean up empty slices
+	if len(h.table[fieldName][value]) == 0 {
+		delete(h.table[fieldName], value)
+	}
+	// Clean up empty maps
+	if len(h.table[fieldName]) == 0 {
+		delete(h.table, fieldName)
+	}
 }

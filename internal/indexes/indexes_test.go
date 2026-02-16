@@ -62,6 +62,7 @@ func Benchmark_Search(b *testing.B) {
 					idxType = idx.String()
 					storage.CreateIndex(testField, idx)
 				}
+
 				v, err := searchable.GetString(testField)
 				if err != nil {
 					b.Fatalf("failed to get string: %v", err)

@@ -1,14 +1,11 @@
 package dal
 
 import (
-	"sync"
-
 	"github.com/thumbrise/golang-learning/internal/indexes/indexes"
 )
 
 type UserStorage struct {
 	data    map[int]User
-	mu      sync.RWMutex
 	indexes map[string]indexes.Index
 }
 
