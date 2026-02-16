@@ -1,6 +1,6 @@
 package dal
 
-import "github.com/thumbrise/golang-learning/internal/indexes/indexes"
+import "github.com/thumbrise/golang-learning/internal/search/indexes"
 
 type Indexer struct{}
 
