@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/algorithms_and_data_structures/tower_of_hanoi"
+	"github.com/thumbrise/golang-learning/internal/leetcode/tower_of_hanoi"
 	"github.com/thumbrise/golang-learning/pkg/testutil"
 )
 

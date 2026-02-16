@@ -3,7 +3,7 @@ package indexes_test
 import (
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/indexes/hash"
+	"github.com/thumbrise/golang-learning/internal/indexes/indexes/hash"
 	"github.com/thumbrise/golang-learning/internal/indexes/test/fixtures"
 )
 
@@ -17,6 +17,15 @@ func linearSearchEmail(users []fixtures.User, email string) []*fixtures.User {
 	}
 
 	return result
+}
+
+type Searcher interface {
+	SearchEqual(fieldName string, value string) []int
+	SearchRange(fieldName string, from string, to string) []int
+	SearchPrefix(fieldName string, prefix string) []int
+	SearchSuffix(fieldName string, suffix string) []int
+	SearchContains(fieldName string, substring string) []int
+	SearchIn(fieldName string, values []string) []int
 }
 
 func BuildHash(users []fixtures.User, fieldName string) *hash.Hash {
