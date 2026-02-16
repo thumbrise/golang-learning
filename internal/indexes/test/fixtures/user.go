@@ -7,6 +7,7 @@ import (
 )
 
 type User struct {
+	ID             int
 	Email          string
 	Age            int
 	FavoriteColors []string
@@ -17,6 +18,7 @@ func GenerateTestUsers(count int) []User {
 	users := make([]User, count)
 	for i := range count {
 		users[i] = User{
+			ID:             i,
 			Email:          faker.Email(),
 			LastAccessTime: time.Now().UnixNano() + int64(i), // монотонно возрастают
 		}

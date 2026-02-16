@@ -1,16 +1,27 @@
 package fixtures
 
-import "github.com/thumbrise/golang-learning/internal/indexes/indexes"
+import (
+	"sync"
+
+	"github.com/thumbrise/golang-learning/internal/indexes/indexes"
+)
 
 type UserStorage struct {
-	data    []User
-	indexes []indexes.Index
+	data        map[int]User
+	dataDynamic map[int]map[string]interface{}
+	mu          sync.RWMutex
+	indexes     []indexes.Index
 }
 
 func NewUserStorage(data []User, indexes []indexes.Index) *UserStorage {
+	dataMap := make(map[int]User)
+	for _, user := range data {
+		dataMap[user.ID] = user
+	}
 	return &UserStorage{
-		data:    data,
-		indexes: indexes,
+		data:        dataMap,
+		dataDynamic: make(map[int]map[string]interface{}),
+		indexes:     indexes,
 	}
 }
 
