@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/thumbrise/golang-learning/internal/search/storage/core"
+	"github.com/thumbrise/golang-learning/internal/database/storage/core"
 )
 
 var ErrNotSupported = errors.New("SeqSearcher: method not supported")

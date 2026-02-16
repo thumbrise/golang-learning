@@ -1,15 +1,15 @@
-package search_test
+package database_test
 
 import (
 	"math/rand"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/thumbrise/golang-learning/internal/search/dal"
-	"github.com/thumbrise/golang-learning/internal/search/indexes/hash"
-	"github.com/thumbrise/golang-learning/internal/search/storage"
-	"github.com/thumbrise/golang-learning/internal/search/storage/search"
-	"github.com/thumbrise/golang-learning/internal/search/test/fixtures"
+	"github.com/thumbrise/golang-learning/internal/database/dal"
+	"github.com/thumbrise/golang-learning/internal/database/indexes/hash"
+	"github.com/thumbrise/golang-learning/internal/database/storage"
+	"github.com/thumbrise/golang-learning/internal/database/storage/search"
+	"github.com/thumbrise/golang-learning/internal/database/test/fixtures"
 )
 
 //nolint:ireturn //matrix polymorphism
