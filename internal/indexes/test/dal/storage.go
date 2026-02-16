@@ -31,12 +31,23 @@ func (s *UserStorage) CreateIndex(field string, index indexes.Index) {
 }
 
 func (s *UserStorage) SearchEqual(field string, value string) []User {
-	// TODO: Использовать индекс если он есть
 	result := make([]User, 0)
 
-	for _, user := range s.data {
-		if user.Get(field) == value {
-			result = append(result, user)
+	// TODO: Нужен планировщик
+	if len(s.indexes) > 0 {
+		for _, index := range s.indexes {
+			ctids := index.Search(field, value)
+			// TODO: Использовать ctids для поиска пользователей
+			for _, ctid := range ctids {
+				result = append(result, s.data[ctid])
+			}
+		}
+
+	} else {
+		for _, user := range s.data {
+			if user.Get(field) == value {
+				result = append(result, user)
+			}
 		}
 	}
 
