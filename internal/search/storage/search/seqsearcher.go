@@ -55,18 +55,21 @@ func (d *SeqSearcher[TRecord]) Update(ctid string, fieldName string, oldValue st
 func (d *SeqSearcher[TRecord]) SizeBytes() int {
 	err := fmt.Errorf("%w: SizeBytes", ErrNotSupported)
 	slog.Warn(err.Error())
+
 	return 0
 }
 
 func (d *SeqSearcher[TRecord]) Depth() int {
 	err := fmt.Errorf("%w: Depth", ErrNotSupported)
 	slog.Warn(err.Error())
+
 	return 0
 }
 
 func (d *SeqSearcher[TRecord]) Stats() map[string]any {
 	err := fmt.Errorf("%w: Stats", ErrNotSupported)
 	slog.Warn(err.Error())
+
 	return nil
 }
 
