@@ -31,3 +31,19 @@ func (u *User) Fields() []string {
 func (u *User) Get(field string) any {
 	return u.ToMap()[field]
 }
+
+func (u *User) GetString(field string) string {
+	return u.Get(field).(string)
+}
+
+func (u *User) GetInt(field string) int {
+	return u.Get(field).(int)
+}
+
+func (u *User) GetInt64(field string) int64 {
+	return u.Get(field).(int64)
+}
+
+func (u *User) GetSlice(field string) []string {
+	return u.Get(field).([]string)
+}

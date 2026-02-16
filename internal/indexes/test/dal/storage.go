@@ -31,30 +31,7 @@ func (s *UserStorage) CreateIndex(field string, index indexes.Index) {
 }
 
 func (s *UserStorage) SearchEqual(field string, value string) []User {
-	return s.linearSearch(field, value)
-}
-
-func (s *UserStorage) SearchRange(field string, from string, to string) []User {
-	return s.linearSearch(field, from)
-}
-
-func (s *UserStorage) SearchPrefix(field string, prefix string) []User {
-	return s.linearSearch(field, prefix)
-}
-
-func (s *UserStorage) SearchSuffix(field string, suffix string) []User {
-	return s.linearSearch(field, suffix)
-}
-
-func (s *UserStorage) SearchContains(field string, substring string) []User {
-	return s.linearSearch(field, substring)
-}
-
-func (s *UserStorage) SearchIn(field string, values []string) []User {
-	return s.linearSearch(field, values[0]) // Simplified for now
-}
-
-func (s *UserStorage) linearSearch(field string, value string) []User {
+	// TODO: Использовать индекс если он есть
 	result := make([]User, 0)
 
 	for _, user := range s.data {
@@ -64,4 +41,29 @@ func (s *UserStorage) linearSearch(field string, value string) []User {
 	}
 
 	return result
+}
+
+func (s *UserStorage) SearchRange(field string, from string, to string) []User {
+	// TODO: Использовать индекс если он есть
+	return nil
+}
+
+func (s *UserStorage) SearchPrefix(field string, prefix string) []User {
+	// TODO: Использовать индекс если он есть
+	return nil
+}
+
+func (s *UserStorage) SearchSuffix(field string, suffix string) []User {
+	// TODO: Использовать индекс если он есть
+	return nil
+}
+
+func (s *UserStorage) SearchContains(field string, substring string) []User {
+	// TODO: Использовать индекс если он есть
+	return nil
+}
+
+func (s *UserStorage) SearchIn(field string, values []string) []User {
+	// TODO: Использовать индекс если он есть
+	return nil
 }
