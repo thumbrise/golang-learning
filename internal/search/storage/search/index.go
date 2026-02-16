@@ -1,4 +1,4 @@
-package indexes
+package search
 
 type Index interface {
 	Insert(ctid string, fieldName string, value string)

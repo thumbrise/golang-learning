@@ -1,4 +1,4 @@
-package storage
+package core
 
 type Heap[TRecord Record] struct {
 	data map[string]TRecord
