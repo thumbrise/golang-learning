@@ -78,7 +78,6 @@ func Benchmark_Search(b *testing.B) {
 			}
 		})
 		b.Run("Hash", func(b *testing.B) {
-
 			for range b.N {
 				foundedUsers := hsh.SearchEqual("Email", searchable.Email)
 				if len(foundedUsers) == 0 {
@@ -91,11 +90,18 @@ func Benchmark_Search(b *testing.B) {
 		// TODO BTree
 	})
 
+	// TODO Age
+	//  Linear
+	//  Hash
+	//  BTree
+	//  GIN
+	//  BRIN
+
 	// TODO FavoriteColors
 	//  Linear
 	//  Hash
 	//  BTree
-	// 	GIN
+	//  GIN
 
 	// TODO LastAccessTime
 	//  Linear

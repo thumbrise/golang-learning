@@ -7,5 +7,6 @@ type Index interface {
 	Update(fieldName string, oldValue string, newValue string, ctid int)
 	SizeBytes() int
 	Depth() int
-	Stats() map[string]interface{}
+	Stats() map[string]any
+	Type() string
 }

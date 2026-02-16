@@ -9,6 +9,7 @@ func NewHash(fields map[string]*Field) *Hash {
 		fields: fields,
 	}
 }
+
 func (b *Hash) SearchEqual(field string, value string) []int {
 	result := make([]int, 0)
 
