@@ -7,13 +7,13 @@ import (
 	"github.com/thumbrise/golang-learning/internal/search/dal"
 )
 
-func GenerateTestUsers(count int) []dal.User {
-	users := make([]dal.User, count)
+func GenerateTestUsers(count int) []*dal.User {
+	users := make([]*dal.User, count)
 	for i := range count {
-		users[i] = dal.User{
+		users[i] = &dal.User{
 			ID:             i,
 			Email:          faker.Email(),
-			LastAccessTime: time.Now().UnixNano() + int64(i), // монотонно возрастают
+			LastAccessTime: time.Now().UnixNano() + int64(i),
 		}
 		users[i].FavoriteColors = GetRandomColors()
 	}

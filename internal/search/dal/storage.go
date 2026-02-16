@@ -4,31 +4,32 @@ import (
 	"github.com/thumbrise/golang-learning/internal/search/indexes"
 )
 
-type UserStorage struct {
-	heap    *Heap
+type Storage[TRecord Record] struct {
+	heap    *Heap[TRecord]
 	indexes map[string]indexes.Index
 }
 
-func NewUserStorage(data []User) *UserStorage {
+func NewStorage[TRecord Record](data []TRecord) *Storage[TRecord] {
 	heap := NewHeap(data)
 
-	return &UserStorage{
+	return &Storage[TRecord]{
 		heap:    heap,
 		indexes: make(map[string]indexes.Index),
 	}
 }
 
-func (s *UserStorage) CreateIndex(field string, index indexes.Index) {
+func (s *Storage[TRecord]) CreateIndex(field string, index indexes.Index) {
 	indexer := NewIndexer()
-	s.heap.Iterate(func(user *User) {
-		indexer.CreateIndex(user.ID, field, user.Get(field), index)
+
+	s.heap.Iterate(func(rec TRecord) {
+		indexer.CreateIndex(rec.PK(), field, rec.Get(field), index)
 	})
 
 	s.indexes[index.Type()] = index
 }
 
-func (s *UserStorage) SearchEqual(field string, value string) []User {
-	result := make([]User, 0)
+func (s *Storage[TRecord]) SearchEqual(field string, value string) []TRecord {
+	result := make([]TRecord, 0)
 
 	// TODO: Нужен планировщик
 	if len(s.indexes) > 0 {
@@ -38,11 +39,10 @@ func (s *UserStorage) SearchEqual(field string, value string) []User {
 				result = append(result, s.heap.Get(ctid))
 			}
 		}
-
 	} else {
-		s.heap.Iterate(func(user *User) {
-			if user.Get(field) == value {
-				result = append(result, *user)
+		s.heap.Iterate(func(rec TRecord) {
+			if rec.Get(field) == value {
+				result = append(result, rec)
 			}
 		})
 	}
@@ -50,27 +50,27 @@ func (s *UserStorage) SearchEqual(field string, value string) []User {
 	return result
 }
 
-func (s *UserStorage) SearchRange(field string, from string, to string) []User {
+func (s *Storage[TRecord]) SearchRange(field string, from string, to string) []TRecord {
 	// TODO: Использовать индекс если он есть
 	return nil
 }
 
-func (s *UserStorage) SearchPrefix(field string, prefix string) []User {
+func (s *Storage[TRecord]) SearchPrefix(field string, prefix string) []TRecord {
 	// TODO: Использовать индекс если он есть
 	return nil
 }
 
-func (s *UserStorage) SearchSuffix(field string, suffix string) []User {
+func (s *Storage[TRecord]) SearchSuffix(field string, suffix string) []TRecord {
 	// TODO: Использовать индекс если он есть
 	return nil
 }
 
-func (s *UserStorage) SearchContains(field string, substring string) []User {
+func (s *Storage[TRecord]) SearchContains(field string, substring string) []TRecord {
 	// TODO: Использовать индекс если он есть
 	return nil
 }
 
-func (s *UserStorage) SearchIn(field string, values []string) []User {
+func (s *Storage[TRecord]) SearchIn(field string, values []string) []TRecord {
 	// TODO: Использовать индекс если он есть
 	return nil
 }

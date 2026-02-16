@@ -3,6 +3,7 @@ package dal
 import (
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 type User struct {
@@ -11,6 +12,10 @@ type User struct {
 	Age            int
 	FavoriteColors []string
 	LastAccessTime int64
+}
+
+func (u *User) PK() string {
+	return strconv.Itoa(u.ID)
 }
 
 func (u *User) ToMap() map[string]interface{} {
