@@ -9,7 +9,7 @@ import (
 type UserStorage struct {
 	data    map[int]User
 	mu      sync.RWMutex
-	indexes map[string]map[string][]int
+	indexes map[string]indexes.Index
 }
 
 func NewUserStorage(data []User) *UserStorage {
@@ -22,8 +22,13 @@ func NewUserStorage(data []User) *UserStorage {
 	}
 }
 
-func (s *UserStorage) CreateIndex(fieldName string, index indexes.Index) map[string][]int {
-	return nil
+func (s *UserStorage) CreateIndex(fieldName string, index indexes.Index) {
+	indexer := NewIndexer()
+	for _, user := range s.data {
+		f := user.DynamicFields()[fieldName]
+		indexer.CreateIndex(user.ID, fieldName, f, index)
+	}
+	s.indexes[index.Type()] = index
 }
 
 func (s *UserStorage) SearchEqual(fieldName string, value string) []User {
