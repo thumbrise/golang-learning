@@ -40,6 +40,8 @@ func NewHashTable[T any](size int, hasher Hasher) *HashTable[T] {
 func (h *HashTable[T]) Set(key string, value T) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	hsh := h.hash(key)
+	h.data[hsh] = append(h.data[hsh], value)
 }
 
 func (h *HashTable[T]) Get(key string) T {
@@ -47,9 +49,14 @@ func (h *HashTable[T]) Get(key string) T {
 	defer h.mu.RUnlock()
 	var zero T
 
-	return zero
+	hsh := h.hash(key)
+	if h.data[hsh] == nil {
+		return zero
+	}
+
+	return h.data[hsh][0]
 }
 
 func (h *HashTable[T]) hash(key string) int {
-	return h.hasher.Hash(key)
+	return h.hasher.Hash(key) % h.size
 }
