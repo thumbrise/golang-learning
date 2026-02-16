@@ -1,30 +1,31 @@
 package dal
 
-type Heap struct {
-	data map[int]User
+type Heap[TRecord Record] struct {
+	data map[string]TRecord
 }
 
-func NewHeap(users []User) *Heap {
-	dataMap := make(map[int]User)
-	for _, user := range users {
-		dataMap[user.ID] = user
+func NewHeap[TRecord Record](records []TRecord) *Heap[TRecord] {
+	dataMap := make(map[string]TRecord)
+	for _, rec := range records {
+		dataMap[rec.PK()] = rec
 	}
-	return &Heap{
+
+	return &Heap[TRecord]{
 		data: dataMap,
 	}
 }
 
-func (h *Heap) Iterate(f func(*User)) {
-	for _, user := range h.data {
-		f(&user)
+type IterateFunc[TRecord Record] func(record TRecord)
+
+func (h *Heap[TRecord]) Iterate(f IterateFunc[TRecord]) {
+	for _, record := range h.data {
+		f(record)
 	}
 }
 
-func (h *Heap) Get(ctid int) User {
+// Get returns record by ctid
+//
+//nolint:ireturn //generic
+func (h *Heap[TRecord]) Get(ctid string) TRecord {
 	return h.data[ctid]
-}
-
-func (h *Heap) GetPtr(ctid int) *User {
-	user := h.data[ctid]
-	return &user
 }

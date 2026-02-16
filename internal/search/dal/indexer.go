@@ -8,7 +8,7 @@ func NewIndexer() *Indexer {
 	return &Indexer{}
 }
 
-func (i *Indexer) CreateIndex(ctid int, fieldName string, fieldValue any, index indexes.Index) {
+func (i *Indexer) CreateIndex(ctid string, fieldName string, fieldValue any, index indexes.Index) {
 	vstr := i.parseString(fieldValue)
 	if vstr != "" {
 		i.index(ctid, fieldName, vstr, index)
@@ -26,7 +26,7 @@ func (i *Indexer) CreateIndex(ctid int, fieldName string, fieldValue any, index 
 	}
 }
 
-func (i *Indexer) index(ctid int, fieldName string, fieldValue string, index indexes.Index) {
+func (i *Indexer) index(ctid string, fieldName string, fieldValue string, index indexes.Index) {
 	index.Insert(ctid, fieldName, fieldValue)
 }
 

@@ -6,14 +6,12 @@ import (
 )
 
 type (
-	CTIDs  = []int
+	CTIDs  = []string
 	Values = map[string]CTIDs
 	Keys   = map[string]Values
 )
 
 type Hash struct {
-	// Why RWMutex? Because we have multiple readers and a single writer?
-	// TODO: Consider using a more specific locking strategy if needed.
 	mu    sync.RWMutex
 	table Keys
 }
@@ -28,7 +26,7 @@ func (h *Hash) Type() string {
 	return h.String()
 }
 
-func (h *Hash) Insert(ctid int, fieldName string, value string) {
+func (h *Hash) Insert(ctid string, fieldName string, value string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -43,8 +41,8 @@ func (h *Hash) Insert(ctid int, fieldName string, value string) {
 	h.table[fieldName][value] = append(h.table[fieldName][value], ctid)
 }
 
-func (h *Hash) Search(fieldName string, value string) []int {
-	result := make([]int, 0)
+func (h *Hash) Search(fieldName string, value string) []string {
+	result := make([]string, 0)
 
 	vals, ok := h.table[fieldName]
 	if !ok {
@@ -78,7 +76,7 @@ func (h *Hash) Delete(fieldName string, value string) {
 
 // Full list scan on delete: Instead of marking deletions lazily or using a map for O(1) removal, Delete performs a full scan to filter out the target ctid. This implies performance degrades linearly with the number of duplicated values per key.
 // TODO: Consider using a more efficient deletion strategy if performance becomes an issue.
-func (h *Hash) DeleteCTID(ctid int, fieldName string, value string) {
+func (h *Hash) DeleteCTID(ctid string, fieldName string, value string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -92,7 +90,7 @@ func (h *Hash) DeleteCTID(ctid int, fieldName string, value string) {
 	// Delete all occurrences of ctid, even if it appears multiple times
 	original := h.table[fieldName][value]
 
-	filtered := make([]int, 0, len(original))
+	filtered := make([]string, 0, len(original))
 	for _, ctidStored := range original {
 		if ctidStored != ctid {
 			filtered = append(filtered, ctidStored)
@@ -104,7 +102,7 @@ func (h *Hash) DeleteCTID(ctid int, fieldName string, value string) {
 	h.cleanup(fieldName, value)
 }
 
-func (h *Hash) Update(ctid int, fieldName string, oldValue string, newValue string) {
+func (h *Hash) Update(ctid string, fieldName string, oldValue string, newValue string) {
 	h.DeleteCTID(ctid, fieldName, oldValue)
 	h.Insert(ctid, fieldName, newValue)
 }
