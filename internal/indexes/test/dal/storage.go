@@ -5,27 +5,24 @@ import (
 )
 
 type UserStorage struct {
-	data    map[int]User
+	heap    *Heap
 	indexes map[string]indexes.Index
 }
 
 func NewUserStorage(data []User) *UserStorage {
-	dataMap := make(map[int]User)
-	for _, user := range data {
-		dataMap[user.ID] = user
-	}
+	heap := NewHeap(data)
 
 	return &UserStorage{
-		data:    dataMap,
+		heap:    heap,
 		indexes: make(map[string]indexes.Index),
 	}
 }
 
 func (s *UserStorage) CreateIndex(field string, index indexes.Index) {
 	indexer := NewIndexer()
-	for _, user := range s.data {
+	s.heap.Iterate(func(user *User) {
 		indexer.CreateIndex(user.ID, field, user.Get(field), index)
-	}
+	})
 
 	s.indexes[index.Type()] = index
 }
@@ -37,18 +34,17 @@ func (s *UserStorage) SearchEqual(field string, value string) []User {
 	if len(s.indexes) > 0 {
 		for _, index := range s.indexes {
 			ctids := index.Search(field, value)
-			// TODO: Использовать ctids для поиска пользователей
 			for _, ctid := range ctids {
-				result = append(result, s.data[ctid])
+				result = append(result, s.heap.Get(ctid))
 			}
 		}
 
 	} else {
-		for _, user := range s.data {
+		s.heap.Iterate(func(user *User) {
 			if user.Get(field) == value {
-				result = append(result, user)
+				result = append(result, *user)
 			}
-		}
+		})
 	}
 
 	return result
