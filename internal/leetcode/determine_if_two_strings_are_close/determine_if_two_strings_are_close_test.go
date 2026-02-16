@@ -3,7 +3,7 @@ package determine_if_two_strings_are_close_test
 import (
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/algorithms_and_data_structures/determine_if_two_strings_are_close"
+	"github.com/thumbrise/golang-learning/internal/leetcode/determine_if_two_strings_are_close"
 )
 
 func TestCloseStrings(t *testing.T) {
