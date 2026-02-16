@@ -6,7 +6,7 @@ const defaultSize = 10
 
 type BucketItem[T any] struct {
 	key   string
-	hash  int
+	hash  uint64
 	value T
 }
 type HashTable[T any] struct {
@@ -111,9 +111,9 @@ func (h *HashTable[T]) Delete(key string) {
 // hash - оригинальный хеш
 //
 //nolint:nonamedreturns // имеет смысл
-func (h *HashTable[T]) hash(key string) (bucket int, hash int) {
+func (h *HashTable[T]) hash(key string) (bucket int, hash uint64) {
 	hash = h.hasher.Hash(key)
-	bucket = hash % h.size
+	bucket = int(hash % uint64(h.size))
 
 	return
 }
