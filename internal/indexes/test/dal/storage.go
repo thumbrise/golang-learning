@@ -18,7 +18,8 @@ func NewUserStorage(data []User) *UserStorage {
 		dataMap[user.ID] = user
 	}
 	return &UserStorage{
-		data: dataMap,
+		data:    dataMap,
+		indexes: make(map[string]indexes.Index),
 	}
 }
 

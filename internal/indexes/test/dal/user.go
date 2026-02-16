@@ -1,5 +1,10 @@
 package dal
 
+import (
+	"errors"
+	"fmt"
+)
+
 type User struct {
 	ID             int
 	Email          string
@@ -32,18 +37,36 @@ func (u *User) Get(field string) any {
 	return u.ToMap()[field]
 }
 
-func (u *User) GetString(field string) string {
-	return u.Get(field).(string)
+var ErrCantCast = errors.New("can't cast")
+
+func (u *User) GetString(field string) (string, error) {
+	v, ok := u.Get(field).(string)
+	if !ok {
+		return "", fmt.Errorf("%w: %s", ErrCantCast, field)
+	}
+	return v, nil
 }
 
-func (u *User) GetInt(field string) int {
-	return u.Get(field).(int)
+func (u *User) GetInt(field string) (int, error) {
+	v, ok := u.Get(field).(int)
+	if !ok {
+		return 0, fmt.Errorf("%w: %s", ErrCantCast, field)
+	}
+	return v, nil
 }
 
-func (u *User) GetInt64(field string) int64 {
-	return u.Get(field).(int64)
+func (u *User) GetInt64(field string) (int64, error) {
+	v, ok := u.Get(field).(int64)
+	if !ok {
+		return 0, fmt.Errorf("%w: %s", ErrCantCast, field)
+	}
+	return v, nil
 }
 
-func (u *User) GetSlice(field string) []string {
-	return u.Get(field).([]string)
+func (u *User) GetSlice(field string) ([]string, error) {
+	v, ok := u.Get(field).([]string)
+	if !ok {
+		return nil, fmt.Errorf("%w: %s", ErrCantCast, field)
+	}
+	return v, nil
 }

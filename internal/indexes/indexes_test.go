@@ -57,16 +57,20 @@ func Benchmark_Search(b *testing.B) {
 				idxType := "Linear"
 				if testIndex != nil {
 					idx := testIndex()
-					idxType = idx.Type()
+					idxType = idx.String()
 					storage.CreateIndex(testField, idx)
 				}
 
 				b.Run(idxType, func(b *testing.B) {
 					b.Run("SearchEqual", func(b *testing.B) {
 						for range b.N {
-							results := storage.SearchEqual(testField, searchable.GetString(testField))
+							v, err := searchable.GetString(testField)
+							if err != nil {
+								b.Fatalf("failed to get string: %v", err)
+							}
+							results := storage.SearchEqual(testField, v)
 							if len(results) == 0 {
-								b.Errorf("no results v = %s", searchable.GetString(testField))
+								b.Errorf("no results v = %s", v)
 
 								return
 							}

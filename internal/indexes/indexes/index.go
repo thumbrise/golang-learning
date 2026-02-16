@@ -9,4 +9,5 @@ type Index interface {
 	Depth() int
 	Stats() map[string]any
 	Type() string
+	String() string
 }

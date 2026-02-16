@@ -1,7 +1,13 @@
 package hash
 
+import "fmt"
+
 type Hash struct {
 	fields map[string]*Field
+}
+
+func (b *Hash) Type() string {
+	return b.String()
 }
 
 func (b *Hash) Insert(ctid int, fieldName string, value string) {
@@ -39,9 +45,8 @@ func (b *Hash) Stats() map[string]any {
 	panic("implement me")
 }
 
-func (b *Hash) Type() string {
-	//TODO implement me
-	panic("implement me")
+func (b *Hash) String() string {
+	return fmt.Sprintf("%T", b)
 }
 
 func NewHash() *Hash {
