@@ -2,78 +2,77 @@ package hash
 
 import "fmt"
 
+type CTIDs = []int
+type Values = map[string]CTIDs
+type Keys = map[string]Values
+
 type Hash struct {
-	fields map[string]*Field
-}
-
-func (b *Hash) Type() string {
-	return b.String()
-}
-
-func (b *Hash) Insert(ctid int, fieldName string, value string) {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (b *Hash) Search(fieldName string, value string) []int {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (b *Hash) Delete(ctid int, fieldName string, value string) {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (b *Hash) Update(ctid int, fieldName string, oldValue string, newValue string) {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (b *Hash) SizeBytes() int {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (b *Hash) Depth() int {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (b *Hash) Stats() map[string]any {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (b *Hash) String() string {
-	return fmt.Sprintf("%T", b)
+	table Keys
 }
 
 func NewHash() *Hash {
 	return &Hash{
-		fields: make(map[string]*Field),
+		table: make(Keys),
 	}
 }
 
-func (b *Hash) SearchEqual(field string, value string) []int {
+func (h *Hash) Type() string {
+	return h.String()
+}
+
+func (h *Hash) Insert(ctid int, fieldName string, value string) {
+	if h.table[fieldName] == nil {
+		h.table[fieldName] = make(Values)
+	}
+
+	if h.table[fieldName][value] == nil {
+		h.table[fieldName][value] = make(CTIDs, 0, 8)
+	}
+
+	h.table[fieldName][value] = append(h.table[fieldName][value], ctid)
+}
+
+func (h *Hash) Search(fieldName string, value string) []int {
 	result := make([]int, 0)
 
-	b3field, ok := b.fields[field]
+	b3field, ok := h.table[fieldName]
 	if !ok {
 		return result
 	}
 
-	b3value, ok := b3field.Values[value]
+	b3value, ok := b3field[value]
 	if !ok {
 		return result
 	}
 
-	return b3value.CTIDs
+	return b3value
 }
 
-type Field struct {
-	Values map[string]FieldValue
+func (h *Hash) Delete(ctid int, fieldName string, value string) {
+	// TODO implement me
+	panic("implement me")
 }
-type FieldValue struct {
-	CTIDs []int
+
+func (h *Hash) Update(ctid int, fieldName string, oldValue string, newValue string) {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (h *Hash) SizeBytes() int {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (h *Hash) Depth() int {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (h *Hash) Stats() map[string]any {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (h *Hash) String() string {
+	return fmt.Sprintf("%T", h)
 }
