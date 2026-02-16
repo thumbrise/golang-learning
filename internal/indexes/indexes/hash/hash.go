@@ -11,37 +11,37 @@ func (b *Hash) Type() string {
 }
 
 func (b *Hash) Insert(ctid int, fieldName string, value string) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
 func (b *Hash) Search(fieldName string, value string) []int {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
 func (b *Hash) Delete(ctid int, fieldName string, value string) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
 func (b *Hash) Update(ctid int, fieldName string, oldValue string, newValue string) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
 func (b *Hash) SizeBytes() int {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
 func (b *Hash) Depth() int {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
 func (b *Hash) Stats() map[string]any {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
@@ -54,6 +54,7 @@ func NewHash() *Hash {
 		fields: make(map[string]*Field),
 	}
 }
+
 func (b *Hash) SearchEqual(field string, value string) []int {
 	result := make([]int, 0)
 

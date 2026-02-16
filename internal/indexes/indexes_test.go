@@ -11,6 +11,7 @@ import (
 	"github.com/thumbrise/golang-learning/internal/indexes/test/fixtures"
 )
 
+//nolint:ireturn //matrix polymorphism
 func BuildHash() indexes.Index {
 	return hash.NewHash()
 }
@@ -55,6 +56,7 @@ func Benchmark_Search(b *testing.B) {
 				prepareSearchables(users, searchable)
 				storage := dal.NewUserStorage(users)
 				idxType := "Linear"
+
 				if testIndex != nil {
 					idx := testIndex()
 					idxType = idx.String()
@@ -68,6 +70,7 @@ func Benchmark_Search(b *testing.B) {
 							if err != nil {
 								b.Fatalf("failed to get string: %v", err)
 							}
+
 							results := storage.SearchEqual(testField, v)
 							if len(results) == 0 {
 								b.Errorf("no results v = %s", v)

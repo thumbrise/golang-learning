@@ -17,6 +17,7 @@ func NewUserStorage(data []User) *UserStorage {
 	for _, user := range data {
 		dataMap[user.ID] = user
 	}
+
 	return &UserStorage{
 		data:    dataMap,
 		indexes: make(map[string]indexes.Index),
@@ -28,6 +29,7 @@ func (s *UserStorage) CreateIndex(field string, index indexes.Index) {
 	for _, user := range s.data {
 		indexer.CreateIndex(user.ID, field, user.Get(field), index)
 	}
+
 	s.indexes[index.Type()] = index
 }
 

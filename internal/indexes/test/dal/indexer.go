@@ -2,16 +2,17 @@ package dal
 
 import "github.com/thumbrise/golang-learning/internal/indexes/indexes"
 
-type Indexer struct {
-}
+type Indexer struct{}
 
 func NewIndexer() *Indexer {
 	return &Indexer{}
 }
+
 func (i *Indexer) CreateIndex(ctid int, fieldName string, fieldValue any, index indexes.Index) {
 	vstr := i.parseString(fieldValue)
 	if vstr != "" {
 		i.index(ctid, fieldName, vstr, index)
+
 		return
 	}
 
@@ -20,16 +21,20 @@ func (i *Indexer) CreateIndex(ctid int, fieldName string, fieldValue any, index 
 		for _, v := range vslice {
 			i.index(ctid, fieldName, v, index)
 		}
+
 		return
 	}
 }
+
 func (i *Indexer) index(ctid int, fieldName string, fieldValue string, index indexes.Index) {
 	index.Insert(ctid, fieldName, fieldValue)
 }
+
 func (i *Indexer) parseString(value any) string {
 	if v, ok := value.(string); ok {
 		return v
 	}
+
 	return ""
 }
 
@@ -37,5 +42,6 @@ func (i *Indexer) parseSliceOfStrings(value any) []string {
 	if v, ok := value.([]string); ok {
 		return v
 	}
+
 	return nil
 }

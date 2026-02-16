@@ -44,6 +44,7 @@ func (u *User) GetString(field string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("%w: %s", ErrCantCast, field)
 	}
+
 	return v, nil
 }
 
@@ -52,6 +53,7 @@ func (u *User) GetInt(field string) (int, error) {
 	if !ok {
 		return 0, fmt.Errorf("%w: %s", ErrCantCast, field)
 	}
+
 	return v, nil
 }
 
@@ -60,6 +62,7 @@ func (u *User) GetInt64(field string) (int64, error) {
 	if !ok {
 		return 0, fmt.Errorf("%w: %s", ErrCantCast, field)
 	}
+
 	return v, nil
 }
 
@@ -68,5 +71,6 @@ func (u *User) GetSlice(field string) ([]string, error) {
 	if !ok {
 		return nil, fmt.Errorf("%w: %s", ErrCantCast, field)
 	}
+
 	return v, nil
 }
