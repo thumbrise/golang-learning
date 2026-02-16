@@ -65,8 +65,8 @@ func (h *HashTable[T]) Set(key string, value T) {
 // Get возвращает значение по ключу
 // если ключ не найден, возвращает нулевое значение типа T
 //
-//nolint:nonamedreturns // полиморфизм
-func (h *HashTable[T]) Get(key string) (value T) {
+//nolint:ireturn // полиморфизм
+func (h *HashTable[T]) Get(key string) T {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 
