@@ -10,18 +10,6 @@ import (
 	"github.com/thumbrise/golang-learning/internal/indexes/test/fixtures"
 )
 
-func linearSearchEmail(users []dal.User, email string) []*dal.User {
-	result := make([]*dal.User, 0)
-
-	for i, user := range users {
-		if user.Email == email {
-			result = append(result, &users[i])
-		}
-	}
-
-	return result
-}
-
 func BuildHash(users []dal.User, fieldName string) *hash.Hash {
 	values := map[string]hash.FieldValue{}
 
@@ -64,6 +52,27 @@ func Benchmark_Search(b *testing.B) {
 	//  - измерять количество операций чтения/записи
 	//  - измерять количество итераций
 	//  - измерять количество сравнений
+	//  Для каждого варианта запускать benchmark
+
+	// Проектируем.
+	// У нас будет матрица из:
+	// - полей
+	// - индексов
+	// - аргументов поиска
+	// - тому подобное
+	// Есть набор полей.
+	// Есть набор индексов.
+	// Есть набор аргументов поиска, он же применяется к prepareSearchables.
+	fields := (&dal.User{}).Fields()
+
+	tests := []struct {
+		name string
+	}{
+		{
+			name: "Email",
+		},
+	}
+
 	users := fixtures.GenerateTestUsers(usersCount)
 
 	searchable := dal.User{
@@ -77,6 +86,31 @@ func Benchmark_Search(b *testing.B) {
 
 	hsh := BuildHash(users, "Email")
 
+	for _, f := range fields {
+		b.Run(f, func(b *testing.B) {
+			b.Run("Linear", func(b *testing.B) {
+				for range b.N {
+					storage := NewStorage(users)
+					foundedUsers := linearSearchEmail(storage, searchable.Get(f).(string))
+					if len(foundedUsers) == 0 {
+						b.Errorf("no results v = %s", searchable.Get(f))
+
+						return
+					}
+				}
+			})
+			b.Run("Hash", func(b *testing.B) {
+				for range b.N {
+					foundedUsers := hsh.SearchEqual(f, searchable.Get(f))
+					if len(foundedUsers) == 0 {
+						b.Errorf("no results v = %s", searchable.Get(f))
+
+						return
+					}
+				}
+			})
+		})
+	}
 	b.Run("Email", func(b *testing.B) {
 		b.Run("Linear", func(b *testing.B) {
 			for range b.N {

@@ -8,7 +8,7 @@ type User struct {
 	LastAccessTime int64
 }
 
-func (u *User) DynamicFields() map[string]interface{} {
+func (u *User) ToMap() map[string]interface{} {
 	return map[string]interface{}{
 		"id":               u.ID,
 		"email":            u.Email,
@@ -16,4 +16,18 @@ func (u *User) DynamicFields() map[string]interface{} {
 		"favorite_colors":  u.FavoriteColors,
 		"last_access_time": u.LastAccessTime,
 	}
+}
+
+func (u *User) Fields() []string {
+	return []string{
+		"id",
+		"email",
+		"age",
+		"favorite_colors",
+		"last_access_time",
+	}
+}
+
+func (u *User) Get(field string) any {
+	return u.ToMap()[field]
 }

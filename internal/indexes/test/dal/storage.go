@@ -22,35 +22,46 @@ func NewUserStorage(data []User) *UserStorage {
 	}
 }
 
-func (s *UserStorage) CreateIndex(fieldName string, index indexes.Index) {
+func (s *UserStorage) CreateIndex(field string, index indexes.Index) {
 	indexer := NewIndexer()
 	for _, user := range s.data {
-		f := user.DynamicFields()[fieldName]
-		indexer.CreateIndex(user.ID, fieldName, f, index)
+		indexer.CreateIndex(user.ID, field, user.Get(field), index)
 	}
 	s.indexes[index.Type()] = index
 }
 
-func (s *UserStorage) SearchEqual(fieldName string, value string) []User {
-	return nil
+func (s *UserStorage) SearchEqual(field string, value string) []User {
+	return s.linearSearch(field, value)
 }
 
-func (s *UserStorage) SearchRange(fieldName string, from string, to string) []User {
-	return nil
+func (s *UserStorage) SearchRange(field string, from string, to string) []User {
+	return s.linearSearch(field, from)
 }
 
-func (s *UserStorage) SearchPrefix(fieldName string, prefix string) []User {
-	return nil
+func (s *UserStorage) SearchPrefix(field string, prefix string) []User {
+	return s.linearSearch(field, prefix)
 }
 
-func (s *UserStorage) SearchSuffix(fieldName string, suffix string) []User {
-	return nil
+func (s *UserStorage) SearchSuffix(field string, suffix string) []User {
+	return s.linearSearch(field, suffix)
 }
 
-func (s *UserStorage) SearchContains(fieldName string, substring string) []User {
-	return nil
+func (s *UserStorage) SearchContains(field string, substring string) []User {
+	return s.linearSearch(field, substring)
 }
 
-func (s *UserStorage) SearchIn(fieldName string, values []string) []User {
-	return nil
+func (s *UserStorage) SearchIn(field string, values []string) []User {
+	return s.linearSearch(field, values[0]) // Simplified for now
+}
+
+func (s *UserStorage) linearSearch(field string, value string) []User {
+	result := make([]User, 0)
+
+	for _, user := range s.data {
+		if user.Get(field) == value {
+			result = append(result, user)
+		}
+	}
+
+	return result
 }
