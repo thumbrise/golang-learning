@@ -1,4 +1,4 @@
-package dal
+package storage
 
 import "github.com/thumbrise/golang-learning/internal/search/indexes"
 

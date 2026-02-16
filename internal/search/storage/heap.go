@@ -1,4 +1,4 @@
-package dal
+package storage
 
 type Heap[TRecord Record] struct {
 	data map[string]TRecord

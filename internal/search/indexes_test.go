@@ -8,6 +8,7 @@ import (
 	"github.com/thumbrise/golang-learning/internal/search/dal"
 	"github.com/thumbrise/golang-learning/internal/search/indexes"
 	"github.com/thumbrise/golang-learning/internal/search/indexes/hash"
+	"github.com/thumbrise/golang-learning/internal/search/storage"
 	"github.com/thumbrise/golang-learning/internal/search/test/fixtures"
 )
 
@@ -54,7 +55,7 @@ func Benchmark_Search(b *testing.B) {
 			b.Run(testField, func(b *testing.B) {
 				users := fixtures.GenerateTestUsers(usersCount)
 				prepareSearchables(users, searchable)
-				storage := dal.NewStorage(users)
+				storage := storage.NewStorage(users)
 				idxType := "Linear"
 
 				if testIndex != nil {

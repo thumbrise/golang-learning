@@ -1,4 +1,4 @@
-package dal
+package storage
 
 type Record interface {
 	PK() string
