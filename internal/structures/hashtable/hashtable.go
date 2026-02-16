@@ -4,11 +4,16 @@ import "sync"
 
 const defaultSize = 10
 
+type BucketItem[T any] struct {
+	key   string
+	hash  int
+	value T
+}
 type HashTable[T any] struct {
-	size   int
-	data   [][]T
-	hasher Hasher
-	mu     sync.RWMutex
+	size    int
+	buckets [][]*BucketItem[T]
+	hasher  Hasher
+	mu      sync.RWMutex
 }
 
 // NewHashTable создает новую хеш-таблицу
@@ -19,8 +24,6 @@ type HashTable[T any] struct {
 // defaults:
 //   - size: defaultSize
 //   - hasher: nil (будет использоваться стандартная хеш-функция)
-//
-
 func NewHashTable[T any](size int, hasher Hasher) *HashTable[T] {
 	if size == 0 {
 		size = defaultSize
@@ -31,32 +34,86 @@ func NewHashTable[T any](size int, hasher Hasher) *HashTable[T] {
 	}
 
 	return &HashTable[T]{
-		data:   make([][]T, size),
-		size:   size,
-		hasher: hasher,
+		buckets: make([][]*BucketItem[T], size),
+		size:    size,
+		hasher:  hasher,
 	}
 }
 
 func (h *HashTable[T]) Set(key string, value T) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	hsh := h.hash(key)
-	h.data[hsh] = append(h.data[hsh], value)
+
+	bucket, hash := h.hash(key)
+	item := &BucketItem[T]{
+		key:   key,
+		hash:  hash,
+		value: value,
+	}
+
+	for i, existing := range h.buckets[bucket] {
+		if existing.hash == hash && existing.key == key {
+			h.buckets[bucket][i] = item
+
+			return
+		}
+	}
+
+	h.buckets[bucket] = append(h.buckets[bucket], item)
 }
 
-func (h *HashTable[T]) Get(key string) T {
+// Get возвращает значение по ключу
+// если ключ не найден, возвращает нулевое значение типа T
+//
+//nolint:nonamedreturns // полиморфизм
+func (h *HashTable[T]) Get(key string) (value T) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
+
 	var zero T
 
-	hsh := h.hash(key)
-	if h.data[hsh] == nil {
+	bucket, hash := h.hash(key)
+	if h.buckets[bucket] == nil {
 		return zero
 	}
 
-	return h.data[hsh][0]
+	// Полагаемся на метод Set. Он должен недопустить дубликатов ключей
+	for _, item := range h.buckets[bucket] {
+		if item.hash == hash && item.key == key {
+			return item.value
+		}
+	}
+
+	return zero
 }
 
-func (h *HashTable[T]) hash(key string) int {
-	return h.hasher.Hash(key) % h.size
+func (h *HashTable[T]) Delete(key string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	bucket, hash := h.hash(key)
+	if h.buckets[bucket] == nil {
+		return
+	}
+
+	replacement := make([]*BucketItem[T], 0, len(h.buckets[bucket])-1)
+	for i, item := range h.buckets[bucket] {
+		if item.hash != hash || item.key != key {
+			replacement = append(replacement, h.buckets[bucket][i])
+		}
+	}
+
+	h.buckets[bucket] = replacement
+}
+
+// hash возвращает нужное ведро и оригинальный хеш
+// bucket - индекс ведра
+// hash - оригинальный хеш
+//
+//nolint:nonamedreturns // имеет смысл
+func (h *HashTable[T]) hash(key string) (bucket int, hash int) {
+	hash = h.hasher.Hash(key)
+	bucket = hash % h.size
+
+	return
 }
