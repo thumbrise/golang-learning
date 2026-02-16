@@ -1,9 +1,9 @@
 package storage
 
 import (
-	"github.com/thumbrise/golang-learning/internal/search/storage/core"
-	"github.com/thumbrise/golang-learning/internal/search/storage/planner"
-	"github.com/thumbrise/golang-learning/internal/search/storage/search"
+	"github.com/thumbrise/golang-learning/internal/database/storage/core"
+	"github.com/thumbrise/golang-learning/internal/database/storage/planner"
+	"github.com/thumbrise/golang-learning/internal/database/storage/search"
 )
 
 type Storage[TRecord core.Record] struct {
