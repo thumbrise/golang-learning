@@ -1,14 +1,14 @@
-package indexes_test
+package search_test
 
 import (
 	"math/rand"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/thumbrise/golang-learning/internal/indexes/indexes"
-	"github.com/thumbrise/golang-learning/internal/indexes/indexes/hash"
-	"github.com/thumbrise/golang-learning/internal/indexes/test/dal"
-	"github.com/thumbrise/golang-learning/internal/indexes/test/fixtures"
+	dal2 "github.com/thumbrise/golang-learning/internal/search/dal"
+	"github.com/thumbrise/golang-learning/internal/search/indexes"
+	"github.com/thumbrise/golang-learning/internal/search/indexes/hash"
+	"github.com/thumbrise/golang-learning/internal/search/test/fixtures"
 )
 
 //nolint:ireturn //matrix polymorphism
@@ -16,7 +16,7 @@ func BuildHash() indexes.Index {
 	return hash.NewHash()
 }
 
-func prepareSearchables(users []dal.User, searchable dal.User) {
+func prepareSearchables(users []dal2.User, searchable dal2.User) {
 	searchUser := &users[len(users)-1]
 
 	searchUser.Email = searchable.Email
@@ -27,7 +27,7 @@ func Benchmark_Search(b *testing.B) {
 
 	const usersCount = 100000
 
-	testFields := (&dal.User{}).Fields()
+	testFields := (&dal2.User{}).Fields()
 	testIndexes := []func() indexes.Index{
 		nil,
 		BuildHash,
@@ -36,7 +36,7 @@ func Benchmark_Search(b *testing.B) {
 		// TODO: BRIN
 	}
 
-	searchable := dal.User{
+	searchable := dal2.User{
 		Email:          "searchable@example.com",
 		Age:            0,   // todo
 		FavoriteColors: nil, // todo
@@ -54,7 +54,7 @@ func Benchmark_Search(b *testing.B) {
 			b.Run(testField, func(b *testing.B) {
 				users := fixtures.GenerateTestUsers(usersCount)
 				prepareSearchables(users, searchable)
-				storage := dal.NewUserStorage(users)
+				storage := dal2.NewUserStorage(users)
 				idxType := "Linear"
 
 				if testIndex != nil {

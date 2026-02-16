@@ -1,7 +1,7 @@
 package dal
 
 import (
-	"github.com/thumbrise/golang-learning/internal/indexes/indexes"
+	"github.com/thumbrise/golang-learning/internal/search/indexes"
 )
 
 type UserStorage struct {
