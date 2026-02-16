@@ -1,8 +1,10 @@
 package indexes_test
 
 import (
+	"math/rand"
 	"testing"
 
+	"github.com/go-faker/faker/v4"
 	"github.com/thumbrise/golang-learning/internal/indexes/indexes/hash"
 	"github.com/thumbrise/golang-learning/internal/indexes/test/dal"
 	"github.com/thumbrise/golang-learning/internal/indexes/test/fixtures"
@@ -52,8 +54,16 @@ func prepareSearchables(users []dal.User, searchable dal.User) {
 }
 
 func Benchmark_Search(b *testing.B) {
-	const usersCount = 100000
+	faker.SetRandomSource(rand.NewSource(12345))
 
+	const usersCount = 100000
+	// TODO: Матрица состоящая из полей, индексов, аргументов поиска, тому подобное
+	//  Для каждого варианта:
+	//  - измерять время выполнения
+	//  - измерять память
+	//  - измерять количество операций чтения/записи
+	//  - измерять количество итераций
+	//  - измерять количество сравнений
 	users := fixtures.GenerateTestUsers(usersCount)
 
 	searchable := dal.User{
