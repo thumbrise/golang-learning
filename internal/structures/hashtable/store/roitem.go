@@ -1,4 +1,4 @@
-package buckets
+package store
 
 type ROItem[T any] interface {
 	GetKey() string

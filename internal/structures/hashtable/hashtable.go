@@ -1,17 +1,24 @@
 package hashtable
 
 import (
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/buckets"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/buckets/types"
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
+	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
+	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/chain"
 )
 
-const defaultSize = 10
+// defaultSize = 5 * 2^10 = 5120 buckets = 40KB mean size
+// Its ok for default?
+const defaultSize = 5 << 10
 
 type HashTable[T any] struct {
-	size     int
-	addrspcs []buckets.Bucket[T]
+	addrspcs store.Store[T]
 	hasher   Hasher
+}
+
+type StoreFactory[T any] func(size int) store.Store[T]
+
+func defaultStoreFactory[T any](size int) store.Store[T] {
+	return chain.NewStore[T](size)
 }
 
 // NewHashTable создает новую хеш-таблицу
@@ -22,7 +29,7 @@ type HashTable[T any] struct {
 // defaults:
 //   - size: defaultSize
 //   - hasher: nil (будет использоваться стандартная хеш-функция)
-func NewHashTable[T any](size int, hasher Hasher) *HashTable[T] {
+func NewHashTable[T any](size int, hasher Hasher, storeFactory StoreFactory[T]) *HashTable[T] {
 	if size == 0 {
 		size = defaultSize
 	}
@@ -31,26 +38,31 @@ func NewHashTable[T any](size int, hasher Hasher) *HashTable[T] {
 		hasher = hashers.NewMapHashHasher()
 	}
 
-	addrspcs := make([]buckets.Bucket[T], size)
-	for i := range size {
-		addrspcs[i] = types.NewChain[T]()
+	if storeFactory == nil {
+		storeFactory = defaultStoreFactory[T]
+	}
+
+	stor := storeFactory(size)
+	if stor == nil {
+		panic("store factory is nil")
 	}
 
 	return &HashTable[T]{
-		addrspcs: addrspcs,
-		size:     size,
+		addrspcs: stor,
 		hasher:   hasher,
 	}
 }
 
-func (h *HashTable[T]) Set(key string, value T) {
-	bucket, hash := h.hash(key)
-	item := &buckets.Item[T]{
+func (h *HashTable[T]) Set(key string, value T) bool {
+	hash := h.hash(key)
+
+	item := &store.Item[T]{
 		Key:   key,
 		Hash:  hash,
 		Value: value,
 	}
-	h.addrspcs[bucket].Set(item)
+
+	return h.addrspcs.Set(item)
 }
 
 // Get возвращает значение по ключу
@@ -58,49 +70,26 @@ func (h *HashTable[T]) Set(key string, value T) {
 //
 //nolint:ireturn // полиморфизм
 func (h *HashTable[T]) Get(key string) T {
-	var zero T
+	hash := h.hash(key)
 
-	bucket, hash := h.hash(key)
-
-	addr := h.addrspcs[bucket]
-	if addr == nil {
-		return zero
-	}
-
-	item := addr.Get(hash, key)
-	if item == nil {
-		return zero
-	}
+	item := h.addrspcs.Get(&store.Item[T]{
+		Key:  key,
+		Hash: hash,
+	})
 
 	return item.GetValue()
 }
 
-func (h *HashTable[T]) Delete(key string) {
-	bucket, hash := h.hash(key)
+func (h *HashTable[T]) Delete(key string) bool {
+	hash := h.hash(key)
 
-	addr := h.addrspcs[bucket]
-	if addr == nil {
-		return
-	}
-
-	addr.Delete(hash, key)
+	return h.addrspcs.Delete(&store.Item[T]{
+		Key:  key,
+		Hash: hash,
+	})
 }
 
-// hash возвращает нужное ведро и оригинальный хеш
-// buckets - индекс ведра
-// hash - оригинальный хеш
-//
-//nolint:nonamedreturns // имеет смысл
-func (h *HashTable[T]) hash(key string) (bucket int, hash uint64) {
-	hash = h.hasher.Hash(key)
-	// G115: integer overflow conversion int -> uint64
-	// И что делать?
-	// Можно сделать проверку на переполнение, но это будет замедлять работу
-	// Значит можно представить, что это нюанс?
-	// Но в итоге то это int, а значит может быть отрицательное ведро?
-	// Это нормально, так как uint64 % int всегда даст положительный результат
-	//nolint:gosec // Логика работы хеш-таблицы предполагает такой каст. Номер ведра не может быть отрицательным.
-	bucket = int(hash % uint64(h.size))
-
-	return
+// hash возвращает хеш
+func (h *HashTable[T]) hash(key string) uint64 {
+	return h.hasher.Hash(key)
 }

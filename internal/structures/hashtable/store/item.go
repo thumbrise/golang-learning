@@ -1,4 +1,4 @@
-package buckets
+package store
 
 type Item[T any] struct {
 	Key   string

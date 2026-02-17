@@ -31,7 +31,7 @@ func TestHashTableBasic(t *testing.T) {
 		t.Run("concurrent", func(t *testing.T) {
 			t.Parallel()
 
-			h := hashtable.NewHashTable[string](0, nil)
+			h := hashtable.NewHashTable[string](0, nil, nil)
 
 			t.Run(tt.name, func(t *testing.T) {
 				t.Parallel()
@@ -46,7 +46,7 @@ func TestHashTableBasic(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				t.Parallel()
 
-				h := hashtable.NewHashTable[string](0, nil)
+				h := hashtable.NewHashTable[string](0, nil, nil)
 				h.Set(tt.args.key, tt.args.value)
 
 				if got := h.Get(tt.args.key); got != tt.want {
@@ -68,7 +68,7 @@ func TestHashTableReplace(t *testing.T) {
 		values = append(values, value)
 	}
 
-	h := hashtable.NewHashTable[string](0, nil)
+	h := hashtable.NewHashTable[string](0, nil, nil)
 
 	const key = "replaceable_key"
 	for _, value := range values {
@@ -114,7 +114,7 @@ func BenchmarkHashTable_InsertAfterFill(b *testing.B) {
 						size, fill, hasher, start)
 					b.Run(name, func(b *testing.B) {
 						// Создаём таблицу
-						ht := hashtable.NewHashTable[string](size, hasher)
+						ht := hashtable.NewHashTable[string](size, hasher, nil)
 						// Вставляем fill элементов (подготовка)
 						for i := range fill {
 							ht.Set(keys[i], "value")
