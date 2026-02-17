@@ -50,7 +50,6 @@ func (h *HashTable[T]) Set(key string, value T) {
 		Hash:  hash,
 		Value: value,
 	}
-
 	h.addrspcs[bucket].Set(item)
 }
 
@@ -73,7 +72,7 @@ func (h *HashTable[T]) Get(key string) T {
 		return zero
 	}
 
-	return item.Value
+	return item.GetValue()
 }
 
 func (h *HashTable[T]) Delete(key string) {
@@ -94,6 +93,13 @@ func (h *HashTable[T]) Delete(key string) {
 //nolint:nonamedreturns // имеет смысл
 func (h *HashTable[T]) hash(key string) (bucket int, hash uint64) {
 	hash = h.hasher.Hash(key)
+	// G115: integer overflow conversion int -> uint64
+	// И что делать?
+	// Можно сделать проверку на переполнение, но это будет замедлять работу
+	// Значит можно представить, что это нюанс?
+	// Но в итоге то это int, а значит может быть отрицательное ведро?
+	// Это нормально, так как uint64 % int всегда даст положительный результат
+	//nolint:gosec // Логика работы хеш-таблицы предполагает такой каст. Номер ведра не может быть отрицательным.
 	bucket = int(hash % uint64(h.size))
 
 	return

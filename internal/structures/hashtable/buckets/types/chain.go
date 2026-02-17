@@ -19,7 +19,7 @@ func NewChain[T any]() *Chain[T] {
 }
 
 // Set добавляет item в адресное пространство
-func (h *Chain[T]) Set(item *buckets.Item[T]) {
+func (h *Chain[T]) Set(item *buckets.Item[T]) bool {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -27,17 +27,21 @@ func (h *Chain[T]) Set(item *buckets.Item[T]) {
 		if existing.Hash == item.Hash && existing.Key == item.Key {
 			h.items[i] = item
 
-			return
+			return true
 		}
 	}
 
 	h.items = append(h.items, item)
+
+	return true
 }
 
 // Get возвращает item по hash и key
 //
+// Возвращает nil, если item не найден
+//
 
-func (h *Chain[T]) Get(hash uint64, key string) *buckets.Item[T] {
+func (h *Chain[T]) Get(hash uint64, key string) buckets.ROItem[T] {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 
@@ -54,7 +58,7 @@ func (h *Chain[T]) Get(hash uint64, key string) *buckets.Item[T] {
 }
 
 // Delete удаляет item по hash и key
-func (h *Chain[T]) Delete(hash uint64, key string) {
+func (h *Chain[T]) Delete(hash uint64, key string) bool {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -62,7 +66,9 @@ func (h *Chain[T]) Delete(hash uint64, key string) {
 		if item.Hash == hash && item.Key == key {
 			h.items = append(h.items[:i], h.items[i+1:]...)
 
-			return
+			return true
 		}
 	}
+
+	return false
 }

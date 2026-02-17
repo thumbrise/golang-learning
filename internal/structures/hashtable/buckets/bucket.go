@@ -8,7 +8,7 @@ package buckets
 //
 // !!! Каждый реализатор должен сам обрабатывать race conditions, иметь свои собственные mutex-ы. Sharded locking.
 type Bucket[T any] interface {
-	Set(item *Item[T])
-	Get(hash uint64, key string) *Item[T]
-	Delete(hash uint64, key string)
+	Set(item *Item[T]) bool
+	Get(hash uint64, key string) ROItem[T]
+	Delete(hash uint64, key string) bool
 }
