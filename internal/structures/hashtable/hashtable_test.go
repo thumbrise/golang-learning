@@ -1,10 +1,12 @@
 package hashtable_test
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable"
+	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
 )
 
 func TestHashTableBasic(t *testing.T) {
@@ -82,4 +84,52 @@ func TestHashTableReplace(t *testing.T) {
 func TestHashTableCollision(t *testing.T) {
 	t.Parallel()
 	// ht := NewHashTable()
+}
+
+func BenchmarkHashTable_InsertAfterFill(b *testing.B) {
+	sizes := []int{100, 1000, 10000}
+	fills := []int{0, 10, 100, 1000, 10000, 100000}
+	badHasher := hashers.NewFirstRuneReturnHasher()
+	goodHasher := hashers.NewMapHashHasher()
+	hshrs := []hashtable.Hasher{badHasher, goodHasher}
+	strategies := []string{"chain", "open"}
+
+	// Предгенерируем пул ключей (достаточно большой)
+	const maxKeys = 200000
+
+	keys := make([]string, maxKeys)
+	for i := range keys {
+		keys[i] = fmt.Sprintf("key-%d", i)
+	}
+
+	for _, size := range sizes {
+		for _, fill := range fills {
+			if fill >= maxKeys {
+				continue
+			}
+
+			for _, hasher := range hshrs {
+				for _, start := range strategies {
+					name := fmt.Sprintf("size=%d/fill=%d/hasher=%T/collisionstrat=%sFake",
+						size, fill, hasher, start)
+					b.Run(name, func(b *testing.B) {
+						// Создаём таблицу
+						ht := hashtable.NewHashTable[string](size, hasher)
+						// Вставляем fill элементов (подготовка)
+						for i := range fill {
+							ht.Set(keys[i], "value")
+						}
+						// Новый ключ для вставки
+						newKey := keys[fill] // гарантированно не использован
+
+						b.ResetTimer()
+
+						for range b.N {
+							ht.Set(newKey, "value") // одна вставка
+						}
+					})
+				}
+			}
+		}
+	}
 }

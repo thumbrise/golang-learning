@@ -1,19 +1,17 @@
 package hashtable
 
-import "sync"
+import (
+	"github.com/thumbrise/golang-learning/internal/structures/hashtable/buckets"
+	"github.com/thumbrise/golang-learning/internal/structures/hashtable/buckets/types"
+	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
+)
 
 const defaultSize = 10
 
-type BucketItem[T any] struct {
-	key   string
-	hash  uint64
-	value T
-}
 type HashTable[T any] struct {
-	size    int
-	buckets [][]*BucketItem[T]
-	hasher  Hasher
-	mu      sync.RWMutex
+	size     int
+	addrspcs []buckets.Bucket[T]
+	hasher   Hasher
 }
 
 // NewHashTable создает новую хеш-таблицу
@@ -30,36 +28,30 @@ func NewHashTable[T any](size int, hasher Hasher) *HashTable[T] {
 	}
 
 	if hasher == nil {
-		hasher = newDefaultHasher()
+		hasher = hashers.NewMapHashHasher()
+	}
+
+	addrspcs := make([]buckets.Bucket[T], size)
+	for i := range size {
+		addrspcs[i] = types.NewChain[T]()
 	}
 
 	return &HashTable[T]{
-		buckets: make([][]*BucketItem[T], size),
-		size:    size,
-		hasher:  hasher,
+		addrspcs: addrspcs,
+		size:     size,
+		hasher:   hasher,
 	}
 }
 
 func (h *HashTable[T]) Set(key string, value T) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
 	bucket, hash := h.hash(key)
-	item := &BucketItem[T]{
-		key:   key,
-		hash:  hash,
-		value: value,
+	item := &buckets.Item[T]{
+		Key:   key,
+		Hash:  hash,
+		Value: value,
 	}
 
-	for i, existing := range h.buckets[bucket] {
-		if existing.hash == hash && existing.key == key {
-			h.buckets[bucket][i] = item
-
-			return
-		}
-	}
-
-	h.buckets[bucket] = append(h.buckets[bucket], item)
+	h.addrspcs[bucket].Set(item)
 }
 
 // Get возвращает значение по ключу
@@ -67,47 +59,36 @@ func (h *HashTable[T]) Set(key string, value T) {
 //
 //nolint:ireturn // полиморфизм
 func (h *HashTable[T]) Get(key string) T {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
-
 	var zero T
 
 	bucket, hash := h.hash(key)
-	if h.buckets[bucket] == nil {
+
+	addr := h.addrspcs[bucket]
+	if addr == nil {
 		return zero
 	}
 
-	// Полагаемся на метод Set. Он должен недопустить дубликатов ключей
-	for _, item := range h.buckets[bucket] {
-		if item.hash == hash && item.key == key {
-			return item.value
-		}
+	item := addr.Get(hash, key)
+	if item == nil {
+		return zero
 	}
 
-	return zero
+	return item.Value
 }
 
 func (h *HashTable[T]) Delete(key string) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
 	bucket, hash := h.hash(key)
-	if h.buckets[bucket] == nil {
+
+	addr := h.addrspcs[bucket]
+	if addr == nil {
 		return
 	}
 
-	replacement := make([]*BucketItem[T], 0, len(h.buckets[bucket])-1)
-	for i, item := range h.buckets[bucket] {
-		if item.hash != hash || item.key != key {
-			replacement = append(replacement, h.buckets[bucket][i])
-		}
-	}
-
-	h.buckets[bucket] = replacement
+	addr.Delete(hash, key)
 }
 
 // hash возвращает нужное ведро и оригинальный хеш
-// bucket - индекс ведра
+// buckets - индекс ведра
 // hash - оригинальный хеш
 //
 //nolint:nonamedreturns // имеет смысл
