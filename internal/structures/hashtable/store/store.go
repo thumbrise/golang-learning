@@ -7,9 +7,9 @@ package store
 // И даже в рамках одной и той же таблицы использовать разные реализации пространств.
 //
 // !!! Каждый реализатор должен сам обрабатывать race conditions, иметь свои собственные mutex-ы. Sharded locking.
-// !!! Каждый реализтор должен возвращать store.Zero в случае отсутствия элемента. Не nil
+// !!! Каждый реализтор должен возвращать store.ZeroItem в случае отсутствия элемента. Не nil
 type Store[T any] interface {
-	Set(item ROItem[T]) bool
-	Get(item ROItem[T]) ROItem[T]
-	Delete(item ROItem[T]) bool
+	Set(item Item[T]) bool
+	Get(item Item[T]) Item[T]
+	Delete(item Item[T]) bool
 }

@@ -6,10 +6,6 @@ import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/chain"
 )
 
-// defaultSize = 5 * 2^10 = 5120 buckets = 40KB mean size
-// Its ok for default?
-const defaultSize = 5 << 10
-
 type HashTable[T any] struct {
 	store  store.Store[T]
 	hasher Hasher
@@ -30,10 +26,6 @@ func defaultStoreFactory[T any](size int) store.Store[T] {
 //   - size: defaultSize
 //   - hasher: nil (будет использоваться стандартная хеш-функция)
 func NewHashTable[T any](size int, hasher Hasher, storeFactory StoreFactory[T]) *HashTable[T] {
-	if size == 0 {
-		size = defaultSize
-	}
-
 	if hasher == nil {
 		hasher = hashers.NewMapHashHasher()
 	}
@@ -56,7 +48,7 @@ func NewHashTable[T any](size int, hasher Hasher, storeFactory StoreFactory[T]) 
 func (h *HashTable[T]) Set(key string, value T) bool {
 	hash := h.hash(key)
 
-	item := &store.Item[T]{
+	item := &store.HashedItem[T]{
 		Key:   key,
 		Hash:  hash,
 		Value: value,
@@ -72,7 +64,7 @@ func (h *HashTable[T]) Set(key string, value T) bool {
 func (h *HashTable[T]) Get(key string) T {
 	hash := h.hash(key)
 
-	item := h.store.Get(&store.Item[T]{
+	item := h.store.Get(&store.HashedItem[T]{
 		Key:  key,
 		Hash: hash,
 	})
@@ -83,7 +75,7 @@ func (h *HashTable[T]) Get(key string) T {
 func (h *HashTable[T]) Delete(key string) bool {
 	hash := h.hash(key)
 
-	return h.store.Delete(&store.Item[T]{
+	return h.store.Delete(&store.HashedItem[T]{
 		Key:  key,
 		Hash: hash,
 	})

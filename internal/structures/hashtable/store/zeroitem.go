@@ -1,18 +1,34 @@
 package store
 
-type Zero[T any] struct{}
+type ZeroItem[T any] struct{}
 
-func (i *Zero[T]) GetKey() string {
+func (i *ZeroItem[T]) IsWritable(other Item[T]) bool {
+	return true
+}
+
+func (i *ZeroItem[T]) GetKey() string {
 	return ""
 }
 
-func (i *Zero[T]) GetHash() uint64 {
+func (i *ZeroItem[T]) GetHash() uint64 {
 	return 0
 }
 
 //nolint:ireturn // OK
-func (i *Zero[T]) GetValue() T {
+func (i *ZeroItem[T]) GetValue() T {
 	var zero T
 
 	return zero
+}
+
+func (i *ZeroItem[T]) CompareKey(other Item[T]) bool {
+	return false
+}
+
+func (i *ZeroItem[T]) Copy() Item[T] {
+	return i
+}
+
+func (i *ZeroItem[T]) IsZero() bool {
+	return true
 }

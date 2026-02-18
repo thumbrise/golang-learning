@@ -9,6 +9,7 @@ import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/chain"
+	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/openaddr/linearprob"
 )
 
 type StoreFactory[T any] struct {
@@ -22,6 +23,12 @@ func getStores[T any]() []StoreFactory[T] {
 			Name: "chain",
 			Factory: func(size int) store.Store[T] {
 				return chain.NewStore[T](size)
+			},
+		},
+		{
+			Name: "open addr linear prob",
+			Factory: func(size int) store.Store[T] {
+				return linearprob.NewStore[T](size)
 			},
 		},
 	}
@@ -71,18 +78,22 @@ func TestHashTableSet(t *testing.T) {
 		t.Run("store="+st.Name, func(t *testing.T) {
 			t.Parallel()
 
-			h := hashtable.NewHashTable[string](0, nil, st.Factory)
+			t.Run("Set", func(t *testing.T) {
+				t.Parallel()
 
-			const (
-				key   = "key"
-				value = "value"
-			)
+				h := hashtable.NewHashTable[string](0, nil, st.Factory)
 
-			h.Set(key, value)
+				const (
+					key   = "key"
+					value = "value"
+				)
 
-			if got := h.Get(key); got != value {
-				t.Errorf("Get() = %#v, want %#v", got, value)
-			}
+				h.Set(key, value)
+
+				if got := h.Get(key); got != value {
+					t.Errorf("Get() = %#v, want %#v", got, value)
+				}
+			})
 
 			t.Run("Overwrite value", func(t *testing.T) {
 				t.Parallel()
@@ -151,6 +162,9 @@ func TestHashTableSet(t *testing.T) {
 					h.Set(key, values[i])
 				}
 
+				// TODO:
+				//     hashtable_test.go:165: Get() = "value0", want "value49"
+				//--- FAIL: TestHashTableSet/store=open_addr_linear_prob/Same_keys_overwrite_instead_of_stacking (0.00s)
 				if got := h.Get(key); got != values[49] {
 					t.Errorf("Get() = %#v, want %#v", got, values[49])
 				}
@@ -217,26 +231,30 @@ func TestHashTableDelete(t *testing.T) {
 		t.Run("store="+st.Name, func(t *testing.T) {
 			t.Parallel()
 
-			h := hashtable.NewHashTable[string](0, nil, st.Factory)
+			t.Run("Delete", func(t *testing.T) {
+				t.Parallel()
 
-			const (
-				key   = "key"
-				value = "value"
-				want  = ""
-			)
+				h := hashtable.NewHashTable[string](0, nil, st.Factory)
 
-			h.Set(key, value)
+				const (
+					key   = "key"
+					value = "value"
+					want  = ""
+				)
 
-			if got := h.Get(key); got != value {
-				t.Errorf("Get() = %#v, want %#v", got, value)
-			}
+				h.Set(key, value)
 
-			// delete
-			h.Delete(key)
+				if got := h.Get(key); got != value {
+					t.Errorf("Get() = %#v, want %#v", got, value)
+				}
 
-			if got := h.Get(key); got != "" {
-				t.Errorf("Get() after delete = %#v, want %#v", got, want)
-			}
+				// delete
+				h.Delete(key)
+
+				if got := h.Get(key); got != "" {
+					t.Errorf("Get() after delete = %#v, want %#v", got, want)
+				}
+			})
 
 			presenceTests := []struct {
 				name string
@@ -263,9 +281,22 @@ func TestHashTableDelete(t *testing.T) {
 						value3 = "value3"
 					)
 
-					h.Set(key1, value1)
-					h.Set(key2, value2)
-					h.Set(key3, value3)
+					var b bool
+
+					b = h.Set(key1, value1)
+					if !b {
+						t.Errorf("Set(key1, value1) = %v, want true", b)
+					}
+
+					b = h.Set(key2, value2)
+					if !b {
+						t.Errorf("Set(key2, value2) = %v, want true", b)
+					}
+
+					b = h.Set(key3, value3)
+					if !b {
+						t.Errorf("Set(key3, value3) = %v, want true", b)
+					}
 
 					// Удаляем только key2
 					h.Delete(key2)
@@ -273,6 +304,12 @@ func TestHashTableDelete(t *testing.T) {
 					want1 := value1
 					want2 := ""
 					want3 := value3
+
+					// TODO: === CONT  TestHashTableDelete/store=open_addr_linear_prob/Other_items_still_present_in_same_bucket
+					//    hashtable_test.go:293: Get() = "", want "value1"
+					//    --- FAIL: TestHashTableDelete/store=open_addr_linear_prob/Other_items_still_present_in_same_bucket (0.00s)
+					//    Тут где-то есть гонка
+					//    Ошибка раз через раз
 
 					// Ожидаем, что key1 и key3 сохранились, а key2 удален
 					if got := h.Get(key1); got != want1 {

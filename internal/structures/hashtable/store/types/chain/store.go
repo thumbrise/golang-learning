@@ -5,12 +5,20 @@ import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
 )
 
+// defaultSize = 5 * 2^10 = 5120 buckets = 40KB mean size
+// Its ok for default?
+const defaultSize = 5 << 10
+
 type Store[T any] struct {
 	size    int
 	buckets []*Bucket[T]
 }
 
 func NewStore[T any](size int) *Store[T] {
+	if size == 0 {
+		size = defaultSize
+	}
+
 	buckets := make([]*Bucket[T], size)
 	for i := range size {
 		buckets[i] = NewBucket[T]()
@@ -23,7 +31,7 @@ func NewStore[T any](size int) *Store[T] {
 }
 
 // Set добавляет item в адресное пространство
-func (s *Store[T]) Set(item store.ROItem[T]) bool {
+func (s *Store[T]) Set(item store.Item[T]) bool {
 	bucket := s.bucket(item.GetHash())
 
 	addr := s.buckets[bucket]
@@ -37,20 +45,20 @@ func (s *Store[T]) Set(item store.ROItem[T]) bool {
 // Get возвращает item по bucket и key
 //
 // Возвращает nil, если item не найден
-func (s *Store[T]) Get(item store.ROItem[T]) store.ROItem[T] {
+func (s *Store[T]) Get(item store.Item[T]) store.Item[T] {
 	hash := item.GetHash()
 	bucket := s.bucket(hash)
 
 	addr := s.buckets[bucket]
 	if addr == nil {
-		return &store.Zero[T]{}
+		return &store.ZeroItem[T]{}
 	}
 
 	return addr.Get(item)
 }
 
 // Delete удаляет item по bucket и key
-func (s *Store[T]) Delete(item store.ROItem[T]) bool {
+func (s *Store[T]) Delete(item store.Item[T]) bool {
 	bucket := s.bucket(item.GetHash())
 
 	addr := s.buckets[bucket]
