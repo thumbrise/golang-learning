@@ -1,10 +1,10 @@
+// Package chain реализует стратегию цепочек
 package chain
 
 import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
 )
 
-// Store - Адресное пространство, реализующее стратегию цепочек
 type Store[T any] struct {
 	size    int
 	buckets []*Bucket[T]
@@ -43,7 +43,7 @@ func (s *Store[T]) Get(item store.ROItem[T]) store.ROItem[T] {
 
 	addr := s.buckets[bucket]
 	if addr == nil {
-		return nil
+		return &store.Zero[T]{}
 	}
 
 	return addr.Get(item)

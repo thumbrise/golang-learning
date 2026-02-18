@@ -11,8 +11,8 @@ import (
 const defaultSize = 5 << 10
 
 type HashTable[T any] struct {
-	addrspcs store.Store[T]
-	hasher   Hasher
+	store  store.Store[T]
+	hasher Hasher
 }
 
 type StoreFactory[T any] func(size int) store.Store[T]
@@ -48,8 +48,8 @@ func NewHashTable[T any](size int, hasher Hasher, storeFactory StoreFactory[T]) 
 	}
 
 	return &HashTable[T]{
-		addrspcs: stor,
-		hasher:   hasher,
+		store:  stor,
+		hasher: hasher,
 	}
 }
 
@@ -62,7 +62,7 @@ func (h *HashTable[T]) Set(key string, value T) bool {
 		Value: value,
 	}
 
-	return h.addrspcs.Set(item)
+	return h.store.Set(item)
 }
 
 // Get возвращает значение по ключу
@@ -72,7 +72,7 @@ func (h *HashTable[T]) Set(key string, value T) bool {
 func (h *HashTable[T]) Get(key string) T {
 	hash := h.hash(key)
 
-	item := h.addrspcs.Get(&store.Item[T]{
+	item := h.store.Get(&store.Item[T]{
 		Key:  key,
 		Hash: hash,
 	})
@@ -83,7 +83,7 @@ func (h *HashTable[T]) Get(key string) T {
 func (h *HashTable[T]) Delete(key string) bool {
 	hash := h.hash(key)
 
-	return h.addrspcs.Delete(&store.Item[T]{
+	return h.store.Delete(&store.Item[T]{
 		Key:  key,
 		Hash: hash,
 	})
