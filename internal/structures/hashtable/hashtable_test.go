@@ -78,18 +78,21 @@ func TestHashTableSet(t *testing.T) {
 		t.Run("store="+st.Name, func(t *testing.T) {
 			t.Parallel()
 
-			h := hashtable.NewHashTable[string](0, nil, st.Factory)
+			t.Run("Set", func(t *testing.T) {
 
-			const (
-				key   = "key"
-				value = "value"
-			)
+				h := hashtable.NewHashTable[string](0, nil, st.Factory)
 
-			h.Set(key, value)
+				const (
+					key   = "key"
+					value = "value"
+				)
 
-			if got := h.Get(key); got != value {
-				t.Errorf("Get() = %#v, want %#v", got, value)
-			}
+				h.Set(key, value)
+
+				if got := h.Get(key); got != value {
+					t.Errorf("Get() = %#v, want %#v", got, value)
+				}
+			})
 
 			t.Run("Overwrite value", func(t *testing.T) {
 				t.Parallel()
