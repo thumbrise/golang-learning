@@ -11,5 +11,5 @@ package store
 type Store[T any] interface {
 	Set(item ROItem[T]) bool
 	Get(item ROItem[T]) ROItem[T]
-	Delete(Item ROItem[T]) bool
+	Delete(item ROItem[T]) bool
 }

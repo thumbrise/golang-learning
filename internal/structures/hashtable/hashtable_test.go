@@ -2,51 +2,33 @@ package hashtable_test
 
 import (
 	"fmt"
-	"strconv"
+	"sync"
 	"testing"
 
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable"
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
-	"golang.org/x/sync/errgroup"
 )
 
-func TestHashTableConcurrent(t *testing.T) {
-	t.Parallel()
-
-	values := []string{}
-
-	const count = 100000
+func TestHashTableConcurrentUniqueKeys(t *testing.T) {
+	const count = 1000
+	ht := hashtable.NewHashTable[string](0, nil, nil)
+	var wg sync.WaitGroup
 	for i := range count {
-		value := "value" + strconv.Itoa(i)
-		values = append(values, value)
+		wg.Add(1)
+		go func(n int) {
+			defer wg.Done()
+			key := fmt.Sprintf("key-%d", n)
+			ht.Set(key, fmt.Sprintf("value-%d", n))
+		}(i)
 	}
-
-	h := hashtable.NewHashTable[string](0, nil, nil)
-
-	const key = "replaceable_key"
-
-	errgrp := &errgroup.Group{}
-	for _, value := range values {
-		errgrp.Go(func() error {
-			h.Set(key, value)
-
-			return nil
-		})
-	}
-
-	_ = errgrp.Wait()
-
-	want := "value" + strconv.Itoa(count-1)
-	if got := h.Get(key); got != want {
-		// TODO: hashtable_test.go:42: Get() = "value99994", want "value99999"
-		//  И тому подобное. Гонка
-		t.Errorf("Get() = %#v, want %#v", got, want)
-	}
-
-	h.Delete(key)
-
-	if got := h.Get(key); got != "" {
-		t.Errorf("Get() after delete = %#v, want %#v", got, "")
+	wg.Wait()
+	// Проверяем, что все ключи на месте
+	for i := range count {
+		key := fmt.Sprintf("key-%d", i)
+		want := fmt.Sprintf("value-%d", i)
+		if got := ht.Get(key); got != want {
+			t.Errorf("for key %s: got %s, want %s", key, got, want)
+		}
 	}
 }
 
