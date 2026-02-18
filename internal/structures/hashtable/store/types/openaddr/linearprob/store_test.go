@@ -10,7 +10,7 @@ import (
 func TestStore_Set(t *testing.T) {
 	stor := linearprob.NewStore[int](10)
 
-	res := stor.Set(&store.Item[int]{
+	res := stor.Set(&store.HashedItem[int]{
 		Key:   "key",
 		Hash:  0,
 		Value: 1,
@@ -23,7 +23,7 @@ func TestStore_Set(t *testing.T) {
 func TestStore_Get(t *testing.T) {
 	stor := linearprob.NewStore[int](10)
 
-	res := stor.Set(&store.Item[int]{
+	res := stor.Set(&store.HashedItem[int]{
 		Key:   "key",
 		Value: 1,
 	})
@@ -31,7 +31,7 @@ func TestStore_Get(t *testing.T) {
 		t.Error("expected true, got false")
 	}
 
-	getRes := stor.Get(&store.Item[int]{
+	getRes := stor.Get(&store.HashedItem[int]{
 		Key: "key",
 	})
 	if getRes.GetValue() != 1 {
@@ -42,7 +42,7 @@ func TestStore_Get(t *testing.T) {
 func TestStore_Delete(t *testing.T) {
 	stor := linearprob.NewStore[int](10)
 
-	res := stor.Set(&store.Item[int]{
+	res := stor.Set(&store.HashedItem[int]{
 		Key:   "key",
 		Value: 1,
 	})
@@ -50,7 +50,7 @@ func TestStore_Delete(t *testing.T) {
 		t.Error("expected true, got false")
 	}
 
-	deleteRes := stor.Delete(&store.Item[int]{
+	deleteRes := stor.Delete(&store.HashedItem[int]{
 		Key: "key",
 	})
 	if !deleteRes {

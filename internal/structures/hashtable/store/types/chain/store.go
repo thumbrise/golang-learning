@@ -31,7 +31,7 @@ func NewStore[T any](size int) *Store[T] {
 }
 
 // Set добавляет item в адресное пространство
-func (s *Store[T]) Set(item store.ROItem[T]) bool {
+func (s *Store[T]) Set(item store.Item[T]) bool {
 	bucket := s.bucket(item.GetHash())
 
 	addr := s.buckets[bucket]
@@ -45,20 +45,20 @@ func (s *Store[T]) Set(item store.ROItem[T]) bool {
 // Get возвращает item по bucket и key
 //
 // Возвращает nil, если item не найден
-func (s *Store[T]) Get(item store.ROItem[T]) store.ROItem[T] {
+func (s *Store[T]) Get(item store.Item[T]) store.Item[T] {
 	hash := item.GetHash()
 	bucket := s.bucket(hash)
 
 	addr := s.buckets[bucket]
 	if addr == nil {
-		return &store.Zero[T]{}
+		return &store.ZeroItem[T]{}
 	}
 
 	return addr.Get(item)
 }
 
 // Delete удаляет item по bucket и key
-func (s *Store[T]) Delete(item store.ROItem[T]) bool {
+func (s *Store[T]) Delete(item store.Item[T]) bool {
 	bucket := s.bucket(item.GetHash())
 
 	addr := s.buckets[bucket]

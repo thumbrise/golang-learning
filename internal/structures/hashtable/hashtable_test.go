@@ -231,26 +231,30 @@ func TestHashTableDelete(t *testing.T) {
 		t.Run("store="+st.Name, func(t *testing.T) {
 			t.Parallel()
 
-			h := hashtable.NewHashTable[string](0, nil, st.Factory)
+			t.Run("Delete", func(t *testing.T) {
+				t.Parallel()
 
-			const (
-				key   = "key"
-				value = "value"
-				want  = ""
-			)
+				h := hashtable.NewHashTable[string](0, nil, st.Factory)
 
-			h.Set(key, value)
+				const (
+					key   = "key"
+					value = "value"
+					want  = ""
+				)
 
-			if got := h.Get(key); got != value {
-				t.Errorf("Get() = %#v, want %#v", got, value)
-			}
+				h.Set(key, value)
 
-			// delete
-			h.Delete(key)
+				if got := h.Get(key); got != value {
+					t.Errorf("Get() = %#v, want %#v", got, value)
+				}
 
-			if got := h.Get(key); got != "" {
-				t.Errorf("Get() after delete = %#v, want %#v", got, want)
-			}
+				// delete
+				h.Delete(key)
+
+				if got := h.Get(key); got != "" {
+					t.Errorf("Get() after delete = %#v, want %#v", got, want)
+				}
+			})
 
 			presenceTests := []struct {
 				name string
@@ -277,9 +281,22 @@ func TestHashTableDelete(t *testing.T) {
 						value3 = "value3"
 					)
 
-					h.Set(key1, value1)
-					h.Set(key2, value2)
-					h.Set(key3, value3)
+					var b bool
+
+					b = h.Set(key1, value1)
+					if !b {
+						t.Errorf("Set(key1, value1) = %v, want true", b)
+					}
+
+					b = h.Set(key2, value2)
+					if !b {
+						t.Errorf("Set(key2, value2) = %v, want true", b)
+					}
+
+					b = h.Set(key3, value3)
+					if !b {
+						t.Errorf("Set(key3, value3) = %v, want true", b)
+					}
 
 					// Удаляем только key2
 					h.Delete(key2)

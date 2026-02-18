@@ -48,7 +48,7 @@ func NewHashTable[T any](size int, hasher Hasher, storeFactory StoreFactory[T]) 
 func (h *HashTable[T]) Set(key string, value T) bool {
 	hash := h.hash(key)
 
-	item := &store.Item[T]{
+	item := &store.HashedItem[T]{
 		Key:   key,
 		Hash:  hash,
 		Value: value,
@@ -64,7 +64,7 @@ func (h *HashTable[T]) Set(key string, value T) bool {
 func (h *HashTable[T]) Get(key string) T {
 	hash := h.hash(key)
 
-	item := h.store.Get(&store.Item[T]{
+	item := h.store.Get(&store.HashedItem[T]{
 		Key:  key,
 		Hash: hash,
 	})
@@ -75,7 +75,7 @@ func (h *HashTable[T]) Get(key string) T {
 func (h *HashTable[T]) Delete(key string) bool {
 	hash := h.hash(key)
 
-	return h.store.Delete(&store.Item[T]{
+	return h.store.Delete(&store.HashedItem[T]{
 		Key:  key,
 		Hash: hash,
 	})
