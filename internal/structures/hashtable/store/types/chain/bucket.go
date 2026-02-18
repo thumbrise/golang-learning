@@ -66,15 +66,8 @@ func (h *Bucket[T]) Delete(item store.ROItem[T]) bool {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	// TODO: Item затеняется. Но это не мешает?
-	//  Так как мы не используем item в цикле
-	//  А зачем мы тогда приняли item в параметрах?
-	//  Возможно, это сделано для единообразия с другими методами?
-	//  Нет, мы должны сравнивать existingItem == passedItem
-	//  А щас удаляются АБСОЛЮТНО все данные из ведра, критический ужасный баг.
-	//  Нужно составить тест на этот случай.
-	for i, item := range h.items {
-		if item.Hash == item.GetHash() && item.Key == item.GetKey() {
+	for i, existingItem := range h.items {
+		if existingItem.Hash == item.GetHash() && existingItem.Key == item.GetKey() {
 			h.items = append(h.items[:i], h.items[i+1:]...)
 
 			return true

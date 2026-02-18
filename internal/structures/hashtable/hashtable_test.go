@@ -69,10 +69,53 @@ func TestHashTableDelete(t *testing.T) {
 		}
 	})
 
-	t.Run("Other items still present", func(t *testing.T) {
+	t.Run("Other items still present in table", func(t *testing.T) {
 		t.Parallel()
 
 		h := hashtable.NewHashTable[string](0, nil, nil)
+
+		const (
+			key1 = "key1"
+			key2 = "key2"
+			key3 = "key3"
+		)
+
+		const (
+			value1 = "value1"
+			value2 = "value2"
+			value3 = "value3"
+		)
+
+		h.Set(key1, value1)
+		h.Set(key2, value2)
+		h.Set(key3, value3)
+
+		// Удаляем только key2
+		h.Delete(key2)
+
+		want1 := value1
+		want2 := ""
+		want3 := value3
+
+		// Ожидаем, что key1 и key3 сохранились, а key2 удален
+		if got := h.Get(key1); got != want1 {
+			t.Errorf("Get() = %v, want %v", got, want1)
+		}
+
+		if got := h.Get(key2); got != want2 {
+			t.Errorf("Get() after delete = %v, want %v", got, want2)
+		}
+
+		if got := h.Get(key3); got != want3 {
+			t.Errorf("Get() = %v, want %v", got, want3)
+		}
+	})
+
+	t.Run("Other items still present in same bucket", func(t *testing.T) {
+		t.Parallel()
+
+		// Создаем хеш-таблицу с фиксированным размером, чтобы все элементы попали в одно ведро
+		h := hashtable.NewHashTable[string](1, nil, nil)
 
 		const (
 			key1 = "key1"
