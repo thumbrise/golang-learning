@@ -11,20 +11,26 @@ import (
 
 func TestHashTableConcurrentUniqueKeys(t *testing.T) {
 	const count = 1000
+
 	ht := hashtable.NewHashTable[string](0, nil, nil)
+
 	var wg sync.WaitGroup
 	for i := range count {
 		wg.Add(1)
+
 		go func(n int) {
 			defer wg.Done()
+
 			key := fmt.Sprintf("key-%d", n)
 			ht.Set(key, fmt.Sprintf("value-%d", n))
 		}(i)
 	}
+
 	wg.Wait()
 	// Проверяем, что все ключи на месте
 	for i := range count {
 		key := fmt.Sprintf("key-%d", i)
+
 		want := fmt.Sprintf("value-%d", i)
 		if got := ht.Get(key); got != want {
 			t.Errorf("for key %s: got %s, want %s", key, got, want)
@@ -140,6 +146,23 @@ func TestHashTableSet(t *testing.T) {
 
 func TestHashTableGet(t *testing.T) {
 	t.Parallel()
+
+	t.Run("Get existing key", func(t *testing.T) {
+		t.Parallel()
+
+		h := hashtable.NewHashTable[string](0, nil, nil)
+
+		const (
+			key   = "key"
+			value = "value"
+		)
+
+		h.Set(key, value)
+
+		if got := h.Get(key); got != value {
+			t.Errorf("Get() = %#v, want %#v", got, value)
+		}
+	})
 
 	t.Run("Get non-existent key", func(t *testing.T) {
 		t.Parallel()
