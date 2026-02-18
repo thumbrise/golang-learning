@@ -10,9 +10,9 @@ tasks:
   test:
     desc: Запустить тесты
     cmds:
-      - go test ./... {{.CLI_ARGS}}
+      - go test ./... -race {{.CLI_ARGS}}
 
   bench:
     desc: Запустить бенчмарки
     cmds:
-      - go test ./... -bench . -benchmem
+      - go test ./... -bench -race . -benchmem
