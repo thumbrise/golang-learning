@@ -9,6 +9,7 @@ import (
 
 func TestStore_Set(t *testing.T) {
 	stor := linearprob.NewStore[int](10)
+
 	res := stor.Set(&store.Item[int]{
 		Key:   "key",
 		Hash:  0,
@@ -21,6 +22,7 @@ func TestStore_Set(t *testing.T) {
 
 func TestStore_Get(t *testing.T) {
 	stor := linearprob.NewStore[int](10)
+
 	res := stor.Set(&store.Item[int]{
 		Key:   "key",
 		Value: 1,
@@ -39,6 +41,7 @@ func TestStore_Get(t *testing.T) {
 
 func TestStore_Delete(t *testing.T) {
 	stor := linearprob.NewStore[int](10)
+
 	res := stor.Set(&store.Item[int]{
 		Key:   "key",
 		Value: 1,

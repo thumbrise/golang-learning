@@ -4,7 +4,6 @@ package linearprob
 import (
 	"errors"
 	"fmt"
-
 	"sync"
 
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
@@ -15,13 +14,16 @@ type Store[T any] struct {
 	mu    sync.RWMutex
 }
 
-const sizeMultiplier = 2
-const defaultSize = 5 << 10 // 5 * 2^10 = 5120
+const (
+	sizeMultiplier = 2
+	defaultSize    = 5 << 10 // 5 * 2^10 = 5120
+)
 
 func NewStore[T any](size int) *Store[T] {
 	if size == 0 {
 		size = defaultSize
 	}
+
 	size *= sizeMultiplier
 
 	items := make([]store.ROItem[T], size)
@@ -40,6 +42,7 @@ func failInsert[T any](item store.ROItem[T], s *Store[T]) {
 	err := fmt.Errorf("%w: key=%s hash=%d size=%d", ErrNoSpace, item.GetKey(), item.GetHash(), len(s.items))
 	panic(err)
 }
+
 func (s *Store[T]) Set(item store.ROItem[T]) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -48,6 +51,7 @@ func (s *Store[T]) Set(item store.ROItem[T]) bool {
 
 	if index == -1 {
 		s.grow()
+
 		index = findFreeIndex(item, s.items)
 		if index == -1 {
 			failInsert(item, s)
@@ -55,6 +59,7 @@ func (s *Store[T]) Set(item store.ROItem[T]) bool {
 	}
 
 	s.items[index] = item.Copy()
+
 	return true
 }
 
@@ -111,6 +116,7 @@ func (s *Store[T]) grow() {
 			if newIndex == -1 {
 				failInsert(s.items[i], s)
 			}
+
 			newItems[newIndex] = s.items[i]
 		}
 	}
@@ -122,9 +128,9 @@ func (s *Store[T]) grow() {
 func (s *Store[T]) Size() int {
 	// Не использовать эту функцию внутри других функций, которые уже захватывают блокировку
 	// для избегания рекурсивных взаимных блокировок
-
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+
 	return len(s.items)
 }
 
@@ -134,11 +140,13 @@ func (s *Store[T]) FillFactor() float64 {
 	defer s.mu.RUnlock()
 
 	filled := 0
+
 	for i := range s.items {
 		if !isZero(s.items[i]) {
 			filled++
 		}
 	}
+
 	return float64(filled) / float64(len(s.items))
 }
 
@@ -153,7 +161,7 @@ func findFreeIndex[T any](insertable store.ROItem[T], items []store.ROItem[T]) i
 		}
 	}
 
-	for i := 0; i < start; i++ {
+	for i := range start {
 		if isZero(items[i]) {
 			return i
 		}
@@ -176,7 +184,7 @@ func findItemIndex[T any](target store.ROItem[T], items []store.ROItem[T]) int {
 		}
 	}
 
-	for i := 0; i < start; i++ {
+	for i := range start {
 		if isZero(items[i]) {
 			return -1
 		}

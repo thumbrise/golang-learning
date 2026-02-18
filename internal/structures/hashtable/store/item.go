@@ -30,6 +30,7 @@ func (i *Item[T]) Copy() ROItem[T] {
 		Value: i.Value,
 	}
 }
+
 func (i *Item[T]) IsZero() bool {
 	return false
 }

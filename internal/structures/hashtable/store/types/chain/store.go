@@ -18,6 +18,7 @@ func NewStore[T any](size int) *Store[T] {
 	if size == 0 {
 		size = defaultSize
 	}
+
 	buckets := make([]*Bucket[T], size)
 	for i := range size {
 		buckets[i] = NewBucket[T]()

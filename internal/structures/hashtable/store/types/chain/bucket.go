@@ -76,6 +76,3 @@ func (h *Bucket[T]) Delete(item store.ROItem[T]) bool {
 
 	return false
 }
-func (s *Store[T]) isZero(item store.ROItem[T]) bool {
-	return item == nil || item.IsZero()
-}
