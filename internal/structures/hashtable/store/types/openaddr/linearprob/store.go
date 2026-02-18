@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 
+	"sync"
+
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
 )
 
 type Store[T any] struct {
-	size  int
 	items []store.ROItem[T]
+	mu    sync.RWMutex
 }
 
 const sizeMultiplier = 2
@@ -29,19 +31,27 @@ func NewStore[T any](size int) *Store[T] {
 
 	return &Store[T]{
 		items: items,
-		size:  size,
 	}
 }
 
-var ErrNoFreeIndex = errors.New("no free index")
+var ErrNoSpace = errors.New("failed insert key: no free index even after grow")
 
-// Set добавляет item в адресное пространство
+func failInsert[T any](item store.ROItem[T], s *Store[T]) {
+	err := fmt.Errorf("%w: key=%s hash=%d size=%d", ErrNoSpace, item.GetKey(), item.GetHash(), len(s.items))
+	panic(err)
+}
 func (s *Store[T]) Set(item store.ROItem[T]) bool {
-	index := s.probFreeIndex(item.GetHash())
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	index := findFreeIndex(item, s.items)
 
 	if index == -1 {
-		err := fmt.Errorf("%w: key=%s hash=%d size=%d", ErrNoFreeIndex, item.GetKey(), item.GetHash(), s.size)
-		panic(err)
+		s.grow()
+		index = findFreeIndex(item, s.items)
+		if index == -1 {
+			failInsert(item, s)
+		}
 	}
 
 	s.items[index] = item.Copy()
@@ -49,29 +59,34 @@ func (s *Store[T]) Set(item store.ROItem[T]) bool {
 }
 
 func (s *Store[T]) Get(item store.ROItem[T]) store.ROItem[T] {
-	idx := s.probItemIndex(item)
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	idx := findItemIndex(item, s.items)
 
 	if idx == -1 {
 		return &store.Zero[T]{}
 	}
 
 	addr := s.items[idx]
-	if s.isZero(addr) {
+	if isZero(addr) {
 		return &store.Zero[T]{}
 	}
 
 	return addr
 }
 
-// Delete удаляет item по bucket и key
 func (s *Store[T]) Delete(item store.ROItem[T]) bool {
-	idx := s.probItemIndex(item)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	idx := findItemIndex(item, s.items)
 
 	if idx == -1 {
 		return false
 	}
 
-	if s.isZero(s.items[idx]) {
+	if isZero(s.items[idx]) {
 		return false
 	}
 
@@ -80,19 +95,66 @@ func (s *Store[T]) Delete(item store.ROItem[T]) bool {
 	return true
 }
 
+// grow увеличивает размер хеш-таблицы в sizeMultiplier раз
+// Расчитывает новые индексы для всех элементов и переносит их в новый массив
+func (s *Store[T]) grow() {
+	newSize := len(s.items) * sizeMultiplier
+
+	newItems := make([]store.ROItem[T], newSize)
+	for i := range newSize {
+		newItems[i] = &store.Zero[T]{}
+	}
+
+	for i := range s.items {
+		if !isZero(s.items[i]) {
+			newIndex := findFreeIndex(s.items[i], newItems)
+			if newIndex == -1 {
+				failInsert(s.items[i], s)
+			}
+			newItems[newIndex] = s.items[i]
+		}
+	}
+
+	s.items = newItems
+}
+
+// Size возвращает размер хеш-таблицы
+func (s *Store[T]) Size() int {
+	// Не использовать эту функцию внутри других функций, которые уже захватывают блокировку
+	// для избегания рекурсивных взаимных блокировок
+
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return len(s.items)
+}
+
+// FillFactor возвращает коэффициент заполнения хеш-таблицы
+func (s *Store[T]) FillFactor() float64 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	filled := 0
+	for i := range s.items {
+		if !isZero(s.items[i]) {
+			filled++
+		}
+	}
+	return float64(filled) / float64(len(s.items))
+}
+
 // probFreeIndex возвращает индекс свободной ячейки в хеш-таблице учииывая алгоритм линейного пробирования
 // Циклически проходит по хеш-таблице start -> s.size -> 0 -> start-1
-func (s *Store[T]) probFreeIndex(hash uint64) int {
-	start := s.hashToIndex(hash)
+func findFreeIndex[T any](insertable store.ROItem[T], items []store.ROItem[T]) int {
+	start := hashToIndex(insertable.GetHash(), items)
 
-	for i := start; i < s.size; i++ {
-		if s.isZero(s.items[i]) {
+	for i := start; i < len(items); i++ {
+		if isZero(items[i]) {
 			return i
 		}
 	}
 
 	for i := 0; i < start; i++ {
-		if s.isZero(s.items[i]) {
+		if isZero(items[i]) {
 			return i
 		}
 	}
@@ -100,26 +162,26 @@ func (s *Store[T]) probFreeIndex(hash uint64) int {
 	return -1
 }
 
-// probItemIndex пытается найти элемент с помощью алгоритма линейного пробирования
-func (s *Store[T]) probItemIndex(item store.ROItem[T]) int {
-	start := s.hashToIndex(item.GetHash())
+// findItemIndex пытается найти элемент с помощью алгоритма линейного пробирования
+func findItemIndex[T any](target store.ROItem[T], items []store.ROItem[T]) int {
+	start := hashToIndex(target.GetHash(), items)
 
-	for i := start; i < s.size; i++ {
-		if s.isZero(s.items[i]) {
+	for i := start; i < len(items); i++ {
+		if isZero(items[i]) {
 			return -1
 		}
 
-		if s.items[i].Compare(item) {
+		if items[i].Compare(target) {
 			return i
 		}
 	}
 
 	for i := 0; i < start; i++ {
-		if s.isZero(s.items[i]) {
+		if isZero(items[i]) {
 			return -1
 		}
 
-		if s.items[i].Compare(item) {
+		if items[i].Compare(target) {
 			return i
 		}
 	}
@@ -127,11 +189,11 @@ func (s *Store[T]) probItemIndex(item store.ROItem[T]) int {
 	return -1
 }
 
-func (s *Store[T]) hashToIndex(hash uint64) int {
+func hashToIndex[T any](hash uint64, items []store.ROItem[T]) int {
 	//nolint:gosec // Логика работы хеш-таблицы предполагает такой каст. Номер ведра не может быть отрицательным.
-	return int(hash % uint64(s.size))
+	return int(hash % uint64(len(items)))
 }
 
-func (s *Store[T]) isZero(item store.ROItem[T]) bool {
+func isZero[T any](item store.ROItem[T]) bool {
 	return item == nil || item.IsZero()
 }

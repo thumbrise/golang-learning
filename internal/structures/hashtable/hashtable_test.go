@@ -9,6 +9,7 @@ import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/chain"
+	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/openaddr/linearprob"
 )
 
 type StoreFactory[T any] struct {
@@ -22,6 +23,12 @@ func getStores[T any]() []StoreFactory[T] {
 			Name: "chain",
 			Factory: func(size int) store.Store[T] {
 				return chain.NewStore[T](size)
+			},
+		},
+		{
+			Name: "open addr linear prob",
+			Factory: func(size int) store.Store[T] {
+				return linearprob.NewStore[T](size)
 			},
 		},
 	}
@@ -103,6 +110,9 @@ func TestHashTableSet(t *testing.T) {
 				newValue := "new value"
 				h.Set(key, newValue)
 
+				// TODO:
+				//     hashtable_test.go:114: Get() = "value", want "new value"
+				//--- FAIL: TestHashTableSet/store=open_addr_linear_prob/Overwrite_value (0.00s)
 				if got := h.Get(key); got != newValue {
 					t.Errorf("Get() = %#v, want %#v", got, newValue)
 				}
@@ -151,6 +161,9 @@ func TestHashTableSet(t *testing.T) {
 					h.Set(key, values[i])
 				}
 
+				// TODO:
+				//     hashtable_test.go:165: Get() = "value0", want "value49"
+				//--- FAIL: TestHashTableSet/store=open_addr_linear_prob/Same_keys_overwrite_instead_of_stacking (0.00s)
 				if got := h.Get(key); got != values[49] {
 					t.Errorf("Get() = %#v, want %#v", got, values[49])
 				}
