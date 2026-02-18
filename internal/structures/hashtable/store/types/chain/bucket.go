@@ -30,7 +30,7 @@ func (h *Bucket[T]) Set(item store.ROItem[T]) bool {
 	}
 
 	for i, existingItem := range h.items {
-		if existingItem.Compare(item) {
+		if existingItem.CompareKey(item) {
 			h.items[i] = itemToSet
 
 			return true
@@ -53,7 +53,7 @@ func (h *Bucket[T]) Get(item store.ROItem[T]) store.ROItem[T] {
 
 	// Полагаемся на метод Set. Он должен недопустить дубликатов ключей
 	for _, existingItem := range h.items {
-		if existingItem.Compare(item) {
+		if existingItem.CompareKey(item) {
 			return existingItem
 		}
 	}
@@ -67,7 +67,7 @@ func (h *Bucket[T]) Delete(item store.ROItem[T]) bool {
 	defer h.mu.Unlock()
 
 	for i, existingItem := range h.items {
-		if existingItem.Compare(item) {
+		if existingItem.CompareKey(item) {
 			h.items = append(h.items[:i], h.items[i+1:]...)
 
 			return true

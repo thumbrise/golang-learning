@@ -156,13 +156,14 @@ func findFreeIndex[T any](insertable store.ROItem[T], items []store.ROItem[T]) i
 	start := hashToIndex(insertable.GetHash(), items)
 
 	for i := start; i < len(items); i++ {
-		if isZero(items[i]) {
+		// От пользователя ожидается либо вставка нового элемента, либо очевидная перезапись по ключу
+		if isZero(items[i]) || insertable.CompareKey(items[i]) {
 			return i
 		}
 	}
 
 	for i := range start {
-		if isZero(items[i]) {
+		if isZero(items[i]) || insertable.CompareKey(items[i]) {
 			return i
 		}
 	}
@@ -179,7 +180,7 @@ func findItemIndex[T any](target store.ROItem[T], items []store.ROItem[T]) int {
 			return -1
 		}
 
-		if items[i].Compare(target) {
+		if items[i].CompareKey(target) {
 			return i
 		}
 	}
@@ -189,7 +190,7 @@ func findItemIndex[T any](target store.ROItem[T], items []store.ROItem[T]) int {
 			return -1
 		}
 
-		if items[i].Compare(target) {
+		if items[i].CompareKey(target) {
 			return i
 		}
 	}

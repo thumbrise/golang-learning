@@ -19,7 +19,7 @@ func (i *Item[T]) GetValue() T {
 	return i.Value
 }
 
-func (i *Item[T]) Compare(other ROItem[T]) bool {
+func (i *Item[T]) CompareKey(other ROItem[T]) bool {
 	return i.Hash == other.GetHash() && i.Key == other.GetKey()
 }
 

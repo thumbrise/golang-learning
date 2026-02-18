@@ -79,6 +79,7 @@ func TestHashTableSet(t *testing.T) {
 			t.Parallel()
 
 			t.Run("Set", func(t *testing.T) {
+				t.Parallel()
 
 				h := hashtable.NewHashTable[string](0, nil, st.Factory)
 
@@ -113,9 +114,6 @@ func TestHashTableSet(t *testing.T) {
 				newValue := "new value"
 				h.Set(key, newValue)
 
-				// TODO:
-				//     hashtable_test.go:114: Get() = "value", want "new value"
-				//--- FAIL: TestHashTableSet/store=open_addr_linear_prob/Overwrite_value (0.00s)
 				if got := h.Get(key); got != newValue {
 					t.Errorf("Get() = %#v, want %#v", got, newValue)
 				}

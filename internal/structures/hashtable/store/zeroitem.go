@@ -17,7 +17,7 @@ func (i *Zero[T]) GetValue() T {
 	return zero
 }
 
-func (i *Zero[T]) Compare(other ROItem[T]) bool {
+func (i *Zero[T]) CompareKey(other ROItem[T]) bool {
 	return false
 }
 
