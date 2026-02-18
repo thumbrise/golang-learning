@@ -288,6 +288,12 @@ func TestHashTableDelete(t *testing.T) {
 					want2 := ""
 					want3 := value3
 
+					// TODO: === CONT  TestHashTableDelete/store=open_addr_linear_prob/Other_items_still_present_in_same_bucket
+					//    hashtable_test.go:293: Get() = "", want "value1"
+					//    --- FAIL: TestHashTableDelete/store=open_addr_linear_prob/Other_items_still_present_in_same_bucket (0.00s)
+					//    Тут где-то есть гонка
+					//    Ошибка раз через раз
+
 					// Ожидаем, что key1 и key3 сохранились, а key2 удален
 					if got := h.Get(key1); got != want1 {
 						t.Errorf("Get() = %#v, want %#v", got, want1)
