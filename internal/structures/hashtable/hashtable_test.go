@@ -128,12 +128,13 @@ func TestHashTableSet(t *testing.T) {
 
 		h := hashtable.NewHashTable[string](0, nil, nil)
 
-		const key = "key"
-		const value = "value1"
+		const (
+			key = "key"
+		)
 
 		values := [50]string{}
 
-		for i := 0; i < 50; i++ {
+		for i := range 50 {
 			values[i] = fmt.Sprintf("value%d", i)
 			h.Set(key, values[i])
 		}
@@ -143,6 +144,7 @@ func TestHashTableSet(t *testing.T) {
 		}
 
 		h.Delete(key)
+
 		if got := h.Get(key); got != "" {
 			t.Errorf("Get() = %#v, want %#v", got, "")
 		}
@@ -165,8 +167,10 @@ func TestHashTableGet(t *testing.T) {
 
 		h := hashtable.NewHashTable[string](0, nil, nil)
 
-		const key = "non-existent-key"
-		const want = ""
+		const (
+			key  = "non-existent-key"
+			want = ""
+		)
 
 		if got := h.Get(key); got != want {
 			t.Errorf("Get() = %#v, want %#v", got, want)
@@ -243,6 +247,13 @@ func TestHashTableDelete(t *testing.T) {
 				t.Errorf("Get() = %#v, want %#v", got, want1)
 			}
 
+			// --- FAIL: TestHashTableDelete (0.00s)
+			//    --- FAIL: TestHashTableDelete/Other_items_still_present_in_same_bucket (0.00s)
+			//        hashtable_test.go:247: Get() after delete = "value1", want ""
+			//        hashtable_test.go:251: Get() = "value1", want "value3"
+			// В чем может быть беда?
+			// Скорее всего в алгоритме удаления.
+			// Надо проверить, что удаляется именно тот элемент, который нужно.
 			if got := h.Get(key2); got != want2 {
 				t.Errorf("Get() after delete = %#v, want %#v", got, want2)
 			}

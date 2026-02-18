@@ -29,8 +29,8 @@ func (h *Bucket[T]) Set(item store.ROItem[T]) bool {
 		Value: item.GetValue(),
 	}
 
-	for i, existing := range h.items {
-		if existing.Hash == item.GetHash() && existing.Key == item.GetKey() {
+	for i, existingItem := range h.items {
+		if existingItem.Hash == item.GetHash() && existingItem.Key == item.GetKey() {
 			h.items[i] = itemToSet
 
 			return true
@@ -52,9 +52,9 @@ func (h *Bucket[T]) Get(item store.ROItem[T]) store.ROItem[T] {
 	defer h.mu.RUnlock()
 
 	// Полагаемся на метод Set. Он должен недопустить дубликатов ключей
-	for _, item := range h.items {
-		if item.Hash == item.GetHash() && item.Key == item.GetKey() {
-			return item
+	for _, existingItem := range h.items {
+		if existingItem.Hash == item.GetHash() && existingItem.Key == item.GetKey() {
+			return existingItem
 		}
 	}
 
