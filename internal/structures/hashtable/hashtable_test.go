@@ -9,6 +9,9 @@ import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
 )
 
+// TODO: Вынести интеграционное тестирование в пакет stores_test.
+//  Здесь оставить только модульное тестирование хештейбла как диспетчера.
+
 func TestHashTableConcurrentUniqueKeys(t *testing.T) {
 	const count = 1000
 
