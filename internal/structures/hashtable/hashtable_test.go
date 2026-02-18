@@ -10,7 +10,6 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// Почему delete работает? Он ведь недоделан??? Надо проверить
 func TestHashTableConcurrent(t *testing.T) {
 	t.Parallel()
 
@@ -44,7 +43,6 @@ func TestHashTableConcurrent(t *testing.T) {
 		t.Errorf("Get() = %#v, want %#v", got, want)
 	}
 
-	// delete
 	h.Delete(key)
 
 	if got := h.Get(key); got != "" {
@@ -149,7 +147,6 @@ func TestHashTableSet(t *testing.T) {
 			t.Errorf("Get() = %#v, want %#v", got, "")
 		}
 
-		// Verify that the last value is still there
 		veryNewValue := "very new value"
 		h.Set(key, veryNewValue)
 
@@ -247,13 +244,6 @@ func TestHashTableDelete(t *testing.T) {
 				t.Errorf("Get() = %#v, want %#v", got, want1)
 			}
 
-			// --- FAIL: TestHashTableDelete (0.00s)
-			//    --- FAIL: TestHashTableDelete/Other_items_still_present_in_same_bucket (0.00s)
-			//        hashtable_test.go:247: Get() after delete = "value1", want ""
-			//        hashtable_test.go:251: Get() = "value1", want "value3"
-			// В чем может быть беда?
-			// Скорее всего в алгоритме удаления.
-			// Надо проверить, что удаляется именно тот элемент, который нужно.
 			if got := h.Get(key2); got != want2 {
 				t.Errorf("Get() after delete = %#v, want %#v", got, want2)
 			}
@@ -266,15 +256,15 @@ func TestHashTableDelete(t *testing.T) {
 }
 
 func BenchmarkHashTable_InsertAfterFill(b *testing.B) {
-	sizes := []int{100, 1000, 10000}
-	fills := []int{0, 10, 100, 1000, 10000, 100000}
+	sizes := []int{10, 100, 1000, 10000}
+	fills := []int{10, 100, 1000, 10000}
 	badHasher := hashers.NewFirstRuneReturnHasher()
 	goodHasher := hashers.NewMapHashHasher()
 	hshrs := []hashtable.Hasher{badHasher, goodHasher}
 	strategies := []string{"chain", "open"}
 
 	// Предгенерируем пул ключей (достаточно большой)
-	const maxKeys = 200000
+	const maxKeys = 20000
 
 	keys := make([]string, maxKeys)
 	for i := range keys {

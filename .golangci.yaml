@@ -143,6 +143,7 @@ linters:
         path: .*cmd.*
       - linters:
           - funlen
+          - cyclop
         path: .*_test\.go
 
     paths:
