@@ -7,6 +7,7 @@ import (
 
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable"
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
+	"golang.org/x/sync/errgroup"
 )
 
 // Почему delete работает? Он ведь недоделан??? Надо проверить
@@ -24,21 +25,153 @@ func TestHashTableConcurrent(t *testing.T) {
 	h := hashtable.NewHashTable[string](0, nil, nil)
 
 	const key = "replaceable_key"
+
+	errgrp := &errgroup.Group{}
 	for _, value := range values {
-		h.Set(key, value)
+		errgrp.Go(func() error {
+			h.Set(key, value)
+
+			return nil
+		})
 	}
+
+	_ = errgrp.Wait()
 
 	want := "value" + strconv.Itoa(count-1)
 	if got := h.Get(key); got != want {
-		t.Errorf("Get() = %v, want %v", got, want)
+		// TODO: hashtable_test.go:42: Get() = "value99994", want "value99999"
+		//  И тому подобное. Гонка
+		t.Errorf("Get() = %#v, want %#v", got, want)
 	}
 
 	// delete
 	h.Delete(key)
 
 	if got := h.Get(key); got != "" {
-		t.Errorf("Get() after delete = %v, want %v", got, "")
+		t.Errorf("Get() after delete = %#v, want %#v", got, "")
 	}
+}
+
+func TestHashTableSet(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Set item", func(t *testing.T) {
+		t.Parallel()
+
+		h := hashtable.NewHashTable[string](0, nil, nil)
+
+		const (
+			key   = "key"
+			value = "value"
+		)
+
+		h.Set(key, value)
+
+		if got := h.Get(key); got != value {
+			t.Errorf("Get() = %#v, want %#v", got, value)
+		}
+	})
+
+	t.Run("Overwrite value", func(t *testing.T) {
+		t.Parallel()
+
+		h := hashtable.NewHashTable[string](0, nil, nil)
+
+		const (
+			key   = "key"
+			value = "value"
+		)
+
+		h.Set(key, value)
+
+		if got := h.Get(key); got != value {
+			t.Errorf("Get() = %#v, want %#v", got, value)
+		}
+
+		newValue := "new value"
+		h.Set(key, newValue)
+
+		if got := h.Get(key); got != newValue {
+			t.Errorf("Get() = %#v, want %#v", got, newValue)
+		}
+	})
+	t.Run("Overwrite key", func(t *testing.T) {
+		t.Parallel()
+
+		h := hashtable.NewHashTable[string](0, nil, nil)
+
+		const (
+			key   = "key"
+			value = "value"
+		)
+
+		h.Set(key, value)
+
+		if got := h.Get(key); got != value {
+			t.Errorf("Get() = %#v, want %#v", got, value)
+		}
+
+		newKey := "new key"
+		h.Set(newKey, value)
+
+		if got := h.Get(key); got != value {
+			t.Errorf("Get() = %#v, want %#v", got, value)
+		}
+
+		if got := h.Get(newKey); got != value {
+			t.Errorf("Get() = %#v, want %#v", got, value)
+		}
+	})
+
+	t.Run("Same keys overwrite instead of stacking", func(t *testing.T) {
+		t.Parallel()
+
+		h := hashtable.NewHashTable[string](0, nil, nil)
+
+		const key = "key"
+		const value = "value1"
+
+		values := [50]string{}
+
+		for i := 0; i < 50; i++ {
+			values[i] = fmt.Sprintf("value%d", i)
+			h.Set(key, values[i])
+		}
+
+		if got := h.Get(key); got != values[49] {
+			t.Errorf("Get() = %#v, want %#v", got, values[49])
+		}
+
+		h.Delete(key)
+		if got := h.Get(key); got != "" {
+			t.Errorf("Get() = %#v, want %#v", got, "")
+		}
+
+		// Verify that the last value is still there
+		veryNewValue := "very new value"
+		h.Set(key, veryNewValue)
+
+		if got := h.Get(key); got != veryNewValue {
+			t.Errorf("Get() = %#v, want %#v", got, veryNewValue)
+		}
+	})
+}
+
+func TestHashTableGet(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Get non-existent key", func(t *testing.T) {
+		t.Parallel()
+
+		h := hashtable.NewHashTable[string](0, nil, nil)
+
+		const key = "non-existent-key"
+		const want = ""
+
+		if got := h.Get(key); got != want {
+			t.Errorf("Get() = %#v, want %#v", got, want)
+		}
+	})
 }
 
 func TestHashTableDelete(t *testing.T) {
@@ -58,101 +191,67 @@ func TestHashTableDelete(t *testing.T) {
 		h.Set(key, value)
 
 		if got := h.Get(key); got != value {
-			t.Errorf("Get() = %v, want %v", got, value)
+			t.Errorf("Get() = %#v, want %#v", got, value)
 		}
 
 		// delete
 		h.Delete(key)
 
 		if got := h.Get(key); got != "" {
-			t.Errorf("Get() after delete = %v, want %v", got, want)
+			t.Errorf("Get() after delete = %#v, want %#v", got, want)
 		}
 	})
 
-	t.Run("Other items still present in table", func(t *testing.T) {
-		t.Parallel()
+	presenceTests := []struct {
+		name string
+		size int
+	}{
+		{name: "Other items still present in table", size: 0},
+		{name: "Other items still present in same bucket", size: 1},
+	}
+	for _, test := range presenceTests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-		h := hashtable.NewHashTable[string](0, nil, nil)
+			h := hashtable.NewHashTable[string](test.size, nil, nil)
 
-		const (
-			key1 = "key1"
-			key2 = "key2"
-			key3 = "key3"
-		)
+			const (
+				key1 = "key1"
+				key2 = "key2"
+				key3 = "key3"
+			)
 
-		const (
-			value1 = "value1"
-			value2 = "value2"
-			value3 = "value3"
-		)
+			const (
+				value1 = "value1"
+				value2 = "value2"
+				value3 = "value3"
+			)
 
-		h.Set(key1, value1)
-		h.Set(key2, value2)
-		h.Set(key3, value3)
+			h.Set(key1, value1)
+			h.Set(key2, value2)
+			h.Set(key3, value3)
 
-		// Удаляем только key2
-		h.Delete(key2)
+			// Удаляем только key2
+			h.Delete(key2)
 
-		want1 := value1
-		want2 := ""
-		want3 := value3
+			want1 := value1
+			want2 := ""
+			want3 := value3
 
-		// Ожидаем, что key1 и key3 сохранились, а key2 удален
-		if got := h.Get(key1); got != want1 {
-			t.Errorf("Get() = %v, want %v", got, want1)
-		}
+			// Ожидаем, что key1 и key3 сохранились, а key2 удален
+			if got := h.Get(key1); got != want1 {
+				t.Errorf("Get() = %#v, want %#v", got, want1)
+			}
 
-		if got := h.Get(key2); got != want2 {
-			t.Errorf("Get() after delete = %v, want %v", got, want2)
-		}
+			if got := h.Get(key2); got != want2 {
+				t.Errorf("Get() after delete = %#v, want %#v", got, want2)
+			}
 
-		if got := h.Get(key3); got != want3 {
-			t.Errorf("Get() = %v, want %v", got, want3)
-		}
-	})
-
-	t.Run("Other items still present in same bucket", func(t *testing.T) {
-		t.Parallel()
-
-		// Создаем хеш-таблицу с фиксированным размером, чтобы все элементы попали в одно ведро
-		h := hashtable.NewHashTable[string](1, nil, nil)
-
-		const (
-			key1 = "key1"
-			key2 = "key2"
-			key3 = "key3"
-		)
-
-		const (
-			value1 = "value1"
-			value2 = "value2"
-			value3 = "value3"
-		)
-
-		h.Set(key1, value1)
-		h.Set(key2, value2)
-		h.Set(key3, value3)
-
-		// Удаляем только key2
-		h.Delete(key2)
-
-		want1 := value1
-		want2 := ""
-		want3 := value3
-
-		// Ожидаем, что key1 и key3 сохранились, а key2 удален
-		if got := h.Get(key1); got != want1 {
-			t.Errorf("Get() = %v, want %v", got, want1)
-		}
-
-		if got := h.Get(key2); got != want2 {
-			t.Errorf("Get() after delete = %v, want %v", got, want2)
-		}
-
-		if got := h.Get(key3); got != want3 {
-			t.Errorf("Get() = %v, want %v", got, want3)
-		}
-	})
+			if got := h.Get(key3); got != want3 {
+				t.Errorf("Get() = %#v, want %#v", got, want3)
+			}
+		})
+	}
 }
 
 func BenchmarkHashTable_InsertAfterFill(b *testing.B) {

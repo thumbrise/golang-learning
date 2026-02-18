@@ -6,6 +6,7 @@ require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/emirpasic/gods v1.18.1
 	github.com/go-faker/faker/v4 v4.7.0
+	golang.org/x/sync v0.17.0
 )
 
 require (
