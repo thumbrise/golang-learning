@@ -6,10 +6,6 @@ import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/chain"
 )
 
-// defaultSize = 5 * 2^10 = 5120 buckets = 40KB mean size
-// Its ok for default?
-const defaultSize = 5 << 10
-
 type HashTable[T any] struct {
 	store  store.Store[T]
 	hasher Hasher
@@ -30,10 +26,6 @@ func defaultStoreFactory[T any](size int) store.Store[T] {
 //   - size: defaultSize
 //   - hasher: nil (будет использоваться стандартная хеш-функция)
 func NewHashTable[T any](size int, hasher Hasher, storeFactory StoreFactory[T]) *HashTable[T] {
-	if size == 0 {
-		size = defaultSize
-	}
-
 	if hasher == nil {
 		hasher = hashers.NewMapHashHasher()
 	}

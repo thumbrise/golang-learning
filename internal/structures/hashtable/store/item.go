@@ -18,3 +18,18 @@ func (i *Item[T]) GetHash() uint64 {
 func (i *Item[T]) GetValue() T {
 	return i.Value
 }
+
+func (i *Item[T]) Compare(other ROItem[T]) bool {
+	return i.Hash == other.GetHash() && i.Key == other.GetKey()
+}
+
+func (i *Item[T]) Copy() ROItem[T] {
+	return &Item[T]{
+		Key:   i.Key,
+		Hash:  i.Hash,
+		Value: i.Value,
+	}
+}
+func (i *Item[T]) IsZero() bool {
+	return false
+}

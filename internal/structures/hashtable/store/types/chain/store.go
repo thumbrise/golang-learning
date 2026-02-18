@@ -5,12 +5,19 @@ import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
 )
 
+// defaultSize = 5 * 2^10 = 5120 buckets = 40KB mean size
+// Its ok for default?
+const defaultSize = 5 << 10
+
 type Store[T any] struct {
 	size    int
 	buckets []*Bucket[T]
 }
 
 func NewStore[T any](size int) *Store[T] {
+	if size == 0 {
+		size = defaultSize
+	}
 	buckets := make([]*Bucket[T], size)
 	for i := range size {
 		buckets[i] = NewBucket[T]()

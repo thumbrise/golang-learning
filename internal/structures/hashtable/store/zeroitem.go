@@ -16,3 +16,15 @@ func (i *Zero[T]) GetValue() T {
 
 	return zero
 }
+
+func (i *Zero[T]) Compare(other ROItem[T]) bool {
+	return false
+}
+
+func (i *Zero[T]) Copy() ROItem[T] {
+	return i
+}
+
+func (i *Zero[T]) IsZero() bool {
+	return true
+}
