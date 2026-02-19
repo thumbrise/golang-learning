@@ -129,7 +129,39 @@ func TestArrayWithInt(t *testing.T) {
 					}
 				}
 			})
+			t.Run("Bounds", func(t *testing.T) {
+				testsBounds := []struct {
+					name      string
+					bound     int
+					wantPanic bool
+				}{
+					{name: "negative", bound: -1, wantPanic: true},
+					{name: "positive", bound: test.size, wantPanic: true},
+					{name: "zero", bound: 0, wantPanic: false},
+					{name: "last", bound: test.size - 1, wantPanic: false},
+					{name: "additional1", bound: test.size + 1, wantPanic: true},
+					{name: "additional2", bound: test.size / 2, wantPanic: false},
+					{name: "additional3", bound: test.size * 2, wantPanic: true},
+					{name: "additional4", bound: -test.size, wantPanic: true},
+					{name: "additional5", bound: test.size - 10000000, wantPanic: true},
+					{name: "additional6", bound: test.size * test.size, wantPanic: true},
+					{name: "additional7", bound: int(^uint(0) >> 1), wantPanic: true},
+				}
 
+				for _, testBound := range testsBounds {
+					t.Run(testBound.name, func(t *testing.T) {
+						func() {
+							defer func() {
+								if r := recover(); r == nil && testBound.wantPanic {
+									t.Errorf("Expected panic when try access index %d of array with size %d", testBound.bound, test.size)
+								}
+							}()
+
+							arr.Set(testBound.bound, 42)
+						}()
+					})
+				}
+			})
 			t.Run("Clear", func(t *testing.T) {
 				arr.Clear()
 				t.Run("IsCleared", func(t *testing.T) {
