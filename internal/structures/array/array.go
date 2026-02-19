@@ -31,8 +31,10 @@ func NewArray[T any](length int) *Array[T] {
 func (a *Array[T]) Get(index int) T {
 	a.checkBounds(index)
 
+	//nolint:govet // Надо
 	return *(*T)(unsafe.Pointer(a.addr(index)))
 }
+
 func (a *Array[T]) checkBounds(index int) {
 	if a == nil {
 		panic("array is nil")
@@ -51,6 +53,7 @@ func (a *Array[T]) Set(index int, value T) {
 	a.checkBounds(index)
 
 	valueAddr := a.addr(index)
+	//nolint:govet // Надо
 	*(*T)(unsafe.Pointer(valueAddr)) = value
 }
 

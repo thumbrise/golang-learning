@@ -54,6 +54,7 @@ func TestArrayWithInt(t *testing.T) {
 		value    int
 		toDelete bool
 	}
+
 	testsInt := []struct {
 		name string
 		size int
@@ -108,10 +109,12 @@ func TestArrayWithInt(t *testing.T) {
 					if !item.toDelete {
 						continue
 					}
+
 					if arr.Get(i) != 0 {
 						t.Fatalf("Array deleted value after Set(item, 0) should be 0, got %d", arr.Get(item.value))
 					}
 				}
+
 				for i, item := range test.data {
 					if item.toDelete {
 						continue
@@ -119,6 +122,7 @@ func TestArrayWithInt(t *testing.T) {
 
 					// check original not deleted values
 					got := arr.Get(i)
+
 					want := item.value
 					if got != want {
 						t.Fatalf("Array original value after Set() for index %d should be %d, got %d", i, want, got)
@@ -141,6 +145,7 @@ func TestArrayWithInt(t *testing.T) {
 									t.Errorf("Expected panic after Clear() for item %#v", item)
 								}
 							}()
+
 							arr.Get(i)
 						}()
 					}
@@ -154,6 +159,7 @@ func TestArrayWithInt(t *testing.T) {
 									t.Errorf("Expected panic after Clear() for item %#v", item)
 								}
 							}()
+
 							arr.Set(i, item.value)
 						}()
 					}
