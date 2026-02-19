@@ -49,6 +49,7 @@ func TestArray(t *testing.T) {
 		t.Fatal("Array data should be nil")
 	}
 }
+
 func TestArrayWithInt(t *testing.T) {
 	testArrayGeneric(t, 5, map[int]testItem[int]{
 		0: {42, true},
@@ -74,6 +75,7 @@ func TestArrayWithStruct(t *testing.T) {
 		Name string
 		Age  int
 	}
+
 	zeroPerson := Person{}
 	testArrayGeneric(t, 3, map[int]testItem[Person]{
 		0: {Person{"Alice", 30}, true},
@@ -158,6 +160,7 @@ func testArrayGeneric[T any](t *testing.T, size int, items map[int]testItem[T], 
 					t.Errorf("Expected panic for index %d, but got none", tc.bound)
 				}
 			}()
+
 			arr.Set(tc.bound, zero)
 		})
 	}
@@ -178,6 +181,7 @@ func testArrayGeneric[T any](t *testing.T, size int, items map[int]testItem[T], 
 						t.Errorf("Expected panic after Clear for index %d", i)
 					}
 				}()
+
 				arr.Get(i)
 			}(idx)
 
@@ -187,6 +191,7 @@ func testArrayGeneric[T any](t *testing.T, size int, items map[int]testItem[T], 
 						t.Errorf("Expected panic after Clear for index %d", i)
 					}
 				}()
+
 				arr.Set(i, zero)
 			}(idx)
 		}
