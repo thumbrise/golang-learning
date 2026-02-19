@@ -81,6 +81,7 @@ func TestArrayWithInt(t *testing.T) {
 					t.Fatalf("Array Set should return true for k=%d v=%d", k, v)
 				}
 			}
+
 			for k := range test.toSet {
 				if arr.Get(k) != test.toSet[k] {
 					t.Fatalf("Array value after Set(k, v) should be %d, got %d", test.toSet[k], arr.Get(k))
