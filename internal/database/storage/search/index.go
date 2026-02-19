@@ -1,5 +1,7 @@
 package search
 
+import "github.com/thumbrise/golang-learning/internal/database/storage/stats"
+
 type Index interface {
 	Insert(ctid string, fieldName string, value string)
 	Search(fieldName string, value string) []string
@@ -8,7 +10,7 @@ type Index interface {
 	Update(ctid string, fieldName string, oldValue string, newValue string)
 	SizeBytes() int
 	Depth() int
-	Stats() map[string]any
+	Stats() *stats.IndexStats
 	Type() string
 	String() string
 }

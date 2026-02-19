@@ -29,3 +29,7 @@ func (h *Heap[TRecord]) Iterate(f IterateFunc[TRecord]) {
 func (h *Heap[TRecord]) Get(ctid string) TRecord {
 	return h.data[ctid]
 }
+
+func (h *Heap[TRecord]) Len() int {
+	return len(h.data)
+}

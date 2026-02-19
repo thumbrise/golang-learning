@@ -23,7 +23,7 @@ func NewPlanner[TRecord core.Record](heap *core.Heap[TRecord], indexes map[strin
 func (p *Planner[TR]) SuggestIndex(conditions []search.Condition) search.Index {
 	var (
 		cheapest search.Index
-		minCost  float64 = -1
+		minCost  uint32 = 0
 	)
 
 	for _, index := range p.indexes {
@@ -39,7 +39,10 @@ func (p *Planner[TR]) SuggestIndex(conditions []search.Condition) search.Index {
 
 // analyze анализирует индекс и возвращает его стоимость
 func (p *Planner[TR]) analyze(index search.Index, conditions []search.Condition) Analysis {
-	// TODO: Взвесить стоимость индексов
-	// Понять бы как считать стоимость индексов
-	return NewAnalysis(0, 0)
+	st := index.Stats()
+
+	return NewAnalysis(
+		st.Cost,
+		st.Rows,
+	)
 }

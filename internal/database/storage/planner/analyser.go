@@ -1,11 +1,11 @@
 package planner
 
 type Analysis struct {
-	Cost float64
-	Rows int
+	Cost uint32
+	Rows uint32
 }
 
-func NewAnalysis(cost float64, rows int) Analysis {
+func NewAnalysis(cost uint32, rows uint32) Analysis {
 	return Analysis{
 		Cost: cost,
 		Rows: rows,

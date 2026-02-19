@@ -16,7 +16,6 @@ func (i *TombstoneItem[T]) GetHash() uint64 {
 	return 0
 }
 
-//nolint:ireturn // OK
 func (i *TombstoneItem[T]) GetValue() T {
 	var zero T
 
