@@ -5,9 +5,7 @@ import (
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
 )
 
-// defaultSize = 5 * 2^10 = 5120 buckets = 40KB mean size
-// Its ok for default?
-const defaultSize = 5 << 10
+const defaultSize = 5 << 10 // 5120
 
 type Store[T any] struct {
 	size    int
@@ -30,7 +28,6 @@ func NewStore[T any](size int) *Store[T] {
 	}
 }
 
-// Set добавляет item в адресное пространство
 func (s *Store[T]) Set(item store.Item[T]) bool {
 	bucket := s.bucket(item.GetHash())
 
@@ -42,9 +39,6 @@ func (s *Store[T]) Set(item store.Item[T]) bool {
 	return addr.Set(item)
 }
 
-// Get возвращает item по bucket и key
-//
-// Возвращает nil, если item не найден
 func (s *Store[T]) Get(item store.Item[T]) store.Item[T] {
 	hash := item.GetHash()
 	bucket := s.bucket(hash)
@@ -57,7 +51,6 @@ func (s *Store[T]) Get(item store.Item[T]) store.Item[T] {
 	return addr.Get(item)
 }
 
-// Delete удаляет item по bucket и key
 func (s *Store[T]) Delete(item store.Item[T]) bool {
 	bucket := s.bucket(item.GetHash())
 
@@ -68,11 +61,6 @@ func (s *Store[T]) Delete(item store.Item[T]) bool {
 
 	return addr.Delete(item)
 }
-
-// bucket возвращает нужное ведро и оригинальный хеш
-// store - индекс ведра
-// bucket - оригинальный хеш
-//
 
 func (s *Store[T]) bucket(hash uint64) int {
 	// G115: integer overflow conversion int -> uint64
