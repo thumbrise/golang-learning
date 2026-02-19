@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/thumbrise/golang-learning/internal/database/storage/core"
+	"github.com/thumbrise/golang-learning/internal/database/storage/stats"
 )
 
 var ErrNotSupported = errors.New("SeqSearcher: method not supported")
@@ -66,11 +67,13 @@ func (d *SeqSearcher[TRecord]) Depth() int {
 	return 0
 }
 
-func (d *SeqSearcher[TRecord]) Stats() map[string]any {
-	err := fmt.Errorf("%w: Stats", ErrNotSupported)
-	slog.Warn(err.Error())
+func (d *SeqSearcher[TRecord]) Stats() *stats.IndexStats {
+	rows := uint32(d.heap.Len())
 
-	return nil
+	return &stats.IndexStats{
+		Cost: 1 * rows,
+		Rows: rows,
+	}
 }
 
 func (d *SeqSearcher[TRecord]) Type() string {

@@ -17,6 +17,22 @@ func defaultStoreFactory[T any](size int) store.Store[T] {
 	return chain.NewStore[T](size)
 }
 
+// Выпал такой же ключ в таблице
+// Сравнили ХЕШ % size = bucket
+//
+// hash1 == hash2 return
+// continue
+
+// cash == index
+
+// cat(12346134734174 != 329867138967138967)
+
+// a
+// b
+// c
+// d
+// e
+
 // NewHashTable создает новую хеш-таблицу
 //
 // size - размер хеш-таблицы

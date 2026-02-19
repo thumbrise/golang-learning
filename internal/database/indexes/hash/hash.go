@@ -3,6 +3,8 @@ package hash
 import (
 	"fmt"
 	"sync"
+
+	"github.com/thumbrise/golang-learning/internal/database/storage/stats"
 )
 
 type (
@@ -117,9 +119,11 @@ func (h *Hash) Depth() int {
 	panic("implement me")
 }
 
-func (h *Hash) Stats() map[string]any {
-	// TODO implement me
-	panic("implement me")
+func (h *Hash) Stats() *stats.IndexStats {
+	return &stats.IndexStats{
+		Cost: 1,
+		Rows: uint32(len(h.table)),
+	}
 }
 
 func (h *Hash) String() string {

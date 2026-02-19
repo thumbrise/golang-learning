@@ -18,7 +18,6 @@ func (i *HashedItem[T]) GetHash() uint64 {
 	return i.Hash
 }
 
-//nolint:ireturn // OK
 func (i *HashedItem[T]) GetValue() T {
 	return i.Value
 }
