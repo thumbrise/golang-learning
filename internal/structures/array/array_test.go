@@ -2,6 +2,7 @@ package array_test
 
 import (
 	"log/slog"
+	"reflect"
 	"testing"
 
 	"github.com/thumbrise/golang-learning/internal/structures/array"
@@ -48,304 +49,24 @@ func TestArray(t *testing.T) {
 		t.Fatal("Array data should be nil")
 	}
 }
-
 func TestArrayWithInt(t *testing.T) {
-	type Item struct {
-		value    int
-		toDelete bool
-	}
-
-	testsInt := []struct {
-		name string
-		size int
-		data map[int]Item
-	}{
-		{
-			name: "int_5",
-			size: 5,
-			data: map[int]Item{
-				0: {value: 1, toDelete: true},
-				1: {value: 2, toDelete: false},
-				2: {value: 3, toDelete: true},
-				3: {value: 4, toDelete: false},
-				4: {value: 5, toDelete: true},
-			},
-		},
-	}
-	for _, test := range testsInt {
-		t.Run(test.name, func(t *testing.T) {
-			arr := array.NewArray[int](test.size)
-
-			t.Run("Len", func(t *testing.T) {
-				if arr.Len() != test.size {
-					t.Fatalf("Array length should be %d, got %d", test.size, arr.Len())
-				}
-			})
-
-			t.Run("Set", func(t *testing.T) {
-				for i, item := range test.data {
-					arr.Set(i, item.value)
-				}
-			})
-
-			t.Run("Get", func(t *testing.T) {
-				for i, item := range test.data {
-					if arr.Get(i) != item.value {
-						t.Fatalf("Array value after Set(i, item) should be %d, got %d", item.value, arr.Get(i))
-					}
-				}
-			})
-
-			t.Run("Delete", func(t *testing.T) {
-				for i, item := range test.data {
-					if !item.toDelete {
-						continue
-					}
-
-					arr.Set(i, 0)
-				}
-
-				for i, item := range test.data {
-					if !item.toDelete {
-						continue
-					}
-
-					if arr.Get(i) != 0 {
-						t.Fatalf("Array deleted value after Set(item, 0) should be 0, got %d", arr.Get(item.value))
-					}
-				}
-
-				for i, item := range test.data {
-					if item.toDelete {
-						continue
-					}
-
-					// check original not deleted values
-					got := arr.Get(i)
-
-					want := item.value
-					if got != want {
-						t.Fatalf("Array original value after Set() for index %d should be %d, got %d", i, want, got)
-					}
-				}
-			})
-			t.Run("Bounds", func(t *testing.T) {
-				testsBounds := []struct {
-					name      string
-					bound     int
-					wantPanic bool
-				}{
-					{name: "negative", bound: -1, wantPanic: true},
-					{name: "positive", bound: test.size, wantPanic: true},
-					{name: "zero", bound: 0, wantPanic: false},
-					{name: "last", bound: test.size - 1, wantPanic: false},
-					{name: "additional1", bound: test.size + 1, wantPanic: true},
-					{name: "additional2", bound: test.size / 2, wantPanic: false},
-					{name: "additional3", bound: test.size * 2, wantPanic: true},
-					{name: "additional4", bound: -test.size, wantPanic: true},
-					{name: "additional5", bound: test.size - 10000000, wantPanic: true},
-					{name: "additional6", bound: test.size * test.size, wantPanic: true},
-					{name: "additional7", bound: int(^uint(0) >> 1), wantPanic: true},
-				}
-
-				for _, testBound := range testsBounds {
-					t.Run(testBound.name, func(t *testing.T) {
-						func() {
-							defer func() {
-								if r := recover(); r == nil && testBound.wantPanic {
-									t.Errorf("Expected panic when try access index %d of array with size %d", testBound.bound, test.size)
-								}
-							}()
-
-							arr.Set(testBound.bound, 42)
-						}()
-					})
-				}
-			})
-			t.Run("Clear", func(t *testing.T) {
-				arr.Clear()
-				t.Run("IsCleared", func(t *testing.T) {
-					if !arr.IsCleared() {
-						t.Fatal("Array should be cleared")
-					}
-				})
-				t.Run("Get", func(t *testing.T) {
-					for i, item := range test.data {
-						func() {
-							defer func() {
-								if r := recover(); r == nil {
-									t.Errorf("Expected panic after Clear() for item %#v", item)
-								}
-							}()
-
-							arr.Get(i)
-						}()
-					}
-				})
-
-				t.Run("Set", func(t *testing.T) {
-					for i, item := range test.data {
-						func() {
-							defer func() {
-								if r := recover(); r == nil {
-									t.Errorf("Expected panic after Clear() for item %#v", item)
-								}
-							}()
-
-							arr.Set(i, item.value)
-						}()
-					}
-				})
-			})
-		})
-	}
+	testArrayGeneric(t, 5, map[int]testItem[int]{
+		0: {42, true},
+		1: {100, false},
+		2: {7, true},
+		3: {0, false},
+		4: {12345, true},
+	}, 0)
 }
+
 func TestArrayWithString(t *testing.T) {
-	type Item struct {
-		value    string
-		toDelete bool
-	}
-
-	tests := []struct {
-		name string
-		size int
-		data map[int]Item
-	}{
-		{
-			name: "string_5",
-			size: 5,
-			data: map[int]Item{
-				0: {value: "apple", toDelete: true},
-				1: {value: "banana", toDelete: false},
-				2: {value: "cherry", toDelete: true},
-				3: {value: "date", toDelete: false},
-				4: {value: "elderberry", toDelete: true},
-			},
-		},
-		// Добавь другие случаи при необходимости
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			arr := array.NewArray[string](test.size)
-
-			t.Run("Len", func(t *testing.T) {
-				if arr.Len() != test.size {
-					t.Fatalf("Array length should be %d, got %d", test.size, arr.Len())
-				}
-			})
-
-			t.Run("Set", func(t *testing.T) {
-				for i, item := range test.data {
-					arr.Set(i, item.value)
-				}
-			})
-
-			t.Run("Get", func(t *testing.T) {
-				for i, item := range test.data {
-					if arr.Get(i) != item.value {
-						t.Fatalf("Array value after Set(i, item) should be %q, got %q", item.value, arr.Get(i))
-					}
-				}
-			})
-
-			t.Run("Delete", func(t *testing.T) {
-				// Удаляем (зануляем) элементы с toDelete = true
-				for i, item := range test.data {
-					if !item.toDelete {
-						continue
-					}
-					arr.Set(i, "") // пустая строка — аналог нуля для int
-				}
-
-				// Проверяем, что удалённые стали пустыми
-				for i, item := range test.data {
-					if !item.toDelete {
-						continue
-					}
-					if arr.Get(i) != "" {
-						t.Fatalf("Array deleted value should be empty string, got %q", arr.Get(i))
-					}
-				}
-
-				// Проверяем, что неудалённые остались неизменными
-				for i, item := range test.data {
-					if item.toDelete {
-						continue
-					}
-					if got := arr.Get(i); got != item.value {
-						t.Fatalf("Array original value for index %d should be %q, got %q", i, item.value, got)
-					}
-				}
-			})
-
-			t.Run("Bounds", func(t *testing.T) {
-				testsBounds := []struct {
-					name      string
-					bound     int
-					wantPanic bool
-				}{
-					{name: "negative", bound: -1, wantPanic: true},
-					{name: "positive", bound: test.size, wantPanic: true},
-					{name: "zero", bound: 0, wantPanic: false},
-					{name: "last", bound: test.size - 1, wantPanic: false},
-					{name: "additional1", bound: test.size + 1, wantPanic: true},
-					{name: "additional2", bound: test.size / 2, wantPanic: false},
-					{name: "additional3", bound: test.size * 2, wantPanic: true},
-					{name: "additional4", bound: -test.size, wantPanic: true},
-					{name: "additional5", bound: test.size - 10000000, wantPanic: true},
-					{name: "additional6", bound: test.size * test.size, wantPanic: true},
-					{name: "additional7", bound: int(^uint(0) >> 1), wantPanic: true},
-				}
-
-				for _, testBound := range testsBounds {
-					t.Run(testBound.name, func(t *testing.T) {
-						func() {
-							defer func() {
-								if r := recover(); r == nil && testBound.wantPanic {
-									t.Errorf("Expected panic when try access index %d of array with size %d", testBound.bound, test.size)
-								}
-							}()
-							arr.Set(testBound.bound, "test")
-						}()
-					})
-				}
-			})
-
-			t.Run("Clear", func(t *testing.T) {
-				arr.Clear()
-				t.Run("IsCleared", func(t *testing.T) {
-					if !arr.IsCleared() {
-						t.Fatal("Array should be cleared")
-					}
-				})
-				t.Run("Get", func(t *testing.T) {
-					for i, item := range test.data {
-						func() {
-							defer func() {
-								if r := recover(); r == nil {
-									t.Errorf("Expected panic after Clear() for item %#v", item)
-								}
-							}()
-							arr.Get(i)
-						}()
-					}
-				})
-				t.Run("Set", func(t *testing.T) {
-					for i, item := range test.data {
-						func() {
-							defer func() {
-								if r := recover(); r == nil {
-									t.Errorf("Expected panic after Clear() for item %#v", item)
-								}
-							}()
-							arr.Set(i, item.value)
-						}()
-					}
-				})
-			})
-		})
-	}
+	testArrayGeneric(t, 5, map[int]testItem[string]{
+		0: {"apple", true},
+		1: {"banana", false},
+		2: {"cherry", true},
+		3: {"date", false},
+		4: {"elderberry", true},
+	}, "")
 }
 
 func TestArrayWithStruct(t *testing.T) {
@@ -353,145 +74,121 @@ func TestArrayWithStruct(t *testing.T) {
 		Name string
 		Age  int
 	}
-	type Item struct {
-		value    Person
-		toDelete bool
+	zeroPerson := Person{}
+	testArrayGeneric(t, 3, map[int]testItem[Person]{
+		0: {Person{"Alice", 30}, true},
+		1: {Person{"Bob", 25}, false},
+		2: {Person{"Charlie", 35}, true},
+	}, zeroPerson)
+}
+
+type testItem[T any] struct {
+	value    T
+	toDelete bool
+}
+
+func testArrayGeneric[T any](t *testing.T, size int, items map[int]testItem[T], zero T) {
+	t.Helper()
+
+	arr := array.NewArray[T](size)
+	defer arr.Clear()
+
+	// Проверка длины
+	if arr.Len() != size {
+		t.Fatalf("Len: expected %d, got %d", size, arr.Len())
 	}
 
-	tests := []struct {
-		name string
-		size int
-		data map[int]Item
+	// Установка значений
+	for idx, item := range items {
+		arr.Set(idx, item.value)
+	}
+
+	// Проверка Get после Set
+	for idx, item := range items {
+		got := arr.Get(idx)
+		if !reflect.DeepEqual(got, item.value) {
+			t.Fatalf("Get(%d): expected %+v, got %+v", idx, item.value, got)
+		}
+	}
+
+	// «Удаление» (зануление) помеченных элементов
+	for idx, item := range items {
+		if item.toDelete {
+			arr.Set(idx, zero)
+		}
+	}
+
+	// Проверка, что удалённые стали нулевыми, а остальные не изменились
+	for idx, item := range items {
+		got := arr.Get(idx)
+		if item.toDelete {
+			if !reflect.DeepEqual(got, zero) {
+				t.Fatalf("After delete, index %d: expected zero (%+v), got %+v", idx, zero, got)
+			}
+		} else {
+			if !reflect.DeepEqual(got, item.value) {
+				t.Fatalf("After delete, index %d: expected %+v, got %+v", idx, item.value, got)
+			}
+		}
+	}
+
+	// Тесты граничных индексов
+	boundsTests := []struct {
+		name      string
+		bound     int
+		wantPanic bool
 	}{
-		{
-			name: "person_3",
-			size: 3,
-			data: map[int]Item{
-				0: {value: Person{"Alice", 30}, toDelete: true},
-				1: {value: Person{"Bob", 25}, toDelete: false},
-				2: {value: Person{"Charlie", 35}, toDelete: true},
-			},
-		},
+		{"negative", -1, true},
+		{"equal to size", size, true},
+		{"zero", 0, false},
+		{"last", size - 1, false},
+		{"size+1", size + 1, true},
+		{"half", size / 2, false},
+		{"size*2", size * 2, true},
+		{"-size", -size, true},
+		{"far negative", size - 10000000, true},
+		{"far positive", size * size, true},
+		{"max int", int(^uint(0) >> 1), true},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			arr := array.NewArray[Person](test.size)
-
-			t.Run("Len", func(t *testing.T) {
-				if arr.Len() != test.size {
-					t.Fatalf("Array length should be %d, got %d", test.size, arr.Len())
+	for _, tc := range boundsTests {
+		t.Run("bounds/"+tc.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil && tc.wantPanic {
+					t.Errorf("Expected panic for index %d, but got none", tc.bound)
 				}
-			})
-
-			t.Run("Set", func(t *testing.T) {
-				for i, item := range test.data {
-					arr.Set(i, item.value)
-				}
-			})
-
-			t.Run("Get", func(t *testing.T) {
-				for i, item := range test.data {
-					got := arr.Get(i)
-					if got != item.value {
-						t.Fatalf("Array value after Set(i, item) should be %+v, got %+v", item.value, got)
-					}
-				}
-			})
-
-			t.Run("Delete", func(t *testing.T) {
-				zero := Person{}
-				for i, item := range test.data {
-					if !item.toDelete {
-						continue
-					}
-					arr.Set(i, zero) // «обнуляем» структуру
-				}
-
-				for i, item := range test.data {
-					if !item.toDelete {
-						continue
-					}
-					if got := arr.Get(i); got != zero {
-						t.Fatalf("Array deleted value should be %+v, got %+v", zero, got)
-					}
-				}
-
-				for i, item := range test.data {
-					if item.toDelete {
-						continue
-					}
-					if got := arr.Get(i); got != item.value {
-						t.Fatalf("Array original value for index %d should be %+v, got %+v", i, item.value, got)
-					}
-				}
-			})
-
-			t.Run("Bounds", func(t *testing.T) {
-				testsBounds := []struct {
-					name      string
-					bound     int
-					wantPanic bool
-				}{
-					{name: "negative", bound: -1, wantPanic: true},
-					{name: "positive", bound: test.size, wantPanic: true},
-					{name: "zero", bound: 0, wantPanic: false},
-					{name: "last", bound: test.size - 1, wantPanic: false},
-					{name: "additional1", bound: test.size + 1, wantPanic: true},
-					{name: "additional2", bound: test.size / 2, wantPanic: false},
-					{name: "additional3", bound: test.size * 2, wantPanic: true},
-					{name: "additional4", bound: -test.size, wantPanic: true},
-					{name: "additional5", bound: test.size - 10000000, wantPanic: true},
-					{name: "additional6", bound: test.size * test.size, wantPanic: true},
-					{name: "additional7", bound: int(^uint(0) >> 1), wantPanic: true},
-				}
-
-				for _, testBound := range testsBounds {
-					t.Run(testBound.name, func(t *testing.T) {
-						func() {
-							defer func() {
-								if r := recover(); r == nil && testBound.wantPanic {
-									t.Errorf("Expected panic when try access index %d of array with size %d", testBound.bound, test.size)
-								}
-							}()
-							arr.Set(testBound.bound, Person{"X", 0})
-						}()
-					})
-				}
-			})
-
-			t.Run("Clear", func(t *testing.T) {
-				arr.Clear()
-				t.Run("IsCleared", func(t *testing.T) {
-					if !arr.IsCleared() {
-						t.Fatal("Array should be cleared")
-					}
-				})
-				t.Run("Get", func(t *testing.T) {
-					for i, item := range test.data {
-						func() {
-							defer func() {
-								if r := recover(); r == nil {
-									t.Errorf("Expected panic after Clear() for item %#v", item)
-								}
-							}()
-							arr.Get(i)
-						}()
-					}
-				})
-				t.Run("Set", func(t *testing.T) {
-					for i, item := range test.data {
-						func() {
-							defer func() {
-								if r := recover(); r == nil {
-									t.Errorf("Expected panic after Clear() for item %#v", item)
-								}
-							}()
-							arr.Set(i, item.value)
-						}()
-					}
-				})
-			})
+			}()
+			arr.Set(tc.bound, zero)
 		})
 	}
+
+	// Тест Clear
+	t.Run("Clear", func(t *testing.T) {
+		arr.Clear()
+
+		if !arr.IsCleared() {
+			t.Error("IsCleared = false after Clear")
+		}
+
+		// Попытки доступа после очистки должны паниковать
+		for idx := range items {
+			func(i int) {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("Expected panic after Clear for index %d", i)
+					}
+				}()
+				arr.Get(i)
+			}(idx)
+
+			func(i int) {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("Expected panic after Clear for index %d", i)
+					}
+				}()
+				arr.Set(i, zero)
+			}(idx)
+		}
+	})
 }
