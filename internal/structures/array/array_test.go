@@ -50,79 +50,115 @@ func TestArray(t *testing.T) {
 }
 
 func TestArrayWithInt(t *testing.T) {
+	type Item struct {
+		value    int
+		toDelete bool
+	}
 	testsInt := []struct {
-		name     string
-		size     int
-		toSet    map[int]int
-		toDelete []int
+		name string
+		size int
+		data map[int]Item
 	}{
 		{
 			name: "int_5",
 			size: 5,
-			toSet: map[int]int{
-				0: 1,
-				1: 2,
-				2: 3,
-				3: 4,
-				4: 5,
+			data: map[int]Item{
+				0: {value: 1, toDelete: true},
+				1: {value: 2, toDelete: false},
+				2: {value: 3, toDelete: true},
+				3: {value: 4, toDelete: false},
+				4: {value: 5, toDelete: true},
 			},
-			toDelete: []int{0, 2, 4},
 		},
 	}
 	for _, test := range testsInt {
 		t.Run(test.name, func(t *testing.T) {
 			arr := array.NewArray[int](test.size)
-			if arr.Len() != test.size {
-				t.Fatalf("Array length should be %d, got %d", test.size, arr.Len())
-			}
 
-			for k, v := range test.toSet {
-				if !arr.Set(k, v) {
-					t.Fatalf("Array Set should return true for k=%d v=%d", k, v)
+			t.Run("Len", func(t *testing.T) {
+				if arr.Len() != test.size {
+					t.Fatalf("Array length should be %d, got %d", test.size, arr.Len())
 				}
-			}
+			})
 
-			for k := range test.toSet {
-				if arr.Get(k) != test.toSet[k] {
-					t.Fatalf("Array value after Set(k, v) should be %d, got %d", test.toSet[k], arr.Get(k))
+			t.Run("Set", func(t *testing.T) {
+				for i, item := range test.data {
+					arr.Set(i, item.value)
 				}
-			}
+			})
 
-			for _, k := range test.toDelete {
-				if !arr.Set(k, 0) {
-					t.Fatalf("Array Set should return true for k=%d v=0", k)
+			t.Run("Get", func(t *testing.T) {
+				for i, item := range test.data {
+					if arr.Get(i) != item.value {
+						t.Fatalf("Array value after Set(i, item) should be %d, got %d", item.value, arr.Get(i))
+					}
 				}
-			}
+			})
 
-			for k := range test.toDelete {
-				if arr.Get(k) != 0 {
-					t.Fatalf("Array value after Set(k, 0) should be 0, got %d", arr.Get(k))
+			t.Run("Delete", func(t *testing.T) {
+				for i, item := range test.data {
+					if !item.toDelete {
+						continue
+					}
+
+					arr.Set(i, 0)
 				}
-			}
 
-			for k := range test.toSet {
-				if arr.Get(k) != test.toSet[k] {
-					t.Fatalf("Array value after Set(k, v) should be %d, got %d", test.toSet[k], arr.Get(k))
+				for i, item := range test.data {
+					if !item.toDelete {
+						continue
+					}
+					if arr.Get(i) != 0 {
+						t.Fatalf("Array deleted value after Set(item, 0) should be 0, got %d", arr.Get(item.value))
+					}
 				}
-			}
+				for i, item := range test.data {
+					if item.toDelete {
+						continue
+					}
 
-			arr.Clear()
-
-			if !arr.IsCleared() {
-				t.Fatal("Array should be cleared")
-			}
-
-			for k := range test.toSet {
-				if arr.Get(k) != 0 {
-					t.Fatalf("Array value after Clear() should be 0, got %d", arr.Get(k))
+					// check original not deleted values
+					got := arr.Get(i)
+					want := item.value
+					if got != want {
+						t.Fatalf("Array original value after Set() for index %d should be %d, got %d", i, want, got)
+					}
 				}
-			}
+			})
 
-			for k := range test.toSet {
-				if arr.Set(k, test.toSet[k]) {
-					t.Fatalf("Array Set should return false after Clear()")
-				}
-			}
+			t.Run("Clear", func(t *testing.T) {
+				arr.Clear()
+				t.Run("IsCleared", func(t *testing.T) {
+					if !arr.IsCleared() {
+						t.Fatal("Array should be cleared")
+					}
+				})
+				t.Run("Get", func(t *testing.T) {
+					for i, item := range test.data {
+						func() {
+							defer func() {
+								if r := recover(); r == nil {
+									t.Errorf("Expected panic after Clear() for item %#v", item)
+								}
+							}()
+							arr.Get(i)
+						}()
+					}
+				})
+
+				t.Run("Set", func(t *testing.T) {
+					for i, item := range test.data {
+						func() {
+							defer func() {
+								if r := recover(); r == nil {
+									t.Errorf("Expected panic after Clear() for item %#v", item)
+								}
+							}()
+							arr.Set(i, item.value)
+						}()
+					}
+				})
+			})
 		})
 	}
 }

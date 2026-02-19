@@ -3,6 +3,7 @@
 package array
 
 import (
+	"fmt"
 	"log/slog"
 	"reflect"
 	"unsafe"
@@ -28,13 +29,33 @@ func NewArray[T any](length int) *Array[T] {
 //
 //nolint:ireturn // Надо
 func (a *Array[T]) Get(index int) T {
-	return *new(T)
+	a.checkBounds(index)
+
+	return *(*T)(unsafe.Pointer(a.addr(index)))
+}
+func (a *Array[T]) checkBounds(index int) {
+	if a == nil {
+		panic("array is nil")
+	}
+	if a.data == nil {
+		panic("array pointer is nil")
+	}
+	if index < 0 || index >= a.len {
+		msg := fmt.Sprintf("index %d out of bounds (%d-%d):", index, 0, a.len-1)
+		panic(msg)
+	}
 }
 
 // Set устанавливает значение по индексу
-func (a *Array[T]) Set(index int, value T) bool {
-	// *a.data = value
-	return true
+func (a *Array[T]) Set(index int, value T) {
+	a.checkBounds(index)
+
+	valueAddr := a.addr(index)
+	*(*T)(unsafe.Pointer(valueAddr)) = value
+}
+
+func (a *Array[T]) addr(index int) uintptr {
+	return uintptr(a.data) + uintptr(index)*unsafe.Sizeof(*new(T))
 }
 
 // Clear освобождает память, выделенную под массив
