@@ -162,9 +162,6 @@ func TestHashTableSet(t *testing.T) {
 					h.Set(key, values[i])
 				}
 
-				// TODO:
-				//     hashtable_test.go:165: Get() = "value0", want "value49"
-				//--- FAIL: TestHashTableSet/store=open_addr_linear_prob/Same_keys_overwrite_instead_of_stacking (0.00s)
 				if got := h.Get(key); got != values[49] {
 					t.Errorf("Get() = %#v, want %#v", got, values[49])
 				}
