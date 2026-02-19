@@ -1,4 +1,4 @@
-package chain
+package linearprob
 
 import "github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
 

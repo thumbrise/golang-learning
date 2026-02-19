@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/chain"
 )
 
 type Store[T any] struct {
@@ -96,7 +95,7 @@ func (s *Store[T]) Delete(item store.Item[T]) bool {
 		return false
 	}
 
-	s.items[idx] = &chain.TombstoneItem[T]{}
+	s.items[idx] = &TombstoneItem[T]{}
 
 	return true
 }

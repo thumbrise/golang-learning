@@ -18,7 +18,6 @@ func NewBucket[T any]() *Bucket[T] {
 	}
 }
 
-// Set добавляет item в адресное пространство
 func (h *Bucket[T]) Set(item store.Item[T]) bool {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -42,11 +41,6 @@ func (h *Bucket[T]) Set(item store.Item[T]) bool {
 	return true
 }
 
-// Get возвращает item по bucket и key
-//
-// Возвращает nil, если item не найден
-//
-
 func (h *Bucket[T]) Get(item store.Item[T]) store.Item[T] {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -61,7 +55,6 @@ func (h *Bucket[T]) Get(item store.Item[T]) store.Item[T] {
 	return &store.ZeroItem[T]{}
 }
 
-// Delete удаляет item по bucket и key
 func (h *Bucket[T]) Delete(item store.Item[T]) bool {
 	h.mu.Lock()
 	defer h.mu.Unlock()
