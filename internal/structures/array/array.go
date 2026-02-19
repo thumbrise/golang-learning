@@ -32,8 +32,9 @@ func (a *Array[T]) Get(index int) T {
 }
 
 // Set устанавливает значение по индексу
-func (a *Array[T]) Set(index int, value T) {
+func (a *Array[T]) Set(index int, value T) bool {
 	// *a.data = value
+	return true
 }
 
 // Clear освобождает память, выделенную под массив
