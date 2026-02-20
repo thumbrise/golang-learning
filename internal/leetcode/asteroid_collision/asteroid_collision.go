@@ -19,6 +19,7 @@ func AsteroidCollision(asteroids []int) []int {
 			result = append(result, astNew)
 			i++
 			j++
+
 			continue
 		}
 
@@ -42,13 +43,6 @@ func AsteroidCollision(asteroids []int) []int {
 			continue
 		}
 
-		abs := func(v int) int {
-			if v < 0 {
-				v = -v
-			}
-
-			return v
-		}
 		if abs(astOld) < abs(astNew) {
 			// new win
 			// pop old and push new
@@ -58,10 +52,17 @@ func AsteroidCollision(asteroids []int) []int {
 			continue
 		}
 
-		i++
 		// old win
 		// skip new
+		i++
 	}
 
 	return result
+}
+func abs(v int) int {
+	if v < 0 {
+		v = -v
+	}
+
+	return v
 }
