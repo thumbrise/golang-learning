@@ -156,11 +156,22 @@ func TestAsteroidCollision(t *testing.T) {
 			want: []int{-2, -1, 1, 2},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := asteroid_collision.AsteroidCollision(tt.args.asteroids); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AsteroidCollision() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Run("AsteroidCollision", func(t *testing.T) {
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				if got := asteroid_collision.AsteroidCollision(tt.args.asteroids); !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("AsteroidCollision() = %v, want %v", got, tt.want)
+				}
+			})
+		}
+	})
+	t.Run("AsteroidCollisionImproved", func(t *testing.T) {
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				if got := asteroid_collision.AsteroidCollisionImproved(tt.args.asteroids); !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("AsteroidCollisionImproved() = %v, want %v", got, tt.want)
+				}
+			})
+		}
+	})
 }
