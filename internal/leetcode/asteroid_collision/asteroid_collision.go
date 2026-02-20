@@ -1,86 +1,35 @@
 package asteroid_collision
 
-// AsteroidCollision (Classic)
-//
-// Time Complexity: O(n)
-// Space Complexity: O(n)
-// Логика алгоритма:
-//
-// Нужно вычислить конечное состояние астероидов после всех возможных столкновений.
-// 1. Используем стек для отслеживания астероидов, которые не взорвались.
-// 2. Проходим по массиву астероидов.
-// 3. Каждый раз берем пару left из стека и right из аргумента asteroids.
-// 4. Проверяем возможные сценарии того, кто из них выживет.
-// 5. Если левый взорвется, удаляем его из стека. Если правый при этом выжил, то добавляем его в стек.
-// 6. Если левый выжил, то в случае смерти правого делаем continue, если правый тоже выжил, то добавляем его в стек рядом с левым
-func AsteroidCollision(asteroids []int) []int {
-	result := make([]int, 0, len(asteroids))
-	for i, j := 0, 0; i < len(asteroids); {
-		astNew := asteroids[i]
+func AsteroidCollisionClassic(asteroids []int) []int {
+	stack := make([]int, 0, len(asteroids))
+	for _, ast := range asteroids {
+		// пока есть столкновение (последний положительный, текущий отрицательный)
+		for len(stack) > 0 && stack[len(stack)-1] > 0 && ast < 0 {
+			last := stack[len(stack)-1]
+			if last < -ast { // левый взрывается
+				stack = stack[:len(stack)-1]
 
-		if len(result) == 0 {
-			result = append(result, astNew)
-			i++
-			j = 0
+				continue // продолжаем проверять с новым последним
+			} else if last == -ast { // оба взрываются
+				stack = stack[:len(stack)-1]
+				ast = 0
 
-			continue
+				break
+			} else { // правый взрывается
+				ast = 0
+
+				break
+			}
 		}
 
-		astOld := result[j]
-
-		// never meets each other, old fly left and new fly right->
-		// or
-		// same direction
-		// push new
-		if (astOld < 0 && astNew > 0) ||
-			(astOld*astNew > 0) {
-			result = append(result, astNew)
-			i++
-			j++
-
-			continue
+		if ast != 0 {
+			stack = append(stack, ast)
 		}
-
-		// both explodes
-		// pop old and skip new
-		if astOld == -astNew {
-			result = result[:len(result)-1]
-			i++
-			j--
-
-			continue
-		}
-
-		// new win
-		// pop old and push new
-		if abs(astOld) < abs(astNew) {
-			result = result[:len(result)-1]
-			j--
-
-			continue
-		}
-
-		// old win
-		// skip new
-		i++
 	}
 
-	return result
+	return stack
 }
 
-// AsteroidCollisionImproved (Improved)
-//
-// Time Complexity: O(n)
-// Space Complexity: O(n)
-// Логика алгоритма:
-//
-// Нужно вычислить конечное состояние астероидов после всех возможных столкновений.
-// 1. Используем стек для отслеживания астероидов, которые не взорвались.
-// 2. Проходим по массиву астероидов.
-// 3. Каждый раз берем пару left из стека и right из аргумента asteroids.
-// 4. Проверяем возможные сценарии того, кто из них выживет.
-// 5. Если левый взорвется, удаляем его из стека. Если правый при этом выжил, то добавляем его в стек.
-// 6. Если левый выжил, то в случае смерти правого делаем continue, если правый тоже выжил, то добавляем его в стек рядом с левым
 func AsteroidCollisionImproved(asteroids []int) []int {
 	space := make([]int, 0, len(asteroids))
 
