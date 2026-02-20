@@ -1,35 +1,49 @@
-2352. Equal Row and Column Pairs
-      Medium
-      Topics
-      premium lock icon
-      Companies
-      Hint
-      Given a 0-indexed n x n integer matrix grid, return the number of pairs (ri, cj) such that row ri and column cj are equal.
+# 2352. Equal Row and Column Pairs
+      
+Дана целочисленная матрица grid размером n x n с индексацией с нуля, верните количество пар (ri, cj), таких что строка ri и столбец cj равны.
 
-A row and column pair is considered equal if they contain the same elements in the same order (i.e., an equal array).
+Пара строки и столбца считается равной, если они содержат одни и те же элементы в том же порядке (т.е. равный массив).
 
 
 
-Example 1:
+## Пример 1:
 
+```
+|
+|   3   2   1
+|   1   7   6
+|   2   7   7
+```
 
 Input: grid = [[3,2,1],[1,7,6],[2,7,7]]
-Output: 1
-Explanation: There is 1 equal row and column pair:
-- (Row 2, Column 1): [2,7,7]
-  Example 2:
 
+Output: 1
+
+Explanation: Здесь есть 1 равная пара строки и столбца:
+- (Row 2, Column 1): [2,7,7]
+  
+## Пример 2:
+
+```
+|
+|   3   1   2   2
+|   1   4   4   5
+|   2   4   2   2
+|   2   4   2   2
+```
 
 Input: grid = [[3,1,2,2],[1,4,4,5],[2,4,2,2],[2,4,2,2]]
+
 Output: 3
-Explanation: There are 3 equal row and column pairs:
+
+Explanation: Здесь есть 3 равные пары строки и столбца:
 - (Row 0, Column 0): [3,1,2,2]
 - (Row 2, Column 2): [2,4,2,2]
 - (Row 3, Column 2): [2,4,2,2]
 
 
-Constraints:
+## Ограничения:
 
-n == grid.length == grid[i].length
-1 <= n <= 200
-1 <= grid[i][j] <= 105
+- n == grid.length == grid[i].length
+- 1 <= n <= 200
+- 1 <= grid[i][j] <= 105
