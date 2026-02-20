@@ -1,14 +1,17 @@
-package asteroid_collision
+package asteroid_collision_test
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/thumbrise/golang-learning/internal/leetcode/asteroid_collision"
 )
 
 func TestAsteroidCollision(t *testing.T) {
 	type args struct {
 		asteroids []int
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -45,7 +48,7 @@ func TestAsteroidCollision(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := AsteroidCollision(tt.args.asteroids); !reflect.DeepEqual(got, tt.want) {
+			if got := asteroid_collision.AsteroidCollision(tt.args.asteroids); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AsteroidCollision() = %v, want %v", got, tt.want)
 			}
 		})

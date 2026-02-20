@@ -8,10 +8,17 @@ func AsteroidCollision(asteroids []int) []int {
 		if len(result) == 0 {
 			result = append(result, astNew)
 			i++
+			j = 0
+
 			continue
 		}
 
 		astOld := result[j]
+
+		if astOld < 0 && astNew > 0 {
+			result = append(result, astNew)
+			i++
+		}
 
 		// same direction
 		// push new
@@ -19,6 +26,7 @@ func AsteroidCollision(asteroids []int) []int {
 			result = append(result, astNew)
 			i++
 			j++
+
 			continue
 		}
 
@@ -28,6 +36,7 @@ func AsteroidCollision(asteroids []int) []int {
 			result = result[:len(result)-1]
 			i++
 			j--
+
 			continue
 		}
 
@@ -35,6 +44,7 @@ func AsteroidCollision(asteroids []int) []int {
 			if v < 0 {
 				v = -v
 			}
+
 			return v
 		}
 		if abs(astOld) < abs(astNew) {
@@ -42,10 +52,7 @@ func AsteroidCollision(asteroids []int) []int {
 			// pop old and push new
 			result = result[:len(result)-1]
 			j--
-			//i++
-			//if len(result) == 0{
-			//
-			//}
+
 			continue
 		}
 
