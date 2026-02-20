@@ -83,7 +83,7 @@ func AsteroidCollision(asteroids []int) []int {
 // 6. Если левый выжил, то в случае смерти правого делаем continue, если правый тоже выжил, то добавляем его в стек рядом с левым
 func AsteroidCollisionImproved(asteroids []int) []int {
 	space := make([]int, 0, len(asteroids))
-	// space = append(space, asteroids[0])
+
 	for l, r := 0, 0; r < len(asteroids); {
 		rightAsteroid := asteroids[r]
 
