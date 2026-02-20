@@ -75,8 +75,6 @@ func AsteroidCollisionImproved(asteroids []int) []int {
 		if !leftSurvive {
 			space = space[:len(space)-1]
 			l--
-		} else {
-			//r++
 		}
 
 		switch {
