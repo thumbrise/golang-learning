@@ -120,9 +120,12 @@ func (h *Hash) Depth() int {
 }
 
 func (h *Hash) Stats() *stats.IndexStats {
+	//nolint:gosec // Надо
+	rows := uint32(len(h.table))
+
 	return &stats.IndexStats{
 		Cost: 1,
-		Rows: uint32(len(h.table)),
+		Rows: rows,
 	}
 }
 
