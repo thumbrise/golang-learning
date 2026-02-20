@@ -10,6 +10,7 @@ func TestRemoveStars(t *testing.T) {
 	type args struct {
 		s string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -28,6 +29,71 @@ func TestRemoveStars(t *testing.T) {
 				s: "erase*****",
 			},
 			want: "",
+		},
+		{
+			name: "No stars",
+			args: args{s: "abcdef"},
+			want: "abcdef",
+		},
+		{
+			name: "Single star at end",
+			args: args{s: "abcd*"},
+			want: "abc",
+		},
+		{
+			name: "Single star in middle",
+			args: args{s: "ab*cd"},
+			want: "acd",
+		},
+		{
+			name: "Two consecutive stars at end",
+			args: args{s: "abcd**"},
+			want: "ab",
+		},
+		{
+			name: "Stars interleaved",
+			args: args{s: "a*b*c*d"},
+			want: "d",
+		},
+		{
+			name: "All characters removed",
+			args: args{s: "a*b*c*"},
+			want: "",
+		},
+		{
+			name: "Example 1",
+			args: args{s: "leet**cod*e"},
+			want: "lecoe",
+		},
+		{
+			name: "Example 2",
+			args: args{s: "erase*****"},
+			want: "",
+		},
+		{
+			name: "Single character",
+			args: args{s: "a"},
+			want: "a",
+		},
+		{
+			name: "Two characters no star",
+			args: args{s: "ab"},
+			want: "ab",
+		},
+		{
+			name: "Complex pattern",
+			args: args{s: "abc*d*efg**"},
+			want: "abe", // пошагово: abc*d*efg** -> ab*d*efg** -> ab*efg** -> aefg** -> aef* -> ae? пересчёт в стеке даёт "abe"
+		},
+		{
+			name: "Three stars at the end",
+			args: args{s: "hello***"},
+			want: "he",
+		},
+		{
+			name: "Stars in the middle and end",
+			args: args{s: "ab**c*d"},
+			want: "d", // ab**c*d: после двух звёзд удаляются a и b, остаётся "c*d", затем удаляется c -> "d"
 		},
 	}
 	for _, tt := range tests {

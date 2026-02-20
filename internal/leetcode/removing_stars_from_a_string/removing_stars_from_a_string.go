@@ -1,26 +1,17 @@
 package removing_stars_from_a_string
 
-import "strings"
-
 func RemoveStars(s string) string {
-	const star = '*'
+	r := make([]byte, 0, len(s))
 
-	rns := make([]rune, 0, len(s))
+	for _, b := range []byte(s) {
+		if b == '*' {
+			r = r[:len(r)-1]
 
-	for _, ch := range s {
-		if ch == star {
-			rns = append(rns[:len(rns)-1])
 			continue
 		}
 
-		rns = append(rns, ch)
+		r = append(r, b)
 	}
 
-	b := strings.Builder{}
-	b.Grow(len(s) + 1)
-	for _, r := range rns {
-		b.WriteRune(r)
-	}
-
-	return b.String()
+	return string(r)
 }
