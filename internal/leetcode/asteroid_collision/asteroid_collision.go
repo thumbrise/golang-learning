@@ -18,6 +18,7 @@ func AsteroidCollision(asteroids []int) []int {
 		if astOld < 0 && astNew > 0 {
 			result = append(result, astNew)
 			i++
+			continue
 		}
 
 		// same direction
