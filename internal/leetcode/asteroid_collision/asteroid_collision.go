@@ -71,20 +71,16 @@ func AsteroidCollisionImproved(asteroids []int) []int {
 		leftAsteroid := space[l]
 		leftSurvive, rightSurvive := predictSurvive(leftAsteroid, rightAsteroid)
 
-		// refactor conditions
 		if !leftSurvive {
 			space = space[:len(space)-1]
 			l--
 		}
 
-		switch {
-		case leftSurvive && rightSurvive:
+		if leftSurvive && rightSurvive {
 			space = append(space, rightAsteroid)
 			r++
 			l++
-		case !leftSurvive && !rightSurvive:
-			r++
-		case !rightSurvive:
+		} else if !rightSurvive {
 			r++
 		}
 
