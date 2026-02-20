@@ -37,13 +37,17 @@ func AsteroidCollisionImproved(asteroids []int) []int {
 	for r < len(asteroids) {
 		switch {
 		case len(space) == 0 || space[len(space)-1] <= 0 || asteroids[r] >= 0:
-			space = append(space, asteroids[r]) // Не с чем проверять || Не столкнутся никогда - просто добавляем правого
+			// Не с чем проверять || Не столкнутся никогда - просто добавляем правого
+			space = append(space, asteroids[r])
 			r++
-		case space[len(space)-1] < -asteroids[r]: // Левый меньше по модулю - убиваем левого
+		case space[len(space)-1] < -asteroids[r]:
+			// Левый меньше по модулю - убиваем левого
 			space = space[:len(space)-1]
-		case space[len(space)-1] > -asteroids[r]: // Правый меньше по модулю - убиваем правого
+		case space[len(space)-1] > -asteroids[r]:
+			// Правый меньше по модулю - убиваем правого
 			r++
-		default: // Оба уничтожены =(
+		default:
+			// Оба уничтожены =(
 			space = space[:len(space)-1]
 			r++
 		}
