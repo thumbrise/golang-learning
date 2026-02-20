@@ -103,4 +103,27 @@ func TestRemoveStars(t *testing.T) {
 			}
 		})
 	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := removing_stars_from_a_string.RemoveStarsTwoPointers(tt.args.s); got != tt.want {
+				t.Errorf("RemoveStarsTwoPointers() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkRemoveStars(b *testing.B) {
+	const testString = "leet**cod*e"
+
+	b.Run("Stack", func(b *testing.B) {
+		for range b.N {
+			removing_stars_from_a_string.RemoveStars(testString)
+		}
+	})
+	b.Run("TwoPointers", func(b *testing.B) {
+		for range b.N {
+			removing_stars_from_a_string.RemoveStarsTwoPointers(testString)
+		}
+	})
 }
