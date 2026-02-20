@@ -6,6 +6,14 @@ import (
 
 // EqualPairs
 //
+// Time Complexity: O(n^2)
+// Space Complexity: O(n^2)
+// Логика алгоритма:
+// 1. Создаем два map-счетчика: rows для хранения строк и cols для хранения столбцов. Ключ - последовательность чисел в виде строки, будь-то row или col.
+// 2. Проходим по каждой строке и столбцу, преобразуя их в строки, инкрементим их количество в соответствующем map-счетчике.
+// 3. Проходим по rows счетчикам, сверяем ключи с cols счетчиками.
+// 4. Если cols[key] > 0 и rows[key] > 0, то result += rows[key] * cols[key]
+//
 // BenchmarkEqualPairs/String_Version-14         	     136	   8741902 ns/op
 func EqualPairs(grid [][]int) int {
 	rows := map[string]int{}
