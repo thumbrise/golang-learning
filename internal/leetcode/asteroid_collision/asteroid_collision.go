@@ -1,5 +1,18 @@
 package asteroid_collision
 
+// AsteroidCollision (Classic)
+//
+// Time Complexity: O(n)
+// Space Complexity: O(n)
+// Логика алгоритма:
+//
+// Нужно вычислить конечное состояние астероидов после всех возможных столкновений.
+// 1. Используем стек для отслеживания астероидов, которые не взорвались.
+// 2. Проходим по массиву астероидов.
+// 3. Каждый раз берем пару left из стека и right из аргумента asteroids.
+// 4. Проверяем возможные сценарии того, кто из них выживет.
+// 5. Если левый взорвется, удаляем его из стека. Если правый при этом выжил, то добавляем его в стек.
+// 6. Если левый выжил, то в случае смерти правого делаем continue, если правый тоже выжил, то добавляем его в стек рядом с левым
 func AsteroidCollision(asteroids []int) []int {
 	result := make([]int, 0, len(asteroids))
 	for i, j := 0, 0; i < len(asteroids); {
@@ -55,9 +68,23 @@ func AsteroidCollision(asteroids []int) []int {
 	return result
 }
 
+// AsteroidCollisionImproved (Improved)
+//
+// Time Complexity: O(n)
+// Space Complexity: O(n)
+// Логика алгоритма:
+//
+// Нужно вычислить конечное состояние астероидов после всех возможных столкновений.
+// 1. Используем стек для отслеживания астероидов, которые не взорвались.
+// 2. Проходим по массиву астероидов.
+// 3. Каждый раз берем пару left из стека и right из аргумента asteroids.
+// 4. Проверяем возможные сценарии того, кто из них выживет.
+// 5. Если левый взорвется, удаляем его из стека. Если правый при этом выжил, то добавляем его в стек.
+// 6. Если левый выжил, то в случае смерти правого делаем continue, если правый тоже выжил, то добавляем его в стек рядом с левым
 func AsteroidCollisionImproved(asteroids []int) []int {
 	space := make([]int, 0, len(asteroids))
-	for r, l := 0, 0; r < len(asteroids); {
+	// space = append(space, asteroids[0])
+	for l, r := 0, 0; r < len(asteroids); {
 		rightAsteroid := asteroids[r]
 
 		if len(space) == 0 {
@@ -83,28 +110,32 @@ func AsteroidCollisionImproved(asteroids []int) []int {
 		} else if !rightSurvive {
 			r++
 		}
-
 	}
 
 	return space
 }
+
 func predictSurvive(l, r int) (bool, bool) {
-	sameDirection := l < 0 && r > 0
-	neverMeets := l*r > 0
+	// never meets or same direction
+	if l < 0 && r > 0 || l*r > 0 {
+		return true, true
+	}
+
 	lmod := abs(l)
 	rmod := abs(r)
-	explodesBoth := lmod == rmod
-	leftLose := lmod < rmod
 
-	switch {
-	case sameDirection || neverMeets:
-		return true, true
-	case explodesBoth:
-		return false, false
-	case leftLose:
+	// left explode
+	if lmod < rmod {
 		return false, true
 	}
-	return true, false
+
+	// right explode
+	if lmod > rmod {
+		return true, false
+	}
+
+	// both explode
+	return false, false
 }
 
 func abs(v int) int {

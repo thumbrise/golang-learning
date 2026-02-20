@@ -171,3 +171,18 @@ func TestAsteroidCollision(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkAsteroidCollision(b *testing.B) {
+	asteroids := []int{5, 4, 3, -6, -7}
+
+	b.Run("Classic", func(b *testing.B) {
+		for range b.N {
+			asteroid_collision.AsteroidCollision(asteroids)
+		}
+	})
+	b.Run("Improved", func(b *testing.B) {
+		for range b.N {
+			asteroid_collision.AsteroidCollisionImproved(asteroids)
+		}
+	})
+}
