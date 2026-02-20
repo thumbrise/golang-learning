@@ -15,17 +15,12 @@ func AsteroidCollision(asteroids []int) []int {
 
 		astOld := result[j]
 
-		if astOld < 0 && astNew > 0 {
-			result = append(result, astNew)
-			i++
-			j++
-
-			continue
-		}
-
+		// never meets each other, old fly left and new fly right->
+		// or
 		// same direction
 		// push new
-		if astOld*astNew > 0 {
+		if (astOld < 0 && astNew > 0) ||
+			(astOld*astNew > 0) {
 			result = append(result, astNew)
 			i++
 			j++
@@ -59,6 +54,7 @@ func AsteroidCollision(asteroids []int) []int {
 
 	return result
 }
+
 func abs(v int) int {
 	if v < 0 {
 		v = -v
