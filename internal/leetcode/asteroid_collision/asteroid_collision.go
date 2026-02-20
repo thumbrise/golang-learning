@@ -2,15 +2,23 @@ package asteroid_collision
 
 func AsteroidCollision(asteroids []int) []int {
 	result := make([]int, 0, len(asteroids))
-	result = append(result, asteroids[0])
-	for i := 1; i < len(asteroids); i++ {
-		astOld := result[len(result)-1]
+	for i, j := 0, 0; i < len(asteroids); {
 		astNew := asteroids[i]
+
+		if len(result) == 0 {
+			result = append(result, astNew)
+			i++
+			continue
+		}
+
+		astOld := result[j]
 
 		// same direction
 		// push new
 		if astOld*astNew > 0 {
 			result = append(result, astNew)
+			i++
+			j++
 			continue
 		}
 
@@ -18,16 +26,30 @@ func AsteroidCollision(asteroids []int) []int {
 		// pop old and skip new
 		if astOld == -astNew {
 			result = result[:len(result)-1]
+			i++
+			j--
 			continue
 		}
 
-		if astOld < astNew {
+		abs := func(v int) int {
+			if v < 0 {
+				v = -v
+			}
+			return v
+		}
+		if abs(astOld) < abs(astNew) {
 			// new win
 			// pop old and push new
-			result = append(result[:len(result)-1], astNew)
+			result = result[:len(result)-1]
+			j--
+			//i++
+			//if len(result) == 0{
+			//
+			//}
 			continue
 		}
 
+		i++
 		// old win
 		// skip new
 	}
