@@ -69,45 +69,44 @@ func AsteroidCollisionImproved(asteroids []int) []int {
 		}
 
 		astOld := result[j]
+		oldSurvive, newSurvive := predictSurvive(astOld, astNew)
 
-		// never meets each other, old fly left and new fly right->
-		// or
-		// same direction
-		// push new
-		if (astOld < 0 && astNew > 0) ||
-			(astOld*astNew > 0) {
+		switch {
+		case oldSurvive && newSurvive:
 			result = append(result, astNew)
 			i++
 			j++
-
-			continue
-		}
-
-		// both explodes
-		// pop old and skip new
-		if astOld == -astNew {
+		case !oldSurvive && !newSurvive:
 			result = result[:len(result)-1]
+			j--
 			i++
-			j--
-
-			continue
-		}
-
-		// new win
-		// pop old and push new
-		if abs(astOld) < abs(astNew) {
+		case !oldSurvive:
 			result = result[:len(result)-1]
 			j--
-
-			continue
+		default:
+			i++
 		}
-
-		// old win
-		// skip new
-		i++
 	}
 
 	return result
+}
+func predictSurvive(l, r int) (bool, bool) {
+	sameDirection := l < 0 && r > 0
+	neverMeets := l*r > 0
+	lmod := abs(l)
+	rmod := abs(r)
+	explodesBoth := lmod == rmod
+	leftLose := lmod < rmod
+
+	switch {
+	case sameDirection || neverMeets:
+		return true, true
+	case explodesBoth:
+		return false, false
+	case leftLose:
+		return false, true
+	}
+	return true, false
 }
 
 func abs(v int) int {
