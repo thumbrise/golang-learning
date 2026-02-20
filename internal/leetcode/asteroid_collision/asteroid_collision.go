@@ -56,39 +56,43 @@ func AsteroidCollision(asteroids []int) []int {
 }
 
 func AsteroidCollisionImproved(asteroids []int) []int {
-	result := make([]int, 0, len(asteroids))
-	for i, j := 0, 0; i < len(asteroids); {
-		astNew := asteroids[i]
+	space := make([]int, 0, len(asteroids))
+	for r, l := 0, 0; r < len(asteroids); {
+		rightAsteroid := asteroids[r]
 
-		if len(result) == 0 {
-			result = append(result, astNew)
-			i++
-			j = 0
+		if len(space) == 0 {
+			space = append(space, rightAsteroid)
+			r++
+			l = 0
 
 			continue
 		}
 
-		astOld := result[j]
-		oldSurvive, newSurvive := predictSurvive(astOld, astNew)
+		leftAsteroid := space[l]
+		leftSurvive, rightSurvive := predictSurvive(leftAsteroid, rightAsteroid)
+
+		// refactor conditions
+		if !leftSurvive {
+			space = space[:len(space)-1]
+			l--
+		} else {
+			//r++
+		}
 
 		switch {
-		case oldSurvive && newSurvive:
-			result = append(result, astNew)
-			i++
-			j++
-		case !oldSurvive && !newSurvive:
-			result = result[:len(result)-1]
-			j--
-			i++
-		case !oldSurvive:
-			result = result[:len(result)-1]
-			j--
-		default:
-			i++
+		case leftSurvive && rightSurvive:
+			space = append(space, rightAsteroid)
+			r++
+			l++
+		case !leftSurvive && !rightSurvive:
+			r++
+		case !rightSurvive:
+			r++
 		}
+
 	}
 
-	return result
+	return space
 }
 func predictSurvive(l, r int) (bool, bool) {
 	sameDirection := l < 0 && r > 0
