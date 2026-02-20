@@ -84,30 +84,30 @@ func AsteroidCollision(asteroids []int) []int {
 func AsteroidCollisionImproved(asteroids []int) []int {
 	space := make([]int, 0, len(asteroids))
 
-	for l, r := 0, 0; r < len(asteroids); {
+	r := 0
+	for r < len(asteroids) {
 		rightAsteroid := asteroids[r]
 
 		if len(space) == 0 {
 			space = append(space, rightAsteroid)
 			r++
-			l = 0
 
 			continue
 		}
 
-		leftAsteroid := space[l]
+		leftAsteroid := space[len(space)-1]
 		leftSurvive, rightSurvive := predictSurvive(leftAsteroid, rightAsteroid)
 
-		if !leftSurvive {
+		switch {
+		case !leftSurvive && rightSurvive:
 			space = space[:len(space)-1]
-			l--
-		}
-
-		if leftSurvive && rightSurvive {
+		case leftSurvive && !rightSurvive:
+			r++
+		case leftSurvive:
 			space = append(space, rightAsteroid)
 			r++
-			l++
-		} else if !rightSurvive {
+		default:
+			space = space[:len(space)-1]
 			r++
 		}
 	}
