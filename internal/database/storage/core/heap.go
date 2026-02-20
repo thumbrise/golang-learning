@@ -30,6 +30,7 @@ func (h *Heap[TRecord]) Get(ctid string) TRecord {
 	return h.data[ctid]
 }
 
-func (h *Heap[TRecord]) Len() int {
-	return len(h.data)
+func (h *Heap[TRecord]) Len() uint32 {
+	//nolint:gosec // Надо
+	return uint32(len(h.data))
 }

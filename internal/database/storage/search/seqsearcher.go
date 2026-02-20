@@ -68,7 +68,7 @@ func (d *SeqSearcher[TRecord]) Depth() int {
 }
 
 func (d *SeqSearcher[TRecord]) Stats() *stats.IndexStats {
-	rows := uint32(d.heap.Len())
+	rows := d.heap.Len()
 
 	return &stats.IndexStats{
 		Cost: 1 * rows,

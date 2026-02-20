@@ -16,6 +16,9 @@ func (i *TombstoneItem[T]) GetHash() uint64 {
 	return 0
 }
 
+// GetValue возвращает значение типа T
+//
+//nolint:ireturn // Надо
 func (i *TombstoneItem[T]) GetValue() T {
 	var zero T
 

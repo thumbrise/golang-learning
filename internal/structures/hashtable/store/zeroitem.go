@@ -14,6 +14,9 @@ func (i *ZeroItem[T]) GetHash() uint64 {
 	return 0
 }
 
+// GetValue возвращает значение типа T
+//
+//nolint:ireturn // Надо
 func (i *ZeroItem[T]) GetValue() T {
 	var zero T
 

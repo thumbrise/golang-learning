@@ -27,6 +27,9 @@ func NewArray[T any](length int) *Array[T] {
 // Get возвращает значение по индексу
 //
 
+// Get возвращает значение типа T
+//
+//nolint:ireturn // Надо
 func (a *Array[T]) Get(index int) T {
 	a.checkBounds(index)
 
