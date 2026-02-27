@@ -12,5 +12,7 @@ func TasksChannel(tasks chan *task.Task) chan *task.Task {
 		tasks <- &task.Task{Message: msg}
 	}
 
+	close(tasks)
+
 	return tasks
 }
