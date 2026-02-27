@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store"
 )
 
 type Store[T any] struct {

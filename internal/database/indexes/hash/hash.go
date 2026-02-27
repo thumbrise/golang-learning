@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/thumbrise/golang-learning/internal/database/storage/stats"
+	"github.com/thumbrise/demo/internal/database/storage/stats"
 )
 
 type (

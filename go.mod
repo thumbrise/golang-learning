@@ -1,4 +1,4 @@
-module github.com/thumbrise/golang-learning
+module github.com/thumbrise/demo
 
 go 1.25
 

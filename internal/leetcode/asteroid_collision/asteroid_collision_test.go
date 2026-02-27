@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/leetcode/asteroid_collision"
+	"github.com/thumbrise/demo/internal/leetcode/asteroid_collision"
 )
 
 func TestAsteroidCollision(t *testing.T) {

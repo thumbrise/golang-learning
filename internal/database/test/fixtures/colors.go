@@ -1,7 +1,7 @@
 package fixtures
 
 import (
-	"github.com/thumbrise/golang-learning/pkg/random"
+	"github.com/thumbrise/demo/pkg/random"
 )
 
 var PossibleColors = []string{

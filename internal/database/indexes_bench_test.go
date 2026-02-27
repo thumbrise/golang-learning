@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/thumbrise/golang-learning/internal/database/indexes/hash"
-	"github.com/thumbrise/golang-learning/internal/database/storage"
-	"github.com/thumbrise/golang-learning/internal/database/storage/search"
-	"github.com/thumbrise/golang-learning/internal/database/test/dal"
-	"github.com/thumbrise/golang-learning/internal/database/test/fixtures"
+	"github.com/thumbrise/demo/internal/database/indexes/hash"
+	"github.com/thumbrise/demo/internal/database/storage"
+	"github.com/thumbrise/demo/internal/database/storage/search"
+	"github.com/thumbrise/demo/internal/database/test/dal"
+	"github.com/thumbrise/demo/internal/database/test/fixtures"
 )
 
 //nolint:ireturn //matrix polymorphism

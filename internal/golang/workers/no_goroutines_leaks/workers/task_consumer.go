@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/thumbrise/golang-learning/internal/golang/workers/no_goroutines_leaks/task"
+	"github.com/thumbrise/demo/internal/golang/workers/no_goroutines_leaks/task"
 	"golang.org/x/sync/errgroup"
 )
 

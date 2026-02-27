@@ -2,7 +2,7 @@
 package chain
 
 import (
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store"
 )
 
 const defaultSize = 5 << 10 // 5120

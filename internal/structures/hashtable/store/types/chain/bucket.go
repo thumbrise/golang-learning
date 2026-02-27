@@ -3,7 +3,7 @@ package chain
 import (
 	"sync"
 
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store"
 )
 
 // Bucket - Адресное пространство, реализующее стратегию цепочек
