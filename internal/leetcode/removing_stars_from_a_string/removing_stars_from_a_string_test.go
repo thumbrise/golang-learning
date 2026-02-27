@@ -3,7 +3,7 @@ package removing_stars_from_a_string_test
 import (
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/leetcode/removing_stars_from_a_string"
+	"github.com/thumbrise/demo/internal/leetcode/removing_stars_from_a_string"
 )
 
 func TestRemoveStars(t *testing.T) {

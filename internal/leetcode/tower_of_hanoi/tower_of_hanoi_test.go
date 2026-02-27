@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/leetcode/tower_of_hanoi"
-	"github.com/thumbrise/golang-learning/pkg/testutil"
+	"github.com/thumbrise/demo/internal/leetcode/tower_of_hanoi"
+	"github.com/thumbrise/demo/pkg/testutil"
 )
 
 type towerSet struct {

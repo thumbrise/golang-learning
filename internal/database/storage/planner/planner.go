@@ -1,8 +1,8 @@
 package planner
 
 import (
-	"github.com/thumbrise/golang-learning/internal/database/storage/core"
-	"github.com/thumbrise/golang-learning/internal/database/storage/search"
+	"github.com/thumbrise/demo/internal/database/storage/core"
+	"github.com/thumbrise/demo/internal/database/storage/search"
 )
 
 type Planner[TR core.Record] struct {

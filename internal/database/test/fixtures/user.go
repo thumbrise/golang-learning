@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/thumbrise/golang-learning/internal/database/test/dal"
+	"github.com/thumbrise/demo/internal/database/test/dal"
 )
 
 func GenerateTestUsers(count int) []*dal.User {

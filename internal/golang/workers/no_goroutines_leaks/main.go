@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/thumbrise/golang-learning/internal/golang/workers/no_goroutines_leaks/fixtures"
-	"github.com/thumbrise/golang-learning/internal/golang/workers/no_goroutines_leaks/task"
-	"github.com/thumbrise/golang-learning/internal/golang/workers/no_goroutines_leaks/workers"
+	"github.com/thumbrise/demo/internal/golang/workers/no_goroutines_leaks/fixtures"
+	"github.com/thumbrise/demo/internal/golang/workers/no_goroutines_leaks/task"
+	"github.com/thumbrise/demo/internal/golang/workers/no_goroutines_leaks/workers"
 )
 
 const (

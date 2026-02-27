@@ -1,9 +1,9 @@
 package hashtable
 
 import (
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/chain"
+	"github.com/thumbrise/demo/internal/structures/hashtable/hashers"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store/types/chain"
 )
 
 type HashTable[T any] struct {

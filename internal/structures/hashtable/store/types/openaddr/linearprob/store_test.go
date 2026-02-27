@@ -3,8 +3,8 @@ package linearprob_test
 import (
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/openaddr/linearprob"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store/types/openaddr/linearprob"
 )
 
 func TestStore_Set(t *testing.T) {

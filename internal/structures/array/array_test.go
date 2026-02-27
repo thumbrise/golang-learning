@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/structures/array"
+	"github.com/thumbrise/demo/internal/structures/array"
 )
 
 func TestArray(t *testing.T) {

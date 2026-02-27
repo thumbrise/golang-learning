@@ -5,7 +5,7 @@ import (
 	_ "runtime/pprof"
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/leetcode/equal_row_and_column_pairs"
+	"github.com/thumbrise/demo/internal/leetcode/equal_row_and_column_pairs"
 )
 
 func TestEqualPairs(t *testing.T) {

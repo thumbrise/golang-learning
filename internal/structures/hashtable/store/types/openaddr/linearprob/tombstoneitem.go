@@ -1,6 +1,6 @@
 package linearprob
 
-import "github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
+import "github.com/thumbrise/demo/internal/structures/hashtable/store"
 
 type TombstoneItem[T any] struct{}
 

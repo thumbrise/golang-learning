@@ -5,11 +5,11 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/hashers"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/chain"
-	"github.com/thumbrise/golang-learning/internal/structures/hashtable/store/types/openaddr/linearprob"
+	"github.com/thumbrise/demo/internal/structures/hashtable"
+	"github.com/thumbrise/demo/internal/structures/hashtable/hashers"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store/types/chain"
+	"github.com/thumbrise/demo/internal/structures/hashtable/store/types/openaddr/linearprob"
 )
 
 type StoreFactory[T any] struct {
