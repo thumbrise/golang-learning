@@ -7,13 +7,9 @@ import (
 )
 
 type Bootloader interface {
-	Boot(ctx context.Context) error
-	Shutdown(ctx context.Context) error
-}
-type FBootloader interface {
 	Name() string
 	Bind() []fx.Option
-	BeforeStart() interface{}
+	BeforeStart() error
 	OnStart(ctx context.Context) error
 	Shutdown(ctx context.Context) error
 }

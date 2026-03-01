@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 )
 
 type OTPPostresqlRepository struct {
-	db *components.DB
+	db *database.DB
 }
 
-func NewOTPPostgresqlRepository(db *components.DB) *OTPPostresqlRepository {
+func NewOTPPostgresqlRepository(db *database.DB) *OTPPostresqlRepository {
 	return &OTPPostresqlRepository{db: db}
 }
 

@@ -3,18 +3,32 @@ package database
 import (
 	"context"
 
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
+	"go.uber.org/fx"
 )
 
 type Bootloader struct {
-	db *components.DB
+	db *DB
 }
 
-func NewBootloader(db *components.DB) *Bootloader {
+func NewBootloader(db *DB) *Bootloader {
 	return &Bootloader{db: db}
 }
+func (b *Bootloader) Name() string {
+	return "database"
+}
 
-func (b *Bootloader) Boot(ctx context.Context) error {
+func (b *Bootloader) Bind() []fx.Option {
+	return []fx.Option{
+		fx.Provide(NewBootloader),
+		fx.Provide(NewDB),
+	}
+}
+
+func (b *Bootloader) BeforeStart() error {
+	return nil
+}
+
+func (b *Bootloader) OnStart(ctx context.Context) error {
 	return b.db.Connect(ctx)
 }
 

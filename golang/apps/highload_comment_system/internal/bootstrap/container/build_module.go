@@ -5,7 +5,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func BuildModule(bootloader contracts.FBootloader) fx.Option {
+func BuildModule(bootloader contracts.Bootloader) fx.Option {
 	return fx.Module(
 		bootloader.Name(),
 		fx.Options(bootloader.Bind()...),

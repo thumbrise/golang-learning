@@ -139,7 +139,7 @@ var ModuleInfrastructure = fx.Options(
 		components.NewLogger,
 		components.NewJWT,
 		// fx.Annotate(
-		components.NewDB,
+		database.NewDB,
 		database.NewBootloader,
 		// fx.OnStart(func(ctx context.Context, db *components.DB) error {
 		//	return db.Connect(ctx)
@@ -219,7 +219,7 @@ func main() {
 		// ModuleHomepage,
 
 		// Вот тут я развлекаюсь щас
-		container.BuildModule(&homepage.FBootloader{}),
+		container.BuildModule(&homepage.Bootloader{}),
 
 		// ModuleInfrastructure,
 		// ModuleConfig,

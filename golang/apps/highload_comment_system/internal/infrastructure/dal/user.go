@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 )
 
 type User struct {
@@ -17,10 +17,10 @@ type User struct {
 }
 
 type UserRepository struct {
-	db *components.DB
+	db *database.DB
 }
 
-func NewUserRepository(db *components.DB) *UserRepository {
+func NewUserRepository(db *database.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
