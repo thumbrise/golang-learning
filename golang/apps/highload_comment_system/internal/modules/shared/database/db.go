@@ -9,16 +9,15 @@ import (
 	"net"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"go.uber.org/fx"
 )
 
 type DB struct {
 	pool   *pgxpool.Pool
-	config config.DB
+	config DB
 }
 
-func NewDB(lc fx.Lifecycle, config config.DB) *DB {
+func NewDB(lc fx.Lifecycle, config DB) *DB {
 	db := &DB{config: config}
 
 	lc.Append(fx.Hook{

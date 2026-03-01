@@ -21,6 +21,7 @@ func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
 		fx.Provide(NewBootloader),
 		fx.Provide(NewDB),
+		fx.Provide(NewConfig),
 	}
 }
 

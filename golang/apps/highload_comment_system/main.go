@@ -167,7 +167,7 @@ var ModuleInfrastructure = fx.Options(
 var ModuleConfig = fx.Options(
 	fx.Provide(
 		app.NewConfig,
-		config.NewDB,
+		database.NewDB,
 		mail.NewConfig,
 		auth.NewConfig,
 		config.NewHttp,

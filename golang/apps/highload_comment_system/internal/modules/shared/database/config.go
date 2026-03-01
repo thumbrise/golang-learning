@@ -1,10 +1,10 @@
-package config
+package database
 
 import (
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 )
 
-type DB struct {
+type Config struct {
 	Host     string `env:"DB_HOST"     env-required:"true"`
 	Port     string `env:"DB_PORT"     env-required:"true"`
 	Database string `env:"DB_DATABASE" env-required:"true"`
@@ -12,8 +12,8 @@ type DB struct {
 	Password string `env:"DB_PASSWORD" env-required:"true"`
 }
 
-func NewDB(loader contracts.EnvLoader) DB {
-	cfg := DB{}
+func NewConfig(loader contracts.EnvLoader) Config {
+	cfg := Config{}
 
 	loader.MustLoad(&cfg)
 
