@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +29,9 @@ func NewGenerator() *Generator {
 	return &Generator{}
 }
 
-func (h *Generator) Write(routes gin.RoutesInfo, writer io.Writer) error {
+func (g *Generator) Write(routes gin.RoutesInfo, writer io.Writer) error {
+	g.sort(routes)
+
 	var routeInfos []RouteInfo
 
 	for _, r := range routes {
@@ -72,4 +76,23 @@ func (h *Generator) Write(routes gin.RoutesInfo, writer io.Writer) error {
 	}
 
 	return nil
+}
+func (g *Generator) sort(routes gin.RoutesInfo) {
+	sort.Slice(routes, func(i, j int) bool {
+		getGroup := func(path string) string {
+			if path == "" || path == "/" {
+				return "/"
+			}
+			trimmed := strings.TrimPrefix(path, "/")
+			parts := strings.SplitN(trimmed, "/", 2)
+			return "/" + parts[0]
+		}
+		gi := getGroup(routes[i].Path)
+		gj := getGroup(routes[j].Path)
+		if gi != gj {
+			return gi < gj
+		}
+
+		return routes[i].Path < routes[j].Path
+	})
 }

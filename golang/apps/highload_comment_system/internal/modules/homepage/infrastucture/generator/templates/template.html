@@ -91,12 +91,7 @@
         <td>{{.Handler}}</td>
         <td>
             {{if .IsGET}}
-            {{if .IsWildcard}}
-            <a href="{{.BasePath}}" class="link-base">Base path</a>
-            <span class="wildcard-badge">wildcard</span>
-            {{else}}
-            <a href="{{.Path}}">Open</a>
-            {{end}}
+            <a href="{{if .IsWildcard}}{{.BasePath}}{{else}}{{.Path}}{{end}}" target="_blank" class="link-base">GO</a>
             {{else}}
             {{.Method}}
             {{end}}
