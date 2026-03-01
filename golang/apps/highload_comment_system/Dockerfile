@@ -50,6 +50,9 @@ RUN \
     && groupadd --gid "$DOCKER_HOST_GID" "app" \
     && useradd --uid "$DOCKER_HOST_UID" --gid "$DOCKER_HOST_GID" --create-home --shell /bin/bash "app"
 
+RUN mkdir -p "/home/app/go/{bin,src,pkg}" && \
+    chown -R "$DOCKER_HOST_UID:$DOCKER_HOST_GID" "/home/app/go"
+
 USER $DOCKER_HOST_UID:$DOCKER_HOST_GID
 
 ARG HTTP_PORT=9000

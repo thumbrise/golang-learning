@@ -19,9 +19,11 @@ services:
     working_dir: /var/www/
     user: ${DOCKER_HOST_UID:?}
     volumes:
-      - app_gopath:/go
+      - app_gopath:/home/app/go
       - ../..:/var/www
     entrypoint: bash entrypoint.sh
     environment:
         TZ: "Europe/Moscow"
         XDG_CONFIG_HOME: "/var/www/.xdg"
+        GOPATH: "/home/app/go"
+        GOCACHE: "/home/app/go/cache"

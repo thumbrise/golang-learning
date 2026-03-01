@@ -11,9 +11,6 @@ dotenv: [
   '.env',
 ]
 
-vars:
-  IMAGE_BASE: gitlab.thumbrise.ru:5050/taskman/taskman-backend/base
-
 tasks:
   # Host commands
   c:

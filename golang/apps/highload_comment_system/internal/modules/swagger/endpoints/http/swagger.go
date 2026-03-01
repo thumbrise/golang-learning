@@ -1,8 +1,8 @@
 package http
 
-//	@title						Taskman API
+//	@title						Demo API
 //	@version					1.0
-//	@description				Taskman API
+//	@description				Demo API
 //	@termsOfService				http://swagger.io/terms/
 //	@contact.name				API Support
 //	@contact.url				http://www.swagger.io/support

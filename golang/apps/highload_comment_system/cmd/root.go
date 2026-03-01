@@ -14,9 +14,9 @@ type Kernel struct {
 func NewKernel() *Kernel {
 	cmdRoot := &Kernel{
 		command: &cobra.Command{
-			Use:     "taskman",
+			Use:     "demo",
 			Aliases: []string{"go run ."},
-			Short:   "CLI for taskman",
+			Short:   "CLI",
 		},
 	}
 

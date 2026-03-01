@@ -57,12 +57,12 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: Taskman API
+  description: Demo API
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Taskman API
+  title: Demo API
   version: "1.0"
 paths:
   /api/auth/exchange-otp:

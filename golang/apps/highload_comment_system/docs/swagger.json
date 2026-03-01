@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Taskman API",
-        "title": "Taskman API",
+        "description": "Demo API",
+        "title": "Demo API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
