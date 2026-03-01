@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
 )
 
 type AuthQueryMe struct {
@@ -16,7 +16,7 @@ func NewAuthQueryMe(logger *slog.Logger) *AuthQueryMe {
 }
 
 type AuthQueryMeInput struct {
-	Claims *components.JWTClaims
+	Claims *jwt.JWTClaims
 }
 
 type AuthQueryMeOutput struct {

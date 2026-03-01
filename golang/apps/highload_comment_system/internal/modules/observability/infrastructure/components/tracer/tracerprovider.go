@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/thumbrise/demo/golang-demo/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
@@ -17,8 +17,7 @@ import (
 
 var ErrTraceExporter = errors.New("failed to create trace exporter")
 
-// NewTracerProvider creates exporter struct
-func NewTracerProvider(ctx context.Context, cfgTrace config.Observability, cfgApp config.App) (*sdktrace.TracerProvider, error) {
+func ConfigureTracerProvider(ctx context.Context, cfgTrace Config, cfgApp app.Config) error {
 	exp, err := otlptracehttp.New(ctx,
 		otlptracehttp.WithEndpoint(cfgTrace.OTLPURL),
 		otlptracehttp.WithInsecure(),
@@ -27,7 +26,7 @@ func NewTracerProvider(ctx context.Context, cfgTrace config.Observability, cfgAp
 		otlptracehttp.WithTimeout(5*time.Second),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrTraceExporter, err)
+		return fmt.Errorf("%w: %w", ErrTraceExporter, err)
 	}
 
 	// Создаем ресурс с атрибутами сервиса
@@ -43,7 +42,7 @@ func NewTracerProvider(ctx context.Context, cfgTrace config.Observability, cfgAp
 		resource.WithContainer(),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create resource: %w", err)
+		return fmt.Errorf("failed to create resource: %w", err)
 	}
 
 	// Создаем TracerProvider
@@ -69,7 +68,7 @@ func NewTracerProvider(ctx context.Context, cfgTrace config.Observability, cfgAp
 	otel.SetTracerProvider(tp)
 	otel.SetErrorHandler(ErrorHandler{})
 
-	return tp, nil
+	return nil
 }
 
 // Shutdown правильно завершает работу TracerProvider
@@ -77,18 +76,6 @@ func Shutdown(ctx context.Context, tp *sdktrace.TracerProvider) error {
 	if tp == nil {
 		return nil
 	}
-
-	return tp.Shutdown(ctx)
-}
-
-// ShutdownWithTimeout удобная обертка с таймаутом
-func ShutdownWithTimeout(tp *sdktrace.TracerProvider, timeout time.Duration) error {
-	if tp == nil {
-		return nil
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
+	// return otel.GetTracerProvider().Tracer(cfgApp.Name).
 	return tp.Shutdown(ctx)
 }

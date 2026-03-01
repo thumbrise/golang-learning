@@ -8,35 +8,36 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/thumbrise/demo/golang-demo/internal/config"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
-	otp2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
+	otpdal "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
-	"github.com/thumbrise/demo/golang-demo/pkg/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 )
 
 type AuthCommandSignIn struct {
 	logger                  *slog.Logger
 	otpMailer               *mailers.OTPMailer
-	config                  config.Auth
-	otpGenerator            *otp.Generator
+	otpConfig               otp.Config
+	otpGenerator            contracts.OtpGenerator
 	userRepository          *dal.UserRepository
-	otpRedisRepository      *otp2.OTPRedisRepository
-	otpPostgresqlRepository *otp2.OTPPostresqlRepository
+	otpRedisRepository      *otpdal.OTPRedisRepository
+	otpPostgresqlRepository *otpdal.OTPPostresqlRepository
 }
 
 func NewAuthCommandSignIn(logger *slog.Logger,
 	otpMailer *mailers.OTPMailer,
-	config config.Auth,
-	otpGenerator *otp.Generator,
+	config otp.Config,
+	otpGenerator contracts.OtpGenerator,
 	userRepository *dal.UserRepository,
-	otpRepository *otp2.OTPRedisRepository,
-	otpPostgresqlRepository *otp2.OTPPostresqlRepository,
+	otpRepository *otpdal.OTPRedisRepository,
+	otpPostgresqlRepository *otpdal.OTPPostresqlRepository,
 ) *AuthCommandSignIn {
 	return &AuthCommandSignIn{
 		logger:                  logger,
 		otpMailer:               otpMailer,
-		config:                  config,
+		otpConfig:               config,
 		otpGenerator:            otpGenerator,
 		userRepository:          userRepository,
 		otpRedisRepository:      otpRepository,
@@ -80,7 +81,7 @@ func (a *AuthCommandSignIn) Handle(ctx context.Context, input AuthCommandSignInI
 		return nil, fmt.Errorf("%w: %w", ErrFailedGenerateOTPToken, err)
 	}
 
-	expiredAt := time.Now().Add(time.Minute * time.Duration(a.config.OTPTTLMinutes))
+	expiredAt := time.Now().Add(time.Minute * time.Duration(a.otpConfig.TTLMinutes))
 
 	err = a.otpMailer.Send(input.Email, otpEntity.Code, expiredAt)
 	if err != nil {
@@ -93,7 +94,7 @@ func (a *AuthCommandSignIn) Handle(ctx context.Context, input AuthCommandSignInI
 func (a *AuthCommandSignIn) ensureExists(ctx context.Context, email string) (*dal.User, error) {
 	user, err := a.userRepository.FindByEmail(ctx, email)
 	if err != nil {
-		if dal.IsNotFound(err) {
+		if database.IsNotFound(err) {
 			return a.createUser(ctx, email)
 		}
 
@@ -129,21 +130,21 @@ func (a *AuthCommandSignIn) createUser(ctx context.Context, email string) (*dal.
 	return user, nil
 }
 
-func (a *AuthCommandSignIn) generateCode(ctx context.Context, user *dal.User) (*otp2.OTP, error) {
-	expiredAt := time.Now().Add(time.Minute * time.Duration(a.config.OTPTTLMinutes))
-	otpEntity := &otp2.OTP{
+func (a *AuthCommandSignIn) generateCode(ctx context.Context, user *dal.User) (*otpdal.OTP, error) {
+	expiredAt := time.Now().Add(time.Minute * time.Duration(a.otpConfig.TTLMinutes))
+	otpEntity := &otpdal.OTP{
 		UserID:    user.ID,
 		ExpiresAt: expiredAt,
 	}
 
 	var otpCode string
-	if a.config.OTPForcedValue != "" {
-		otpCode = a.config.OTPForcedValue
+	if a.otpConfig.ForcedValue != "" {
+		otpCode = a.otpConfig.ForcedValue
 		otpEntity.Code = otpCode
 	} else {
 		var err error
 
-		otpCode, err = a.otpGenerator.Generate(a.config.OTPLength)
+		otpCode, err = a.otpGenerator.Generate(a.otpConfig.Length)
 		if err != nil {
 			return nil, fmt.Errorf("%w: %w", ErrFailedGenerateOTPToken, err)
 		}

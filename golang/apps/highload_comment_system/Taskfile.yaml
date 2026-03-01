@@ -31,7 +31,7 @@ tasks:
       - task c -- up -d --build --remove-orphans
 
       - docker image prune --force
-      - docker container prune --force
+      - docker modules prune --force
 
   down:
     desc: Удалить все контейнеры во всех окружениях

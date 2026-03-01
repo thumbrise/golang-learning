@@ -34,7 +34,7 @@ receivers:
         #       - host.docker.internal:9323
         #     labels:
         #       job_name: docker-daemon
-        - job_name: docker-container
+        - job_name: docker-modules
           docker_sd_configs:
             - host: unix:///var/run/docker.sock
           relabel_configs:

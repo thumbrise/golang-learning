@@ -1,33 +1,44 @@
 package auth
 
 import (
-	"context"
-	"log/slog"
-
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
+	authusecases "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
+	otpdal "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
+	authmailers "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
+	otp "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
+	"go.uber.org/fx"
 )
 
-type Bootloader struct {
-	logger *slog.Logger
-	router *http.Router
-}
+var Module = fx.Module("auth",
+	fx.Provide(
+		http.NewMiddleware,
+		http.NewRouter,
 
-func (b *Bootloader) Shutdown(context.Context) error {
-	return nil
-}
+		authmailers.NewOTPMail,
 
-func NewBootloader(
-	logger *slog.Logger,
-	router *http.Router,
-) *Bootloader {
-	return &Bootloader{
-		logger: logger,
-		router: router,
-	}
-}
+		authusecases.NewAuthCommandSignIn,
+		authusecases.NewAuthCommandExchangeOtp,
+		authusecases.NewAuthQueryMe,
+		authusecases.NewAuthCommandRefresh,
 
-func (b *Bootloader) Boot(ctx context.Context) error {
-	b.router.Register()
+		dal.NewUserRepository,
 
-	return nil
-}
+		otp.NewConfig,
+		otpdal.NewOTPRedisRepository,
+		otpdal.NewOTPPostgresqlRepository,
+		otp.NewGenerator,
+		fx.Annotate(
+			otp.NewGenerator,
+			fx.As(new(contracts.OtpGenerator)),
+		),
+
+		jwt.NewJWT,
+		jwt.NewConfig,
+	),
+	fx.Invoke(func(router *http.Router) {
+		router.Register()
+	}),
+)

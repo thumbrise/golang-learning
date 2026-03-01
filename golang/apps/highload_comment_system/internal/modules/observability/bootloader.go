@@ -5,9 +5,16 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/thumbrise/demo/golang-demo/internal/app"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
-	"go.opentelemetry.io/otel/sdk/trace"
+	observabilitytracer "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
+	oteltracer "go.opentelemetry.io/otel/trace"
+	"go.uber.org/fx"
+
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 var (
@@ -17,46 +24,75 @@ var (
 	ErrShutdownTracer   = errors.New("shutdown tracer")
 )
 
-type Bootloader struct {
-	healthRouter        *routers.HealthRouter
-	observabilityRouter *routers.ObservabilityRouter
-	pprofRouter         *routers.PprofRouter
-	profiler            *profiler.Profiler
-	traceProvider       *trace.TracerProvider
-}
+var Module = fx.Module("observability",
+	fx.Provide(
+		profiler.NewConfig,
+		profiler.NewProfiler,
 
-func NewBootloader(healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, profiler *profiler.Profiler, traceProvider *trace.TracerProvider) *Bootloader {
-	return &Bootloader{healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, profiler: profiler, traceProvider: traceProvider}
-}
+		logger.NewLogger,
 
-func (b *Bootloader) Shutdown(ctx context.Context) error {
-	err := b.profiler.Shutdown()
-	if err != nil {
-		return fmt.Errorf("%w: %w", ErrShutdownProfiler, err)
-	}
+		observabilitytracer.NewConfig,
+		observabilitytracer.NewTracer,
+		sdktrace.NewTracerProvider,
+		fx.Annotate(
+			func() *sdktrace.TracerProvider {
+				return &sdktrace.TracerProvider{}
+			},
+			fx.As(new(oteltracer.TracerProvider)),
+		),
 
-	err = b.traceProvider.Shutdown(ctx)
-	if err != nil {
-		return fmt.Errorf("%w: %w", ErrShutdownTracer, err)
-	}
+		routers.NewHealthRouter,
+		routers.NewObservabilityRouter,
+		routers.NewPprofRouter,
 
-	return nil
-}
+		middlewares.NewObservabilityMiddleware,
+	),
+	fx.Invoke(func(
+		profiler *profiler.Profiler,
+		healthRouter *routers.HealthRouter,
+		pprofRouter *routers.PprofRouter,
+		observabilityRouter *routers.ObservabilityRouter,
+	) error {
+		err := profiler.Start()
+		if err != nil {
+			return fmt.Errorf("%w: %w", ErrStartProfiler, err)
+		}
+		// TODO: инкапсулировать все компоненты обсервабилити
+		// err := b.traceProvider.Start()
+		// if err != nil {
+		//	return fmt.Errorf("%w: %w", ErrStartTracer, err)
+		//}
 
-func (b *Bootloader) Boot(ctx context.Context) error {
-	err := b.profiler.Start()
-	if err != nil {
-		return fmt.Errorf("%w: %w", ErrStartProfiler, err)
-	}
-	// TODO: инкапсулировать все компоненты обсервабилити
-	// err := b.traceProvider.Start()
-	// if err != nil {
-	//	return fmt.Errorf("%w: %w", ErrStartTracer, err)
-	//}
+		healthRouter.Register()
+		pprofRouter.Register()
+		observabilityRouter.Register()
 
-	b.healthRouter.Register()
-	b.pprofRouter.Register()
-	b.observabilityRouter.Register()
+		return nil
+	}),
+	fx.Invoke(func(
+		lc fx.Lifecycle,
+		tracerConfig observabilitytracer.Config,
+		appConfig app.Config,
+		profiler *profiler.Profiler,
+		traceProvider *sdktrace.TracerProvider,
+	) {
+		lc.Append(fx.Hook{
+			OnStart: func(ctx context.Context) error {
+				return observabilitytracer.ConfigureTracerProvider(ctx, tracerConfig, appConfig)
+			},
+			OnStop: func(ctx context.Context) error {
+				err := profiler.Shutdown()
+				if err != nil {
+					return fmt.Errorf("%w: %w", ErrShutdownProfiler, err)
+				}
 
-	return nil
-}
+				err = observabilitytracer.Shutdown(ctx, traceProvider)
+				if err != nil {
+					return fmt.Errorf("%w: %w", ErrShutdownTracer, err)
+				}
+
+				return nil
+			},
+		})
+	}),
+)

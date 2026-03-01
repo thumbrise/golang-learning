@@ -1,3 +1,5 @@
+//go:build test
+
 package util
 
 import (
@@ -11,16 +13,16 @@ import (
 	"testing"
 
 	"github.com/steinfletcher/apitest"
-	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
-	"github.com/thumbrise/demo/golang-demo/internal/config"
-	"github.com/thumbrise/demo/golang-demo/pkg/env"
+	"github.com/thumbrise/demo/golang-demo/internal/app"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/modules"
+	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
-var cfg *config.Http
+var cfg *http2.Config
 
 func Uri(uri string) string {
 	if cfg == nil {
-		c := config.NewHttp(env.NewLoader())
+		c := http2.NewConfig(app.NewLoader())
 		cfg = &c
 	}
 
@@ -41,7 +43,7 @@ var handler http.Handler
 
 func Handler(ctx context.Context) http.Handler {
 	if handler == nil {
-		c, err := container.InitializeContainer(ctx)
+		c, err := modules.InitializeContainer(ctx)
 		if err != nil {
 			panic(err)
 		}

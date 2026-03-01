@@ -3,7 +3,7 @@ package cmds
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
 type Route struct {

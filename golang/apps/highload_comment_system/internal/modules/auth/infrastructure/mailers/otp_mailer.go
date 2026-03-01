@@ -5,15 +5,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/thumbrise/demo/golang-demo/internal/config"
+	mail2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/mail"
 	"github.com/wneessen/go-mail"
 )
 
 type OTPMailer struct {
-	config config.Mail
+	config mail2.Config
 }
 
-func NewOTPMail(config config.Mail) *OTPMailer {
+func NewOTPMail(config mail2.Config) *OTPMailer {
 	return &OTPMailer{
 		config: config,
 	}

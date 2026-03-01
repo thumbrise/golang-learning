@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gin-contrib/pprof"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
 type PprofRouter struct {

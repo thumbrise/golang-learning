@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	httpkernel "github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
+	httpkernel "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
 type HomePageRouter struct {

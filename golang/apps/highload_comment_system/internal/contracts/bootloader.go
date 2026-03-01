@@ -1,8 +1,10 @@
 package contracts
 
-import "context"
+import (
+	"go.uber.org/fx"
+)
 
 type Bootloader interface {
-	Boot(ctx context.Context) error
-	Shutdown(ctx context.Context) error
+	Name() string
+	Bind() []fx.Option
 }
