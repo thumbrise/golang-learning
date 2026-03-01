@@ -1,0 +1,36 @@
+package usecases
+
+import (
+	"context"
+	"log/slog"
+
+	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/components"
+)
+
+type AuthQueryMe struct {
+	logger *slog.Logger
+}
+
+func NewAuthQueryMe(logger *slog.Logger) *AuthQueryMe {
+	return &AuthQueryMe{logger: logger}
+}
+
+type AuthQueryMeInput struct {
+	Claims *components.JWTClaims
+}
+
+type AuthQueryMeOutput struct {
+	// Claims *components.JWTClaims
+	Message string
+}
+
+func (a *AuthQueryMe) Handle(ctx context.Context, input AuthQueryMeInput) (*AuthQueryMeOutput, error) {
+	a.logger.Info("AuthQueryMe",
+		slog.Any("input", input),
+	)
+
+	return &AuthQueryMeOutput{
+		// Claims: input.Claims,
+		Message: "Success",
+	}, nil
+}
