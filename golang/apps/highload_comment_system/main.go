@@ -7,7 +7,6 @@ import (
 
 	"github.com/thumbrise/demo/golang-demo/cmd"
 	"github.com/thumbrise/demo/golang-demo/cmd/cmds"
-	"github.com/thumbrise/demo/golang-demo/internal"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
 	"github.com/thumbrise/demo/golang-demo/internal/config"
@@ -45,7 +44,7 @@ import (
 // ModuleCore предоставляет базовые компоненты приложения
 var ModuleCore = fx.Options(
 	fx.Provide(
-		internal.Bootloaders,
+		//internal.Bootloaders,
 		bootstrap.NewRunner,
 		cmd.NewBootloader,
 		cmd.NewKernel,
@@ -211,15 +210,19 @@ func main() {
 	fx.New(
 		ModuleCore,
 		ModuleCmd,
-		ModuleSharedErrorsMap,
-		ModuleSharedRedis,
-		ModuleSwagger,
+		//ModuleSharedErrorsMap,
+		//ModuleSharedRedis,
+		//ModuleSwagger,
 		//ModuleObservability,
-		ModuleAuth,
-		ModuleHomepage,
-		ModuleInfrastructure,
-		ModuleConfig,
-		ModuleDAL,
+		//ModuleAuth,
+		//ModuleHomepage,
+
+		// Вот тут я развлекаюсь щас
+		container.BuildModule(&homepage.FBootloader{}),
+
+		//ModuleInfrastructure,
+		//ModuleConfig,
+		//ModuleDAL,
 		ModuleContainer,
 		ModuleExecuteCmd,
 	).Run()

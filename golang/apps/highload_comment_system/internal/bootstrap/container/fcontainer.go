@@ -13,7 +13,7 @@ import (
 	"go.uber.org/fx"
 )
 
-type Container struct {
+type FContainer struct {
 	bootloaders            []contracts.Bootloader
 	bootedBootloadersTypes map[string]bool
 	logger                 *slog.Logger
@@ -22,15 +22,18 @@ type Container struct {
 	CmdKernel              *cmd.Kernel
 }
 
-func NewContainer(
+func Bootload() {
+	return
+}
+func NewFContainer(
 	bootloaders []contracts.Bootloader,
 	logger *slog.Logger,
 	runner *bootstrap.Runner,
 	httpKernel *http.Kernel,
 	cmdKernel *cmd.Kernel,
 	lc fx.Lifecycle,
-) *Container {
-	c := &Container{
+) *FContainer {
+	c := &FContainer{
 		bootloaders: bootloaders,
 		logger:      logger,
 		Runner:      runner,
@@ -55,8 +58,8 @@ func NewContainer(
 //
 // Does not stops booting if error occurred. Trying boot all.
 //
-// Don't forget to call Container.Shutdown in the end
-func (c *Container) Boot(ctx context.Context) error {
+// Don't forget to call FContainer.Shutdown in the end
+func (c *FContainer) Boot(ctx context.Context) error {
 	err := error(nil)
 
 	for _, bootloader := range c.bootloaders {
@@ -81,7 +84,7 @@ func (c *Container) Boot(ctx context.Context) error {
 	return nil
 }
 
-func (c *Container) Shutdown(ctx context.Context) error {
+func (c *FContainer) Shutdown(ctx context.Context) error {
 	err := error(nil)
 
 	for i := len(c.bootloaders) - 1; i >= 0; i-- {

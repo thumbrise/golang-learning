@@ -11,13 +11,13 @@ import (
 )
 
 func Bootloaders(
-// main
+	// main
 	cmdLoader *cmd.Bootloader,
-// shared
+	// shared
 	errorMapLoader *errorsmap.Bootloader,
 	swaggerLoader *swagger.Bootloader,
-// modules
-//observabilityLoader *observability.Bootloader,
+	// modules
+	//observabilityLoader *observability.Bootloader,
 	authLoader *auth.Bootloader,
 	homepageLoader *homepage.Bootloader,
 	databaseLoader *database.Bootloader,
