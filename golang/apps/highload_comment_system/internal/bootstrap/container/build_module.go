@@ -1,11 +1,22 @@
 package container
 
 import (
+	"github.com/thumbrise/demo/golang-demo/internal"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"go.uber.org/fx"
 )
 
-func BuildModule(bootloader contracts.Bootloader) fx.Option {
+func Build() []fx.Option {
+	loaders := internal.Bootloaders()
+	opts := make([]fx.Option, 0, len(loaders))
+	for _, loader := range loaders {
+		l := loader
+		buildModule(l)
+	}
+
+	return opts
+}
+func buildModule(bootloader contracts.Bootloader) fx.Option {
 	return fx.Module(
 		bootloader.Name(),
 		fx.Options(bootloader.Bind()...),

@@ -11,7 +11,8 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
-	otp2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal/otp"
+	dal2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
 )
 
@@ -20,18 +21,18 @@ type AuthCommandSignIn struct {
 	otpMailer               *mailers.OTPMailer
 	config                  config.Auth
 	otpGenerator            contracts.OtpGenerator
-	userRepository          *dal.UserRepository
-	otpRedisRepository      *otp2.OTPRedisRepository
-	otpPostgresqlRepository *otp2.OTPPostresqlRepository
+	userRepository          *dal2.UserRepository
+	otpRedisRepository      *otp.OTPRedisRepository
+	otpPostgresqlRepository *otp.OTPPostresqlRepository
 }
 
 func NewAuthCommandSignIn(logger *slog.Logger,
 	otpMailer *mailers.OTPMailer,
 	config config.Auth,
 	otpGenerator contracts.OtpGenerator,
-	userRepository *dal.UserRepository,
-	otpRepository *otp2.OTPRedisRepository,
-	otpPostgresqlRepository *otp2.OTPPostresqlRepository,
+	userRepository *dal2.UserRepository,
+	otpRepository *otp.OTPRedisRepository,
+	otpPostgresqlRepository *otp.OTPPostresqlRepository,
 ) *AuthCommandSignIn {
 	return &AuthCommandSignIn{
 		logger:                  logger,
@@ -90,7 +91,7 @@ func (a *AuthCommandSignIn) Handle(ctx context.Context, input AuthCommandSignInI
 	return output, nil
 }
 
-func (a *AuthCommandSignIn) ensureExists(ctx context.Context, email string) (*dal.User, error) {
+func (a *AuthCommandSignIn) ensureExists(ctx context.Context, email string) (*dal2.User, error) {
 	user, err := a.userRepository.FindByEmail(ctx, email)
 	if err != nil {
 		if dal.IsNotFound(err) {
@@ -107,7 +108,7 @@ func (a *AuthCommandSignIn) ensureExists(ctx context.Context, email string) (*da
 	return user, nil
 }
 
-func (a *AuthCommandSignIn) createUser(ctx context.Context, email string) (*dal.User, error) {
+func (a *AuthCommandSignIn) createUser(ctx context.Context, email string) (*dal2.User, error) {
 	count, err := a.userRepository.Count(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrFailedCount, err)
@@ -115,7 +116,7 @@ func (a *AuthCommandSignIn) createUser(ctx context.Context, email string) (*dal.
 
 	name := "guest" + strconv.Itoa(count+1)
 
-	user := &dal.User{
+	user := &dal2.User{
 		Name:      name,
 		Email:     email,
 		CreatedAt: time.Now(),
@@ -129,9 +130,9 @@ func (a *AuthCommandSignIn) createUser(ctx context.Context, email string) (*dal.
 	return user, nil
 }
 
-func (a *AuthCommandSignIn) generateCode(ctx context.Context, user *dal.User) (*otp2.OTP, error) {
+func (a *AuthCommandSignIn) generateCode(ctx context.Context, user *dal2.User) (*otp.OTP, error) {
 	expiredAt := time.Now().Add(time.Minute * time.Duration(a.config.OTPTTLMinutes))
-	otpEntity := &otp2.OTP{
+	otpEntity := &otp.OTP{
 		UserID:    user.ID,
 		ExpiresAt: expiredAt,
 	}

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	dal2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 )
 
@@ -29,12 +30,12 @@ func (r *UserRepository) FindByID(ctx context.Context, id int) (*User, error) {
 
 	rows, err := r.db.Pool().Query(ctx, sql, id)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedQuery, err)
+		return nil, fmt.Errorf("%w: %w", dal2.ErrFailedQuery, err)
 	}
 
 	user, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[User])
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedCollectExactlyOneRow, err)
+		return nil, fmt.Errorf("%w: %w", dal2.ErrFailedCollectExactlyOneRow, err)
 	}
 
 	return &user, nil
@@ -45,12 +46,12 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*User, 
 
 	rows, err := r.db.Pool().Query(ctx, sql, email)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedQuery, err)
+		return nil, fmt.Errorf("%w: %w", dal2.ErrFailedQuery, err)
 	}
 
 	user, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[User])
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedCollectExactlyOneRow, err)
+		return nil, fmt.Errorf("%w: %w", dal2.ErrFailedCollectExactlyOneRow, err)
 	}
 
 	return &user, nil
@@ -61,7 +62,7 @@ func (r *UserRepository) Count(ctx context.Context) (int, error) {
 
 	err := r.db.Pool().QueryRow(ctx, "SELECT COUNT(*) FROM users").Scan(&count)
 	if err != nil {
-		return 0, fmt.Errorf("%w: %w", ErrFailedQuery, err)
+		return 0, fmt.Errorf("%w: %w", dal2.ErrFailedQuery, err)
 	}
 
 	return count, nil
@@ -72,7 +73,7 @@ func (r *UserRepository) Create(ctx context.Context, user *User) error {
 
 	var id int
 	if err := r.db.Pool().QueryRow(ctx, sql, user.Name, user.Email, user.CreatedAt).Scan(&id); err != nil {
-		return fmt.Errorf("%w: %w", ErrFailedQuery, err)
+		return fmt.Errorf("%w: %w", dal2.ErrFailedQuery, err)
 	}
 
 	user.ID = id
@@ -85,7 +86,7 @@ func (r *UserRepository) EmailExists(ctx context.Context, email string) (bool, e
 
 	var exists bool
 	if err := r.db.Pool().QueryRow(ctx, sql, email).Scan(&exists); err != nil {
-		return false, fmt.Errorf("%w: %w", ErrFailedQuery, err)
+		return false, fmt.Errorf("%w: %w", dal2.ErrFailedQuery, err)
 	}
 
 	return exists, nil

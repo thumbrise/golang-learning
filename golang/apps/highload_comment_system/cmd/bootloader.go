@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 
 	"github.com/thumbrise/demo/golang-demo/cmd/cmds"
 	"go.uber.org/fx"
@@ -38,6 +40,12 @@ func (b *Bootloader) BeforeStart() error {
 }
 
 func (b *Bootloader) OnStart(ctx context.Context) error {
+	buf := bytes.NewBuffer(make([]byte, 0))
+	err := b.kernel.Execute(ctx, buf)
+	if err != nil {
+		return err
+	}
+	fmt.Print(buf.String())
 	return nil
 }
 

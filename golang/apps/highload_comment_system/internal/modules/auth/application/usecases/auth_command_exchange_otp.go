@@ -8,7 +8,8 @@ import (
 
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal/otp"
+	dal2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	domainerrors "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/domain/errors"
 )
 
@@ -16,10 +17,10 @@ type AuthCommandExchangeOtp struct {
 	logger         *slog.Logger
 	jwt            *components.JWT
 	otpRepository  *otp.OTPRedisRepository
-	userRepository *dal.UserRepository
+	userRepository *dal2.UserRepository
 }
 
-func NewAuthCommandExchangeOtp(logger *slog.Logger, jwt *components.JWT, otpRepository *otp.OTPRedisRepository, userRepository *dal.UserRepository) *AuthCommandExchangeOtp {
+func NewAuthCommandExchangeOtp(logger *slog.Logger, jwt *components.JWT, otpRepository *otp.OTPRedisRepository, userRepository *dal2.UserRepository) *AuthCommandExchangeOtp {
 	return &AuthCommandExchangeOtp{logger: logger, jwt: jwt, otpRepository: otpRepository, userRepository: userRepository}
 }
 

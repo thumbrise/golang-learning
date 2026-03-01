@@ -1,10 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"context"
-	"fmt"
-
 	"github.com/thumbrise/demo/golang-demo/cmd"
 	"github.com/thumbrise/demo/golang-demo/cmd/cmds"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
@@ -12,12 +8,12 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
-	otp2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	authusecases "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	authhttp "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
+	otp3 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	authmailers "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	homepagehttp "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
@@ -181,50 +177,13 @@ var ModuleConfig = fx.Options(
 var ModuleDAL = fx.Options(
 	fx.Provide(
 		dal.NewUserRepository,
-		otp2.NewOTPRedisRepository,
-		otp2.NewOTPPostgresqlRepository,
+		otp3.NewOTPRedisRepository,
+		otp3.NewOTPPostgresqlRepository,
 	),
 )
 
-// ModuleContainer предоставляет контейнер и его запуск
-//var ModuleContainer = fx.Options(
-//	fx.Provide(container.NewContainer),
-//	fx.Invoke(func(c *container.Container) error {
-//		return c.Boot(context.Background())
-//	}),
-//)
-
-// ModuleExecuteCmd запускает команду через cmd.Kernel
-var ModuleExecuteCmd = fx.Invoke(func(kernel *cmd.Kernel) error {
-	ctx := context.Background()
-	buf := bytes.NewBuffer(make([]byte, 0))
-	err := kernel.Execute(ctx, buf)
-	if err != nil {
-		return err
-	}
-	fmt.Print(buf.String())
-
-	return nil
-})
-
 func main() {
 	fx.New(
-		ModuleCore,
-		ModuleCmd,
-		// ModuleSharedErrorsMap,
-		// ModuleSharedRedis,
-		// ModuleSwagger,
-		// ModuleObservability,
-		// ModuleAuth,
-		// ModuleHomepage,
-
-		// Вот тут я развлекаюсь щас
-		container.BuildModule(&homepage.Bootloader{}),
-
-		// ModuleInfrastructure,
-		// ModuleConfig,
-		// ModuleDAL,
-		//ModuleContainer,
-		ModuleExecuteCmd,
+		container.Build()...,
 	).Run()
 }
