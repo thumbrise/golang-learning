@@ -1,22 +1,26 @@
 package internal
 
 import (
+	"github.com/thumbrise/demo/golang-demo/cmd"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
 )
 
 func Bootloaders() []contracts.Bootloader {
 	return []contracts.Bootloader{
-		// main
-		//cmdLoader *cmd.Bootloader,
+		&cmd.Bootloader{},
 		// shared
-		//errorMapLoader *errorsmap.Bootloader,
-		//swaggerLoader *swagger.Bootloader,
+		&errorsmap.Bootloader{},
+		&swagger.Bootloader{},
 		// modules
-		//observabilityLoader *observability.Bootloader,
-		//authLoader *auth.Bootloader,
+		&observability.Bootloader{},
+		&auth.Bootloader{},
 		&homepage.Bootloader{},
-		//databaseLoader *database.Bootloader,
-
+		&database.Bootloader{},
 	}
 }
