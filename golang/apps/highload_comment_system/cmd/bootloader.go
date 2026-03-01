@@ -17,6 +17,8 @@ type Bootloader struct {
 }
 
 func NewBootloader(kernel *Kernel, route *cmds.Route, routeList *cmds.RouteList, serve *cmds.Serve) *Bootloader {
+	fmt.Printf("Bootloader: %#v\n", &Bootloader{kernel: kernel, route: route, routeList: routeList, serve: serve})
+
 	return &Bootloader{kernel: kernel, route: route, routeList: routeList, serve: serve}
 }
 
@@ -26,15 +28,18 @@ func (b *Bootloader) Name() string {
 
 func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
-		fx.Provide(NewBootloader),
-		fx.Provide(NewKernel),
-		fx.Provide(cmds.NewServe),
-		fx.Provide(cmds.NewRoute),
-		fx.Provide(cmds.NewRouteList),
+		fx.Provide(
+			NewBootloader,
+			NewKernel,
+			cmds.NewServe,
+			cmds.NewRoute,
+			cmds.NewRouteList,
+		),
 	}
 }
 
 func (b *Bootloader) BeforeStart() error {
+
 	b.kernel.AddGroup(b.route.Command, b.routeList.Command)
 	b.kernel.AddCommand(b.serve.Command)
 
@@ -43,7 +48,7 @@ func (b *Bootloader) BeforeStart() error {
 
 func (b *Bootloader) OnStart(ctx context.Context) error {
 	buf := bytes.NewBuffer(make([]byte, 0))
-
+	fmt.Println("IM IN CMD BOOTLOADER")
 	err := b.kernel.Execute(ctx, buf)
 	if err != nil {
 		return err

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
@@ -28,10 +29,12 @@ type Bootloader struct {
 	pprofRouter         *routers.PprofRouter
 	profiler            *profiler.Profiler
 	traceProvider       *sdktrace.TracerProvider
+	tracerConfig        observabilitytracer.Config
+	appConfig           app.Config
 }
 
-func NewBootloader(healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, profiler *profiler.Profiler, traceProvider *sdktrace.TracerProvider) *Bootloader {
-	return &Bootloader{healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, profiler: profiler, traceProvider: traceProvider}
+func NewBootloader(appConfig app.Config, healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, profiler *profiler.Profiler, traceProvider *sdktrace.TracerProvider, tracerConfig observabilitytracer.Config) *Bootloader {
+	return &Bootloader{appConfig: appConfig, healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, profiler: profiler, traceProvider: traceProvider, tracerConfig: tracerConfig}
 }
 
 func (b *Bootloader) Name() string {
@@ -49,7 +52,6 @@ func (b *Bootloader) Bind() []fx.Option {
 			logger.NewLogger,
 
 			observabilitytracer.NewConfig,
-			observabilitytracer.NewTracerProvider,
 			observabilitytracer.NewTracer,
 			sdktrace.NewTracerProvider,
 			fx.Annotate(
@@ -85,7 +87,7 @@ func (b *Bootloader) BeforeStart() error {
 }
 
 func (b *Bootloader) OnStart(ctx context.Context) error {
-	return nil
+	return observabilitytracer.ConfigureTracerProvider(ctx, b.tracerConfig, b.appConfig)
 }
 
 func (b *Bootloader) Shutdown(ctx context.Context) error {
@@ -94,7 +96,7 @@ func (b *Bootloader) Shutdown(ctx context.Context) error {
 		return fmt.Errorf("%w: %w", ErrShutdownProfiler, err)
 	}
 
-	err = b.traceProvider.Shutdown(ctx)
+	err = observabilitytracer.Shutdown(ctx, b.traceProvider)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrShutdownTracer, err)
 	}

@@ -12,7 +12,7 @@ func Build() []fx.Option {
 	opts := make([]fx.Option, 0, len(loaders))
 	for _, loader := range loaders {
 		l := loader
-		buildModule(l)
+		opts = append(opts, buildModule(l))
 	}
 
 	return opts
