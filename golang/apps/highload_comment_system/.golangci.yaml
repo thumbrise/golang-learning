@@ -10,6 +10,7 @@ output:
       path: stderr
       print-linter-name: true
       print-issued-lines: true
+  path-prefix: "golang/apps/highload_comment_system/"
   sort-order:
     - linter
     - severity
