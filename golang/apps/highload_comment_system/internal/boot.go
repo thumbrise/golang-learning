@@ -3,7 +3,6 @@ package internal
 import (
 	"github.com/thumbrise/demo/golang-demo/cmd"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
-	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
@@ -13,20 +12,21 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/mail"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
+	"go.uber.org/fx"
 )
 
-func Bootloaders() []contracts.Bootloader {
-	return []contracts.Bootloader{
-		&app.Bootloader{},
-		&cmd.Bootloader{},
-		&http.Bootloader{},
-		&database.Bootloader{},
-		&mail.Bootloader{},
-		&redis.Bootloader{},
-		&errorsmap.Bootloader{},
-		&swagger.Bootloader{},
-		&observability.Bootloader{},
-		&auth.Bootloader{},
-		&homepage.Bootloader{},
+func Bootloaders() []fx.Option {
+	return []fx.Option{
+		app.Module,
+		cmd.Module,
+		http.Module,
+		database.Module,
+		mail.Module,
+		redis.Module,
+		errorsmap.Module,
+		swagger.Module,
+		observability.Module,
+		auth.Module,
+		homepage.Module,
 	}
 }

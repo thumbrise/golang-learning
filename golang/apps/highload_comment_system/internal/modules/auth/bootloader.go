@@ -1,9 +1,6 @@
 package auth
 
 import (
-	"context"
-	"log/slog"
-
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	authusecases "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
@@ -15,67 +12,33 @@ import (
 	"go.uber.org/fx"
 )
 
-type Bootloader struct {
-	logger *slog.Logger
-	router *http.Router
-}
+var Module = fx.Module("auth",
+	fx.Provide(
+		http.NewMiddleware,
+		http.NewRouter,
 
-func NewBootloader(
-	logger *slog.Logger,
-	router *http.Router,
-) *Bootloader {
-	return &Bootloader{
-		logger: logger,
-		router: router,
-	}
-}
+		authmailers.NewOTPMail,
 
-func (b *Bootloader) Name() string {
-	return "auth"
-}
+		authusecases.NewAuthCommandSignIn,
+		authusecases.NewAuthCommandExchangeOtp,
+		authusecases.NewAuthQueryMe,
+		authusecases.NewAuthCommandRefresh,
 
-func (b *Bootloader) Bind() []fx.Option {
-	return []fx.Option{
-		fx.Provide(
-			NewBootloader,
+		dal.NewUserRepository,
 
-			http.NewMiddleware,
-			http.NewRouter,
-
-			authmailers.NewOTPMail,
-
-			authusecases.NewAuthCommandSignIn,
-			authusecases.NewAuthCommandExchangeOtp,
-			authusecases.NewAuthQueryMe,
-			authusecases.NewAuthCommandRefresh,
-
-			dal.NewUserRepository,
-
-			otp.NewConfig,
-			otpdal.NewOTPRedisRepository,
-			otpdal.NewOTPPostgresqlRepository,
+		otp.NewConfig,
+		otpdal.NewOTPRedisRepository,
+		otpdal.NewOTPPostgresqlRepository,
+		otp.NewGenerator,
+		fx.Annotate(
 			otp.NewGenerator,
-			fx.Annotate(
-				otp.NewGenerator,
-				fx.As(new(contracts.OtpGenerator)),
-			),
-
-			jwt.NewJWT,
-			jwt.NewConfig,
+			fx.As(new(contracts.OtpGenerator)),
 		),
-	}
-}
 
-func (b *Bootloader) BeforeStart() error {
-	b.router.Register()
-
-	return nil
-}
-
-func (b *Bootloader) OnStart(ctx context.Context) error {
-	return nil
-}
-
-func (b *Bootloader) Shutdown(context.Context) error {
-	return nil
-}
+		jwt.NewJWT,
+		jwt.NewConfig,
+		fx.Invoke(func(router *http.Router) {
+			router.Register()
+		}),
+	),
+)

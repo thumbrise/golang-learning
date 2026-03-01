@@ -9,56 +9,30 @@ import (
 	"go.uber.org/fx"
 )
 
-type Bootloader struct {
-	kernel    *Kernel
-	serve     *cmds.Serve
-	route     *cmds.Route
-	routeList *cmds.RouteList
-}
+var Module = fx.Module(
+	"cmd",
+	fx.Provide(
+		NewKernel,
+		cmds.NewServe,
+		cmds.NewRoute,
+		cmds.NewRouteList,
+		fx.Invoke(func(lc fx.Lifecycle, kernel *Kernel, route *cmds.Route, routeList *cmds.RouteList, serve *cmds.Serve) {
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					buf := bytes.NewBuffer(make([]byte, 0))
+					fmt.Println("IM IN CMD BOOTLOADER")
+					err := kernel.Execute(ctx, buf)
+					if err != nil {
+						return err
+					}
 
-func NewBootloader(kernel *Kernel, route *cmds.Route, routeList *cmds.RouteList, serve *cmds.Serve) *Bootloader {
-	fmt.Printf("Bootloader: %#v\n", &Bootloader{kernel: kernel, route: route, routeList: routeList, serve: serve})
+					fmt.Print(buf.String())
 
-	return &Bootloader{kernel: kernel, route: route, routeList: routeList, serve: serve}
-}
-
-func (b *Bootloader) Name() string {
-	return "cmd"
-}
-
-func (b *Bootloader) Bind() []fx.Option {
-	return []fx.Option{
-		fx.Provide(
-			NewBootloader,
-			NewKernel,
-			cmds.NewServe,
-			cmds.NewRoute,
-			cmds.NewRouteList,
-		),
-	}
-}
-
-func (b *Bootloader) BeforeStart() error {
-
-	b.kernel.AddGroup(b.route.Command, b.routeList.Command)
-	b.kernel.AddCommand(b.serve.Command)
-
-	return nil
-}
-
-func (b *Bootloader) OnStart(ctx context.Context) error {
-	buf := bytes.NewBuffer(make([]byte, 0))
-	fmt.Println("IM IN CMD BOOTLOADER")
-	err := b.kernel.Execute(ctx, buf)
-	if err != nil {
-		return err
-	}
-
-	fmt.Print(buf.String())
-
-	return nil
-}
-
-func (b *Bootloader) Shutdown(ctx context.Context) error {
-	return nil
-}
+					return nil
+				},
+			})
+			kernel.AddGroup(route.Command, routeList.Command)
+			kernel.AddCommand(serve.Command)
+		}),
+	),
+)
