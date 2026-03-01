@@ -38,6 +38,7 @@ func (b *Bootloader) Name() string {
 func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
 		fx.Provide(NewBootloader),
+		fx.Provide(NewConfig),
 		fx.Provide(routers.NewHealthRouter),
 		fx.Provide(routers.NewObservabilityRouter),
 		fx.Provide(routers.NewPprofRouter),

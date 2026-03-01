@@ -1,15 +1,15 @@
-package config
+package http
 
 import (
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 )
 
-type Http struct {
+type Config struct {
 	Port string `env:"HTTP_PORT" env-required:"true"`
 }
 
-func NewHttp(loader contracts.EnvLoader) Http {
-	cfg := Http{}
+func NewConfig(loader contracts.EnvLoader) Config {
+	cfg := Config{}
 
 	loader.MustLoad(&cfg)
 

@@ -31,6 +31,7 @@ func (b *Bootloader) Bind() []fx.Option {
 			return engine
 		}),
 		fx.Provide(NewKernel),
+		fx.Provide(NewConfig),
 	}
 }
 

@@ -7,18 +7,17 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
 type Kernel struct {
 	srv    *http.Server
-	config config.Http
+	config Config
 	logger *slog.Logger
 	engine *gin.Engine
 }
 
 func NewKernel(
-	config config.Http,
+	config Config,
 	logger *slog.Logger,
 	engine *gin.Engine,
 ) *Kernel {

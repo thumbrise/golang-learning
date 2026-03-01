@@ -170,8 +170,8 @@ var ModuleConfig = fx.Options(
 		database.NewDB,
 		mail.NewConfig,
 		auth.NewConfig,
-		config.NewHttp,
-		config.NewObservability,
+		http.NewConfig,
+		observability.NewConfig,
 		config.NewRedis,
 	),
 )
