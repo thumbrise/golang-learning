@@ -1,0 +1,27 @@
+services:
+  common_backend:
+    build:
+      args:
+        DOCKER_HOST_UID: ${DOCKER_HOST_UID:?}
+        DOCKER_HOST_GID: ${DOCKER_HOST_GID:?}
+        HTTP_PORT: ${HTTP_PORT:?}
+      context: ../..
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    working_dir: /var/www/
+    user: ${DOCKER_HOST_UID:?}
+    volumes:
+      - app_gopath:/go
+      - ../..:/var/www
+    entrypoint: bash entrypoint.sh
+    environment:
+        TZ: "Europe/Moscow"
+        XDG_CONFIG_HOME: "/var/www/.xdg"

@@ -1,0 +1,16 @@
+#schema: https://taskfile.dev/schema.json
+version: '3.17'
+vars:
+  benchoutputhtml: ./bench/output.html
+  benchoutputtxt: ./bench/output.txt
+
+tasks:
+  benchvizb:
+    desc: Запустить бенчмарки с генерацией HTML отчета
+    cmds:
+      - vizb {{.benchoutputtxt}} -o {{.benchoutputhtml}}
+  
+  bench:
+    desc: Запустить бенчмарки
+    cmds:
+      - go test ./... -bench . -benchmem -count=1 -benchtime=500ms -v | tee 2{{.benchoutputtxt}}
