@@ -8,8 +8,9 @@ import (
 var Module = fx.Module("errorsmap",
 	fx.Provide(
 		http.NewErrorsMapRouter,
-		fx.Invoke(func(router *http.ErrorsMapRouter) {
-			router.Register()
-		}),
+		http.NewErrorsMapMiddleware,
 	),
+	fx.Invoke(func(router *http.ErrorsMapRouter) {
+		router.Register()
+	}),
 )

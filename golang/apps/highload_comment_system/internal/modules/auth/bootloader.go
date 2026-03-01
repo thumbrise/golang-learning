@@ -37,8 +37,8 @@ var Module = fx.Module("auth",
 
 		jwt.NewJWT,
 		jwt.NewConfig,
-		fx.Invoke(func(router *http.Router) {
-			router.Register()
-		}),
 	),
+	fx.Invoke(func(router *http.Router) {
+		router.Register()
+	}),
 )

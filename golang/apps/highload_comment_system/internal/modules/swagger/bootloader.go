@@ -8,8 +8,8 @@ import (
 var Module = fx.Module("swagger",
 	fx.Provide(
 		http.NewSwaggerRouter,
-		fx.Invoke(func(swaggerRouter *http.SwaggerRouter) {
-			swaggerRouter.Register()
-		}),
 	),
+	fx.Invoke(func(swaggerRouter *http.SwaggerRouter) {
+		swaggerRouter.Register()
+	}),
 )

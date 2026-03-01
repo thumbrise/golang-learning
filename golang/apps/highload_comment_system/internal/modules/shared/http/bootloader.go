@@ -14,6 +14,7 @@ var Module = fx.Module("http",
 			engine := gin.New()
 			engine.Use(sloggin.New(logger))
 			engine.Use(gin.Recovery())
+
 			return engine
 		},
 		NewKernel,

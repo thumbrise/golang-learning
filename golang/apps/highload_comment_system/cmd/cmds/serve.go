@@ -16,7 +16,7 @@ func NewServe(runner *bootstrap.Runner, httpKernel *http.Kernel, lc fx.Lifecycle
 		Use:   "serve",
 		Short: "Start http server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			//lc.Append(fx.Hook{
+			// lc.Append(fx.Hook{
 			//	OnStart: func(ctx context.Context) error {
 			//		return httpKernel.Start(ctx)
 			//	},
@@ -25,7 +25,7 @@ func NewServe(runner *bootstrap.Runner, httpKernel *http.Kernel, lc fx.Lifecycle
 			//	},
 			//})
 			return runner.Run(cmd.Context(), httpKernel)
-			//return nil
+			// return nil
 		},
 	}
 
