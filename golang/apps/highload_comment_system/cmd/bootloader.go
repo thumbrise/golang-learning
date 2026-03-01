@@ -37,16 +37,20 @@ func (b *Bootloader) Bind() []fx.Option {
 func (b *Bootloader) BeforeStart() error {
 	b.kernel.AddGroup(b.route.Command, b.routeList.Command)
 	b.kernel.AddCommand(b.serve.Command)
+
 	return nil
 }
 
 func (b *Bootloader) OnStart(ctx context.Context) error {
 	buf := bytes.NewBuffer(make([]byte, 0))
+
 	err := b.kernel.Execute(ctx, buf)
 	if err != nil {
 		return err
 	}
+
 	fmt.Print(buf.String())
+
 	return nil
 }
 

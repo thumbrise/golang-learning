@@ -78,6 +78,7 @@ func (b *Bootloader) BeforeStart() error {
 	b.healthRouter.Register()
 	b.pprofRouter.Register()
 	b.observabilityRouter.Register()
+
 	return nil
 }
 

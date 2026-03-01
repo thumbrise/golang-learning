@@ -7,8 +7,7 @@ import (
 	"go.uber.org/fx"
 )
 
-type Bootloader struct {
-}
+type Bootloader struct{}
 
 func NewBootloader() *Bootloader {
 	return &Bootloader{}

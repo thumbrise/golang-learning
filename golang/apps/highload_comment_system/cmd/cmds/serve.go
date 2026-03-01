@@ -26,7 +26,7 @@ func NewServe(runner *bootstrap.Runner, httpKernel *http.Kernel, lc fx.Lifecycle
 					return httpKernel.Shutdown(ctx)
 				},
 			})
-			//return runner.Run(cmd.Context(), httpKernel)
+			// return runner.Run(cmd.Context(), httpKernel)
 			return nil
 		},
 	}

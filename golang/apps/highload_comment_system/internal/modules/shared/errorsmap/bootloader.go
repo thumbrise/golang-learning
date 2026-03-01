@@ -32,6 +32,7 @@ func (b *Bootloader) Bind() []fx.Option {
 
 func (b *Bootloader) BeforeStart() error {
 	b.router.Register()
+
 	return nil
 }
 

@@ -17,6 +17,7 @@ type Bootloader struct {
 func NewBootloader(engine *gin.Engine, kernel *Kernel) *Bootloader {
 	return &Bootloader{engine: engine, kernel: kernel}
 }
+
 func (b *Bootloader) Name() string {
 	return "http"
 }
@@ -28,6 +29,7 @@ func (b *Bootloader) Bind() []fx.Option {
 			engine := gin.New()
 			engine.Use(sloggin.New(logger))
 			engine.Use(gin.Recovery())
+
 			return engine
 		}),
 		fx.Provide(NewKernel),

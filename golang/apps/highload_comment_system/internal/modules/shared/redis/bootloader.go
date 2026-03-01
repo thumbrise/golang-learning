@@ -11,6 +11,7 @@ type Bootloader struct{}
 func NewBootloader() *Bootloader {
 	return &Bootloader{}
 }
+
 func (b *Bootloader) Name() string {
 	return "Redis"
 }

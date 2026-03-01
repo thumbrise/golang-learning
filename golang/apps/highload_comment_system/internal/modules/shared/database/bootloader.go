@@ -13,6 +13,7 @@ type Bootloader struct {
 func NewBootloader(db *DB) *Bootloader {
 	return &Bootloader{db: db}
 }
+
 func (b *Bootloader) Name() string {
 	return "database"
 }

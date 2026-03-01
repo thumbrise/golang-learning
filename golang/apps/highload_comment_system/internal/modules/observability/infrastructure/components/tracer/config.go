@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	OTLPURL string `env:"OBSERVABILITY_OTLP_URL"      env-required:"true"`
+	OTLPURL string `env:"OBSERVABILITY_OTLP_URL" env-required:"true"`
 }
 
 func NewConfig(loader contracts.EnvLoader) Config {

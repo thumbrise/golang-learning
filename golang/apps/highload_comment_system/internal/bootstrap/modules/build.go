@@ -8,6 +8,7 @@ import (
 
 func Build() []fx.Option {
 	loaders := internal.Bootloaders()
+
 	opts := make([]fx.Option, 0, len(loaders))
 	for _, loader := range loaders {
 		l := loader
@@ -16,6 +17,7 @@ func Build() []fx.Option {
 
 	return opts
 }
+
 func buildModule(bootloader contracts.Bootloader) fx.Option {
 	return fx.Module(
 		bootloader.Name(),

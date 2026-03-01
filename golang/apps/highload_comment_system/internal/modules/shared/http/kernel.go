@@ -54,6 +54,7 @@ func (k *Kernel) Start(ctx context.Context) error {
 func (k *Kernel) Shutdown(ctx context.Context) error {
 	return k.srv.Shutdown(ctx)
 }
+
 func (k *Kernel) Name() string {
 	return "http"
 }
