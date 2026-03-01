@@ -4,11 +4,10 @@ import (
 	"github.com/thumbrise/demo/golang-demo/cmd"
 	"github.com/thumbrise/demo/golang-demo/cmd/cmds"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
-	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/modules"
 	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	authusecases "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	authhttp "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
@@ -26,6 +25,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 	sharederrorsmap "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	sharederrorsmaprouters "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis"
 	rediscomponents "github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
@@ -184,6 +184,6 @@ var ModuleDAL = fx.Options(
 
 func main() {
 	fx.New(
-		container.Build()...,
+		modules.Build()...,
 	).Run()
 }

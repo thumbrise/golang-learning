@@ -1,4 +1,4 @@
-package container
+package modules
 
 import (
 	"github.com/thumbrise/demo/golang-demo/internal"

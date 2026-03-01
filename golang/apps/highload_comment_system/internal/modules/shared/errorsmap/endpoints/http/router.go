@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
 type ErrorsMapRouter struct {

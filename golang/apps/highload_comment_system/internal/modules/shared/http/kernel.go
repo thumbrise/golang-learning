@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	sloggin "github.com/samber/slog-gin"
 	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
@@ -21,13 +20,8 @@ type Kernel struct {
 func NewKernel(
 	config config.Http,
 	logger *slog.Logger,
+	engine *gin.Engine,
 ) *Kernel {
-	engine := gin.New()
-
-	// TODO: Вынести в бутлоадер
-	engine.Use(sloggin.New(logger))
-	engine.Use(gin.Recovery())
-
 	router := &Kernel{
 		config: config,
 		logger: logger,
@@ -61,7 +55,6 @@ func (k *Kernel) Start(ctx context.Context) error {
 func (k *Kernel) Shutdown(ctx context.Context) error {
 	return k.srv.Shutdown(ctx)
 }
-
 func (k *Kernel) Name() string {
 	return "http"
 }

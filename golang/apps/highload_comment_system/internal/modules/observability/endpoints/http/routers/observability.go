@@ -1,8 +1,8 @@
 package routers
 
 import (
-	http2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
+	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 

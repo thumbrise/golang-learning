@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
-	bootstraphttp "github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 	usecases2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
+	bootstraphttp "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
 type Router struct {

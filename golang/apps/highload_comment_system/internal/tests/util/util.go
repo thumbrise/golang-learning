@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/steinfletcher/apitest"
-	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/modules"
 	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"github.com/thumbrise/demo/golang-demo/pkg/env"
 )
@@ -43,7 +43,7 @@ var handler http.Handler
 
 func Handler(ctx context.Context) http.Handler {
 	if handler == nil {
-		c, err := container.InitializeContainer(ctx)
+		c, err := modules.InitializeContainer(ctx)
 		if err != nil {
 			panic(err)
 		}
