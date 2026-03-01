@@ -4,10 +4,13 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
+	authusecases "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
 	otpdal "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
+	authmailers "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
 	otp "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
 	"go.uber.org/fx"
 )
@@ -32,14 +35,33 @@ func (b *Bootloader) Name() string {
 
 func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
-		fx.Provide(NewBootloader),
-		fx.Provide(http.NewRouter),
-		fx.Provide(dal.NewUserRepository),
-		fx.Provide(otpdal.NewOTPRedisRepository),
-		fx.Provide(otpdal.NewOTPPostgresqlRepository),
-		fx.Provide(jwt.NewJWT),
-		fx.Provide(jwt.NewConfig),
-		fx.Provide(otp.NewConfig),
+		fx.Provide(
+			NewBootloader,
+
+			http.NewMiddleware,
+			http.NewRouter,
+
+			authmailers.NewOTPMail,
+
+			authusecases.NewAuthCommandSignIn,
+			authusecases.NewAuthCommandExchangeOtp,
+			authusecases.NewAuthQueryMe,
+			authusecases.NewAuthCommandRefresh,
+
+			dal.NewUserRepository,
+
+			otp.NewConfig,
+			otpdal.NewOTPRedisRepository,
+			otpdal.NewOTPPostgresqlRepository,
+			otp.NewGenerator,
+			fx.Annotate(
+				otp.NewGenerator,
+				fx.As(new(contracts.OtpGenerator)),
+			),
+
+			jwt.NewJWT,
+			jwt.NewConfig,
+		),
 	}
 }
 

@@ -27,6 +27,7 @@ func (b *Bootloader) Name() string {
 func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
 		fx.Provide(NewBootloader),
+		fx.Provide(NewKernel),
 		fx.Provide(cmds.NewServe),
 		fx.Provide(cmds.NewRoute),
 		fx.Provide(cmds.NewRouteList),

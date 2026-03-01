@@ -9,8 +9,12 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
+	observabilitytracer "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	"go.opentelemetry.io/otel/sdk/trace"
+	oteltracer "go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
+
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 var (
@@ -38,15 +42,25 @@ func (b *Bootloader) Name() string {
 
 func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
-		fx.Provide(NewBootloader),
-		fx.Provide(profiler.NewConfig),
-		fx.Provide(tracer.NewConfig),
-		fx.Provide(routers.NewHealthRouter),
-		fx.Provide(routers.NewObservabilityRouter),
-		fx.Provide(routers.NewPprofRouter),
-		fx.Provide(profiler.NewProfiler),
-		fx.Provide(trace.NewTracerProvider),
-		fx.Provide(logger.NewLogger),
+		fx.Provide(
+			NewBootloader,
+			profiler.NewConfig,
+			tracer.NewConfig,
+			routers.NewHealthRouter,
+			routers.NewObservabilityRouter,
+			routers.NewPprofRouter,
+			profiler.NewProfiler,
+			trace.NewTracerProvider,
+			logger.NewLogger,
+			observabilitytracer.NewTracerProvider,
+			observabilitytracer.NewTracer,
+			fx.Annotate(
+				func() *sdktrace.TracerProvider {
+					return &sdktrace.TracerProvider{}
+				},
+				fx.As(new(oteltracer.TracerProvider)),
+			),
+		),
 	}
 }
 

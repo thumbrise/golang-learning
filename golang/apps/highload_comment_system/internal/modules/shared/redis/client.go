@@ -1,4 +1,4 @@
-package components
+package redis
 
 import (
 	"errors"
@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
 const (
@@ -25,7 +24,7 @@ const (
 
 var ErrUrlParse = errors.New("parse url error")
 
-func NewRedisClient(cfg config.Redis) (*redis.Client, error) {
+func NewClient(cfg Config) (*redis.Client, error) {
 	addr := cfg.URL
 	if strings.Contains(addr, "://") {
 		u, err := url.Parse(cfg.URL)

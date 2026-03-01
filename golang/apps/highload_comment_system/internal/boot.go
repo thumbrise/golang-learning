@@ -11,6 +11,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/mail"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
 )
 
@@ -21,6 +22,7 @@ func Bootloaders() []contracts.Bootloader {
 		&http.Bootloader{},
 		&database.Bootloader{},
 		&mail.Bootloader{},
+		&redis.Bootloader{},
 		&errorsmap.Bootloader{},
 		&swagger.Bootloader{},
 		&observability.Bootloader{},

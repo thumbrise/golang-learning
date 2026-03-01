@@ -13,16 +13,16 @@ import (
 	"testing"
 
 	"github.com/steinfletcher/apitest"
+	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/modules"
 	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
-	"github.com/thumbrise/demo/golang-demo/pkg/env"
 )
 
 var cfg *http2.Config
 
 func Uri(uri string) string {
 	if cfg == nil {
-		c := http2.NewConfig(env.NewLoader())
+		c := http2.NewConfig(app.NewLoader())
 		cfg = &c
 	}
 

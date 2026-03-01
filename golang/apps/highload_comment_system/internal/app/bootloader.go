@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"go.uber.org/fx"
 )
 
@@ -21,6 +22,12 @@ func (b Bootloader) Bind() []fx.Option {
 	return []fx.Option{
 		fx.Provide(NewBootloader),
 		fx.Provide(NewConfig),
+		fx.Provide(
+			fx.Annotate(
+				NewLoader,
+				fx.As(new(contracts.EnvLoader)),
+			),
+		),
 	}
 }
 
