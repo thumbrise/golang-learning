@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"net"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/thumbrise/demo/golang-demo/internal/config"
+	"go.uber.org/fx"
 )
 
 type DB struct {
@@ -16,20 +18,32 @@ type DB struct {
 	config config.DB
 }
 
-func MustConnect(ctx context.Context, config config.DB) *DB {
+func NewDB(lc fx.Lifecycle, config config.DB) *DB {
 	db := &DB{config: config}
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			return db.Connect(ctx)
+		},
+		OnStop: func(ctx context.Context) error {
+			db.pool.Close()
+			return nil
+		},
+	})
+	return db
+}
+func (db *DB) Connect(ctx context.Context) error {
 	if db.pool != nil {
 		log.Fatal(ErrPoolAlreadyOpen)
 	}
 
 	pool, err := pgxpool.New(ctx, db.dsn())
 	if err != nil {
-		log.Fatalf("%s: %s", ErrCantBeCreated, err)
+		return fmt.Errorf("%w: %w", ErrCantBeCreated, err)
 	}
 
 	db.pool = pool
-
-	return db
+	slog.Debug("DB connected")
+	return nil
 }
 
 func (db *DB) dsn() string {
@@ -52,7 +66,7 @@ var (
 
 func (db *DB) Pool() *pgxpool.Pool {
 	if db.pool == nil {
-		log.Fatal(ErrPoolIsClosed)
+		panic(ErrPoolIsClosed)
 	}
 
 	return db.pool

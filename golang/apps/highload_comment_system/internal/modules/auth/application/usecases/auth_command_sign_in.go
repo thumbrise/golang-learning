@@ -9,17 +9,17 @@ import (
 	"time"
 
 	"github.com/thumbrise/demo/golang-demo/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
 	otp2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
-	"github.com/thumbrise/demo/golang-demo/pkg/otp"
 )
 
 type AuthCommandSignIn struct {
 	logger                  *slog.Logger
 	otpMailer               *mailers.OTPMailer
 	config                  config.Auth
-	otpGenerator            *otp.Generator
+	otpGenerator            contracts.OtpGenerator
 	userRepository          *dal.UserRepository
 	otpRedisRepository      *otp2.OTPRedisRepository
 	otpPostgresqlRepository *otp2.OTPPostresqlRepository
@@ -28,7 +28,7 @@ type AuthCommandSignIn struct {
 func NewAuthCommandSignIn(logger *slog.Logger,
 	otpMailer *mailers.OTPMailer,
 	config config.Auth,
-	otpGenerator *otp.Generator,
+	otpGenerator contracts.OtpGenerator,
 	userRepository *dal.UserRepository,
 	otpRepository *otp2.OTPRedisRepository,
 	otpPostgresqlRepository *otp2.OTPPostresqlRepository,

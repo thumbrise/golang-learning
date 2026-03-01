@@ -10,6 +10,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
+	"go.uber.org/fx"
 )
 
 var (
@@ -32,6 +33,7 @@ func NewContainer(
 	runner *bootstrap.Runner,
 	httpKernel *http.Kernel,
 	cmdKernel *cmd.Kernel,
+	lc fx.Lifecycle,
 ) *Container {
 	c := &Container{
 		bootloaders: bootloaders,
@@ -41,6 +43,15 @@ func NewContainer(
 		CmdKernel:   cmdKernel,
 	}
 	c.bootedBootloadersTypes = make(map[string]bool)
+
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			return c.Boot(ctx)
+		},
+		OnStop: func(ctx context.Context) error {
+			return c.Shutdown(ctx)
+		},
+	})
 
 	return c
 }
