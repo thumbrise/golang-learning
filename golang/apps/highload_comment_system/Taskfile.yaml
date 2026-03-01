@@ -48,7 +48,7 @@ tasks:
   generate:
     desc: Сгенерировать необходимости
     cmds:
-      - go tool swag init -g internal/modules/swagger/endpoints/http/swagger.go
+      - go tool swag init -g internal/modules/swagger/endpoints/http/swagger.go -o ./apidocs
       - go tool swag fmt
       - go tool wire $(go list ./... | grep -v /test)
 

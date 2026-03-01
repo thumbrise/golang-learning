@@ -21,7 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	_ "github.com/thumbrise/demo/golang-demo/docs"
+	_ "github.com/thumbrise/demo/golang-demo/apidocs"
 	http2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 )
 
