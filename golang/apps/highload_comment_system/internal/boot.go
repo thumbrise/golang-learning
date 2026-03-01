@@ -4,6 +4,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/cmd"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
@@ -14,10 +15,11 @@ func Bootloaders(
 	cmdLoader *cmd.Bootloader,
 	// shared
 	errorMapLoader *errorsmap.Bootloader,
-	observabilityLoader *observability.Bootloader,
 	swaggerLoader *swagger.Bootloader,
 	// modules
+	observabilityLoader *observability.Bootloader,
 	authLoader *auth.Bootloader,
+	homepageLoader *homepage.Bootloader,
 ) []contracts.Bootloader {
 	return []contracts.Bootloader{
 		// main
@@ -30,5 +32,6 @@ func Bootloaders(
 		// modules
 		observabilityLoader,
 		authLoader,
+		homepageLoader,
 	}
 }

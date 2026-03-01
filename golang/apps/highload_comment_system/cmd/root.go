@@ -24,14 +24,6 @@ func NewKernel() *Kernel {
 }
 
 func (k *Kernel) Execute(ctx context.Context, buf io.Writer) error {
-	if k == nil {
-		panic("nil command")
-	}
-
-	if k.command == nil {
-		panic("command is nil")
-	}
-
 	k.command.SetOut(buf)
 
 	return k.command.ExecuteContext(ctx)

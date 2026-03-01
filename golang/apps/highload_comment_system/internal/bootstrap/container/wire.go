@@ -20,20 +20,20 @@ import (
 	authusecases "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	authhttp "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
 	authmailers "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
+	homepagehttp "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
+	homepagegenerator "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	observabilitymiddlewares "github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	observabilityrouters "github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
 	observabilityprofiler "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
+	observabilitytracer "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	sharederrorsmap "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	sharederrorsmaprouters "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis"
 	rediscomponents "github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
 	swaggerhttp "github.com/thumbrise/demo/golang-demo/internal/modules/swagger/endpoints/http"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/user"
-	userusecases "github.com/thumbrise/demo/golang-demo/internal/modules/user/application/usecases"
-	userrouters "github.com/thumbrise/demo/golang-demo/internal/modules/user/endpoints/http/routers"
 	"github.com/thumbrise/demo/golang-demo/pkg/env"
 	"github.com/thumbrise/demo/golang-demo/pkg/otp"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -73,10 +73,11 @@ var sAll = wire.NewSet(
 	observabilityrouters.NewObservabilityRouter,
 	observabilityrouters.NewPprofRouter,
 	wire.NewSet(
-		tracer.NewTracerProvider,
+		observabilitytracer.NewTracerProvider,
 		wire.Bind(new(oteltracer.TracerProvider), new(*sdktrace.TracerProvider)),
 	),
-	tracer.NewTracer,
+	observabilitytracer.NewTracer,
+	observabilityprofiler.NewProfiler,
 
 	// module - auth
 	auth.NewBootloader,
@@ -88,13 +89,10 @@ var sAll = wire.NewSet(
 	authusecases.NewAuthQueryMe,
 	authusecases.NewAuthCommandRefresh,
 
-	// module - user
-	user.NewBootloader,
-	userrouters.NewUsersRouter,
-	userusecases.NewUserQueryOne,
-
-	// module - observability
-	observabilityprofiler.NewProfiler,
+	// module - homepage
+	homepage.NewBootloader,
+	homepagehttp.NewHomePageRouter,
+	homepagegenerator.NewGenerator,
 
 	// infrastructure
 	components.NewLogger,

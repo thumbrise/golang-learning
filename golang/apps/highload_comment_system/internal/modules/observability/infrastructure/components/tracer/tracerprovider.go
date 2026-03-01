@@ -77,6 +77,7 @@ func Shutdown(ctx context.Context, tp *sdktrace.TracerProvider) error {
 	if tp == nil {
 		return nil
 	}
+
 	return tp.Shutdown(ctx)
 }
 

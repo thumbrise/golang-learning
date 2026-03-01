@@ -5,8 +5,8 @@ import (
 )
 
 type Observability struct {
-	OTLPURL      string `env:"OBSERVABILITY_OTLP_URL" env-required:"true"`
-	PyroscopeURL string `env:"OBSERVABILITY_PYROSCOPE_URL"    env-required:"true"`
+	OTLPURL      string `env:"OBSERVABILITY_OTLP_URL"      env-required:"true"`
+	PyroscopeURL string `env:"OBSERVABILITY_PYROSCOPE_URL" env-required:"true"`
 }
 
 func NewObservability(loader contracts.EnvLoader) Observability {
