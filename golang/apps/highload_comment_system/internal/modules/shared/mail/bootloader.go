@@ -7,11 +7,10 @@ import (
 )
 
 type Bootloader struct {
-	db *DB
 }
 
-func NewBootloader(db *DB) *Bootloader {
-	return &Bootloader{db: db}
+func NewBootloader() *Bootloader {
+	return &Bootloader{}
 }
 func (b *Bootloader) Name() string {
 	return "mail"
@@ -20,7 +19,7 @@ func (b *Bootloader) Name() string {
 func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
 		fx.Provide(NewBootloader),
-		fx.Provide(NewDB),
+		fx.Provide(NewConfig),
 	}
 }
 
@@ -29,11 +28,9 @@ func (b *Bootloader) BeforeStart() error {
 }
 
 func (b *Bootloader) OnStart(ctx context.Context) error {
-	return b.db.Connect(ctx)
+	return nil
 }
 
 func (b *Bootloader) Shutdown(context.Context) error {
-	b.db.Pool().Close()
-
 	return nil
 }
