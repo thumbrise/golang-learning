@@ -1,4 +1,3 @@
-// internal/interfaces/http/middlewares/config.go
 package middlewares
 
 import (
@@ -12,7 +11,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -21,14 +19,13 @@ import (
 )
 
 type ObservabilityMiddleware struct {
-	cfgApp           app.Config
-	cfgObservability observability.Config
-	pyroscopeClient  *profiler.Profiler
-	logger           *slog.Logger
+	cfgApp          app.Config
+	pyroscopeClient *profiler.Profiler
+	logger          *slog.Logger
 }
 
-func NewObservabilityMiddleware(cfgApp app.Config, cfgObservability observability.Config, pyroscopeClient *profiler.Profiler, logger *slog.Logger) *ObservabilityMiddleware {
-	return &ObservabilityMiddleware{cfgApp: cfgApp, cfgObservability: cfgObservability, pyroscopeClient: pyroscopeClient, logger: logger}
+func NewObservabilityMiddleware(cfgApp app.Config, pyroscopeClient *profiler.Profiler, logger *slog.Logger) *ObservabilityMiddleware {
+	return &ObservabilityMiddleware{cfgApp: cfgApp, pyroscopeClient: pyroscopeClient, logger: logger}
 }
 
 // Метрики Prometheus

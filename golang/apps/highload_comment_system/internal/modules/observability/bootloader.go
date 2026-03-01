@@ -8,6 +8,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.uber.org/fx"
 )
@@ -38,7 +39,8 @@ func (b *Bootloader) Name() string {
 func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
 		fx.Provide(NewBootloader),
-		fx.Provide(NewConfig),
+		fx.Provide(profiler.NewConfig),
+		fx.Provide(tracer.NewConfig),
 		fx.Provide(routers.NewHealthRouter),
 		fx.Provide(routers.NewObservabilityRouter),
 		fx.Provide(routers.NewPprofRouter),
