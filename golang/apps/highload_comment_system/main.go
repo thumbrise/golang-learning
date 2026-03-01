@@ -44,7 +44,7 @@ import (
 // ModuleCore предоставляет базовые компоненты приложения
 var ModuleCore = fx.Options(
 	fx.Provide(
-		//internal.Bootloaders,
+		// internal.Bootloaders,
 		bootstrap.NewRunner,
 		cmd.NewBootloader,
 		cmd.NewKernel,
@@ -138,10 +138,10 @@ var ModuleInfrastructure = fx.Options(
 	fx.Provide(
 		components.NewLogger,
 		components.NewJWT,
-		//fx.Annotate(
+		// fx.Annotate(
 		components.NewDB,
 		database.NewBootloader,
-		//fx.OnStart(func(ctx context.Context, db *components.DB) error {
+		// fx.OnStart(func(ctx context.Context, db *components.DB) error {
 		//	return db.Connect(ctx)
 		//}),
 		//fx.OnStop(func(ctx context.Context, db *components.DB) error {
@@ -187,12 +187,12 @@ var ModuleDAL = fx.Options(
 )
 
 // ModuleContainer предоставляет контейнер и его запуск
-var ModuleContainer = fx.Options(
-	fx.Provide(container.NewContainer),
-	fx.Invoke(func(c *container.Container) error {
-		return c.Boot(context.Background())
-	}),
-)
+//var ModuleContainer = fx.Options(
+//	fx.Provide(container.NewContainer),
+//	fx.Invoke(func(c *container.Container) error {
+//		return c.Boot(context.Background())
+//	}),
+//)
 
 // ModuleExecuteCmd запускает команду через cmd.Kernel
 var ModuleExecuteCmd = fx.Invoke(func(kernel *cmd.Kernel) error {
@@ -203,6 +203,7 @@ var ModuleExecuteCmd = fx.Invoke(func(kernel *cmd.Kernel) error {
 		return err
 	}
 	fmt.Print(buf.String())
+
 	return nil
 })
 
@@ -210,20 +211,20 @@ func main() {
 	fx.New(
 		ModuleCore,
 		ModuleCmd,
-		//ModuleSharedErrorsMap,
-		//ModuleSharedRedis,
-		//ModuleSwagger,
-		//ModuleObservability,
-		//ModuleAuth,
-		//ModuleHomepage,
+		// ModuleSharedErrorsMap,
+		// ModuleSharedRedis,
+		// ModuleSwagger,
+		// ModuleObservability,
+		// ModuleAuth,
+		// ModuleHomepage,
 
 		// Вот тут я развлекаюсь щас
 		container.BuildModule(&homepage.FBootloader{}),
 
-		//ModuleInfrastructure,
-		//ModuleConfig,
-		//ModuleDAL,
-		ModuleContainer,
+		// ModuleInfrastructure,
+		// ModuleConfig,
+		// ModuleDAL,
+		//ModuleContainer,
 		ModuleExecuteCmd,
 	).Run()
 }

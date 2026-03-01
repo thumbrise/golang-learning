@@ -20,17 +20,21 @@ type DB struct {
 
 func NewDB(lc fx.Lifecycle, config config.DB) *DB {
 	db := &DB{config: config}
+
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			return db.Connect(ctx)
 		},
 		OnStop: func(ctx context.Context) error {
 			db.pool.Close()
+
 			return nil
 		},
 	})
+
 	return db
 }
+
 func (db *DB) Connect(ctx context.Context) error {
 	if db.pool != nil {
 		log.Fatal(ErrPoolAlreadyOpen)
@@ -42,7 +46,9 @@ func (db *DB) Connect(ctx context.Context) error {
 	}
 
 	db.pool = pool
+
 	slog.Debug("DB connected")
+
 	return nil
 }
 

@@ -17,7 +17,7 @@ func Bootloaders(
 	errorMapLoader *errorsmap.Bootloader,
 	swaggerLoader *swagger.Bootloader,
 	// modules
-	//observabilityLoader *observability.Bootloader,
+	// observabilityLoader *observability.Bootloader,
 	authLoader *auth.Bootloader,
 	homepageLoader *homepage.Bootloader,
 	databaseLoader *database.Bootloader,
@@ -32,7 +32,7 @@ func Bootloaders(
 		databaseLoader,
 
 		// modules
-		//observabilityLoader,
+		// observabilityLoader,
 		authLoader,
 		homepageLoader,
 	}

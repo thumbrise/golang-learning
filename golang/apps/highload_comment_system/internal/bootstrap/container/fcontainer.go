@@ -22,9 +22,6 @@ type FContainer struct {
 	CmdKernel              *cmd.Kernel
 }
 
-func Bootload() {
-	return
-}
 func NewFContainer(
 	bootloaders []contracts.Bootloader,
 	logger *slog.Logger,
