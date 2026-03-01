@@ -8,9 +8,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	observabilitytracer "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
-	"go.opentelemetry.io/otel/sdk/trace"
 	oteltracer "go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
 
@@ -29,10 +27,10 @@ type Bootloader struct {
 	observabilityRouter *routers.ObservabilityRouter
 	pprofRouter         *routers.PprofRouter
 	profiler            *profiler.Profiler
-	traceProvider       *trace.TracerProvider
+	traceProvider       *sdktrace.TracerProvider
 }
 
-func NewBootloader(healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, profiler *profiler.Profiler, traceProvider *trace.TracerProvider) *Bootloader {
+func NewBootloader(healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, profiler *profiler.Profiler, traceProvider *sdktrace.TracerProvider) *Bootloader {
 	return &Bootloader{healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, profiler: profiler, traceProvider: traceProvider}
 }
 
@@ -44,22 +42,26 @@ func (b *Bootloader) Bind() []fx.Option {
 	return []fx.Option{
 		fx.Provide(
 			NewBootloader,
+
 			profiler.NewConfig,
-			tracer.NewConfig,
-			routers.NewHealthRouter,
-			routers.NewObservabilityRouter,
-			routers.NewPprofRouter,
 			profiler.NewProfiler,
-			trace.NewTracerProvider,
+
 			logger.NewLogger,
+
+			observabilitytracer.NewConfig,
 			observabilitytracer.NewTracerProvider,
 			observabilitytracer.NewTracer,
+			sdktrace.NewTracerProvider,
 			fx.Annotate(
 				func() *sdktrace.TracerProvider {
 					return &sdktrace.TracerProvider{}
 				},
 				fx.As(new(oteltracer.TracerProvider)),
 			),
+
+			routers.NewHealthRouter,
+			routers.NewObservabilityRouter,
+			routers.NewPprofRouter,
 		),
 	}
 }

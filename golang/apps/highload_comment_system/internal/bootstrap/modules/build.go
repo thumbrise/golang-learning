@@ -18,6 +18,9 @@ func Build() []fx.Option {
 	return opts
 }
 
+// buildModule builds a module for a bootloader
+//
+//nolint:ireturn // spec case
 func buildModule(bootloader contracts.Bootloader) fx.Option {
 	return fx.Module(
 		bootloader.Name(),
