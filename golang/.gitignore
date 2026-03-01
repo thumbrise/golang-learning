@@ -1,0 +1,15 @@
+/.env.local
+/.env.*.local
+../.idea
+.tinker
+.git
+
+report.xml
+build
+.task
+.env.testing
+node_modules
+.env
+.xdg
+
+docker-compose.override.yaml
