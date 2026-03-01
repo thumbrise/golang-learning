@@ -27,6 +27,7 @@ import (
 	sharederrorsmap "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	sharederrorsmaprouters "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/mail"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis"
 	rediscomponents "github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
@@ -166,7 +167,7 @@ var ModuleConfig = fx.Options(
 	fx.Provide(
 		config.NewApp,
 		config.NewDB,
-		config.NewMail,
+		mail.NewConfig,
 		config.NewAuth,
 		config.NewHttp,
 		config.NewObservability,
