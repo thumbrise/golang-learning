@@ -1,0 +1,4 @@
+FROM caddy:2.8.4-alpine
+
+# Expose port 80
+EXPOSE 80
