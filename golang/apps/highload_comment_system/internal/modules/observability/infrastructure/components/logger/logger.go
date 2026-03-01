@@ -5,11 +5,11 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/thumbrise/demo/golang-demo/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"go.opentelemetry.io/otel/trace"
 )
 
-func NewLogger(cfg config.App) *slog.Logger {
+func NewLogger(cfg app.Config) *slog.Logger {
 	handlerOptions := &slog.HandlerOptions{
 		AddSource: false,
 		Level:     slog.LevelDebug,

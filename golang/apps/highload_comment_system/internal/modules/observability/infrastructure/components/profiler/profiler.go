@@ -7,18 +7,19 @@ import (
 	"time"
 
 	"github.com/grafana/pyroscope-go"
+	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
 type Profiler struct {
-	cfgApp           config.App
+	cfgApp           app.Config
 	cfgObservability config.Observability
 	logger           *slog.Logger
 	profiler         *pyroscope.Profiler
 }
 
 func NewProfiler(
-	cfgApp config.App,
+	cfgApp app.Config,
 	cfgObservability config.Observability,
 	logger *slog.Logger,
 ) *Profiler {

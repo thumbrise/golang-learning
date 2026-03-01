@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/thumbrise/demo/golang-demo/cmd"
 	"github.com/thumbrise/demo/golang-demo/cmd/cmds"
+	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/modules"
 	"github.com/thumbrise/demo/golang-demo/internal/config"
@@ -14,6 +15,7 @@ import (
 	otp3 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
 	authmailers "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	homepagehttp "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
 	homepagegenerator "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
@@ -33,7 +35,6 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
 	swaggerhttp "github.com/thumbrise/demo/golang-demo/internal/modules/swagger/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/pkg/env"
-	"github.com/thumbrise/demo/golang-demo/pkg/otp"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	oteltracer "go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
@@ -165,10 +166,10 @@ var ModuleInfrastructure = fx.Options(
 // ModuleConfig предоставляет все конфигурации
 var ModuleConfig = fx.Options(
 	fx.Provide(
-		config.NewApp,
+		app.NewConfig,
 		config.NewDB,
 		mail.NewConfig,
-		config.NewAuth,
+		auth.NewConfig,
 		config.NewHttp,
 		config.NewObservability,
 		config.NewRedis,

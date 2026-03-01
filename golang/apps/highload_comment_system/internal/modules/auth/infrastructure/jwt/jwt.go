@@ -8,16 +8,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
-const JWTContextKeyUser = "jwt"
+const ContextKeyUser = "jwt"
 
 type JWT struct {
-	config config.Auth
+	config Config
 }
 
-func NewJWT(config config.Auth) *JWT {
+func NewJWT(config Config) *JWT {
 	return &JWT{config: config}
 }
 
@@ -44,12 +43,12 @@ func (j *JWT) Issue(userID int, username string, email string, roles []string) (
 		Roles:    roles,
 	}
 
-	accessToken, err := j.createSignedClaims(meta, j.config.JWTAccessTTLMinutes)
+	accessToken, err := j.createSignedClaims(meta, j.config.AccessTTLMinutes)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := j.createSignedClaims(meta, j.config.JWTRefreshTTLMinutes)
+	refreshToken, err := j.createSignedClaims(meta, j.config.RefreshTTLMinutes)
 	if err != nil {
 		return nil, err
 	}
@@ -66,14 +65,14 @@ func (j *JWT) createSignedClaims(meta JWTClaimsMeta, ttlMinutes int) (string, er
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(ttlMinutes) * time.Minute)),
 			Subject:   strconv.Itoa(meta.UserID),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    j.config.JWTIssuer,
+			Issuer:    j.config.Issuer,
 		},
 		Meta: meta,
 	}
 
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 
-	return t.SignedString([]byte(j.config.JWTSecret))
+	return t.SignedString([]byte(j.config.Secret))
 }
 
 var ErrUnexpectedSigningMethod = errors.New("unexpected signing method")
@@ -87,18 +86,12 @@ func (j *JWT) Parse(tokenString string) (*JWTClaims, error) {
 		}
 
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return []byte(j.config.JWTSecret), nil
+		return []byte(j.config.Secret), nil
 	})
 
 	switch {
 	case t != nil && t.Valid:
 		return claims, nil
-	// case errors.Is(err, jwt.ErrTokenMalformed):
-	//	return nil, NewAuthJwtError(err.Error())
-	// case errors.Is(err, jwt.ErrTokenSignatureInvalid):
-	//	return nil, NewAuthJwtError(err.Error())
-	// case errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet):
-	//	return nil, NewAuthJwtError(err.Error())
 	default:
 		return nil, fmt.Errorf("couldn't handle this token: %w", err)
 	}
@@ -107,7 +100,7 @@ func (j *JWT) Parse(tokenString string) (*JWTClaims, error) {
 var ErrUnexpectedJWTClaimsType = errors.New("unexpected JWTClaims type")
 
 func (j *JWT) ClaimsFromGinContext(ctx *gin.Context) *JWTClaims {
-	claimsRaw := ctx.MustGet(JWTContextKeyUser)
+	claimsRaw := ctx.MustGet(ContextKeyUser)
 
 	result, ok := claimsRaw.(*JWTClaims)
 	if !ok {

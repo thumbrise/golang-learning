@@ -35,7 +35,7 @@ func (m *Middleware) Handler() gin.HandlerFunc {
 			return
 		}
 
-		c.Set(jwt.JWTContextKeyUser, claims)
+		c.Set(jwt.ContextKeyUser, claims)
 
 		c.Next()
 	}

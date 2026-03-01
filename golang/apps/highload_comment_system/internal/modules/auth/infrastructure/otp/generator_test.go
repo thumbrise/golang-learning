@@ -5,7 +5,7 @@ package otp_test
 import (
 	"testing"
 
-	"github.com/thumbrise/demo/golang-demo/pkg/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
 )
 
 func TestGenerator_Generate(t *testing.T) {
