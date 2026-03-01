@@ -20,6 +20,9 @@ import (
 	authusecases "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	authhttp "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
 	authmailers "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
+	homepagehttp "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
+	homepagegenerator "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	observabilitymiddlewares "github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	observabilityrouters "github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
@@ -95,6 +98,11 @@ var sAll = wire.NewSet(
 
 	// module - observability
 	observabilityprofiler.NewProfiler,
+
+	// module - homepage
+	homepage.NewBootloader,
+	homepagehttp.NewHomePageRouter,
+	homepagegenerator.NewGenerator,
 
 	// infrastructure
 	components.NewLogger,

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>API Routes</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background: #f5f5f5;
+        }
+        .method {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.9em;
+            min-width: 50px;
+            text-align: center;
+        }
+        .method.get {
+            background: #28a745;
+        }
+        .method.post {
+            background: #007bff;
+        }
+        .method.put {
+            background: #ffc107;
+            color: #333;
+        }
+        .method.delete {
+            background: #dc3545;
+        }
+        .method.patch {
+            background: #6f42c1;
+        }
+        .method.head {
+            background: #17a2b8;
+        }
+        .method.options {
+            background: #6c757d;
+        }
+        .wildcard-badge {
+            background: #6c757d;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .link-base {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>API Navigation</h1>
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Path</th>
+        <th>Handler</th>
+        <th>Link</th>
+    </tr>
+    {{range .Routes}}
+    <tr>
+        <td><span class="method {{.MethodClass}}">{{.Method}}</span></td>
+        <td><code>{{.Path}}</code></td>
+        <td>{{.Handler}}</td>
+        <td>
+            {{if .IsGET}}
+            {{if .IsWildcard}}
+            <a href="{{.BasePath}}" class="link-base">Base path</a>
+            <span class="wildcard-badge">wildcard</span>
+            {{else}}
+            <a href="{{.Path}}">Open</a>
+            {{end}}
+            {{else}}
+            {{.Method}}
+            {{end}}
+        </td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>

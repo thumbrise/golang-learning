@@ -26,6 +26,7 @@ func NewLogger(cfg config.App) *slog.Logger {
 	)
 
 	slog.SetDefault(logger)
+
 	return logger
 }
 
@@ -44,6 +45,7 @@ func (h *traceHandler) Handle(ctx context.Context, r slog.Record) error {
 			slog.Bool("trace_flags.sampled", spanCtx.IsSampled()),
 		)
 	}
+
 	return h.Handler.Handle(ctx, r)
 }
 

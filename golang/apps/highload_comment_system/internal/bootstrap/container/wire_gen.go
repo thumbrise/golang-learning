@@ -23,6 +23,9 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	http4 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
+	http5 "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
@@ -60,6 +63,8 @@ func InitializeContainer(ctx context.Context) (*Container, error) {
 	errorsMapMiddleware := http2.NewErrorsMapMiddleware(logger)
 	errorsMapRouter := http2.NewErrorsMapRouter(errorsMapMiddleware, httpKernel)
 	errorsmapBootloader := errorsmap.NewBootloader(errorsMapRouter)
+	swaggerRouter := http3.NewSwaggerRouter(httpKernel)
+	swaggerBootloader := swagger.NewBootloader(swaggerRouter)
 	healthRouter := routers.NewHealthRouter(httpKernel)
 	configObservability := config.NewObservability(loader)
 	profilerProfiler := profiler.NewProfiler(app, configObservability, logger)
@@ -71,12 +76,10 @@ func InitializeContainer(ctx context.Context) (*Container, error) {
 		return nil, err
 	}
 	observabilityBootloader := observability.NewBootloader(healthRouter, observabilityRouter, pprofRouter, profilerProfiler, tracerProvider)
-	swaggerRouter := http3.NewSwaggerRouter(httpKernel)
-	swaggerBootloader := swagger.NewBootloader(swaggerRouter)
 	mail := config.NewMail(loader)
 	otpMailer := mailers.NewOTPMail(mail)
 	configAuth := config.NewAuth(loader)
-	generator := otp.NewGenerator()
+	otpGenerator := otp.NewGenerator()
 	db := config.NewDB(loader)
 	componentsDB := components.MustConnect(ctx, db)
 	userRepository := dal.NewUserRepository(componentsDB)
@@ -87,7 +90,7 @@ func InitializeContainer(ctx context.Context) (*Container, error) {
 	}
 	otpRedisRepository := otp2.NewOTPRedisRepository(client)
 	otpPostresqlRepository := otp2.NewOTPPostgresqlRepository(componentsDB)
-	authCommandSignIn := usecases.NewAuthCommandSignIn(logger, otpMailer, configAuth, generator, userRepository, otpRedisRepository, otpPostresqlRepository)
+	authCommandSignIn := usecases.NewAuthCommandSignIn(logger, otpMailer, configAuth, otpGenerator, userRepository, otpRedisRepository, otpPostresqlRepository)
 	jwt := components.NewJWT(configAuth)
 	authCommandExchangeOtp := usecases.NewAuthCommandExchangeOtp(logger, jwt, otpRedisRepository, userRepository)
 	authQueryMe := usecases.NewAuthQueryMe(logger)
@@ -95,12 +98,15 @@ func InitializeContainer(ctx context.Context) (*Container, error) {
 	middleware := http4.NewMiddleware(jwt)
 	router := http4.NewRouter(httpKernel, authCommandSignIn, authCommandExchangeOtp, authQueryMe, authCommandRefresh, middleware, jwt)
 	authBootloader := auth.NewBootloader(logger, router)
-	v := internal.Bootloaders(bootloader, errorsmapBootloader, observabilityBootloader, swaggerBootloader, authBootloader)
+	generatorGenerator := generator.NewGenerator()
+	homePageRouter := http5.NewHomePageRouter(generatorGenerator, httpKernel)
+	homepageBootloader := homepage.NewBootloader(homePageRouter)
+	v := internal.Bootloaders(bootloader, errorsmapBootloader, swaggerBootloader, observabilityBootloader, authBootloader, homepageBootloader)
 	container := NewContainer(v, logger, runner, httpKernel, kernel)
 	return container, nil
 }
 
 // wire.go:
 
-var sAll = wire.NewSet(internal.Bootloaders, bootstrap.NewRunner, cmd.NewBootloader, cmd.NewKernel, http.NewKernel, cmds.NewServe, cmds.NewRoute, cmds.NewRouteList, errorsmap.NewBootloader, http2.NewErrorsMapMiddleware, http2.NewErrorsMapRouter, redis.NewBootloader, components2.NewRedisClient, swagger.NewBootloader, http3.NewSwaggerRouter, observability.NewBootloader, middlewares.NewObservabilityMiddleware, routers.NewHealthRouter, routers.NewObservabilityRouter, routers.NewPprofRouter, wire.NewSet(tracer.NewTracerProvider, wire.Bind(new(trace.TracerProvider), new(*trace2.TracerProvider))), tracer.NewTracer, auth.NewBootloader, http4.NewMiddleware, http4.NewRouter, mailers.NewOTPMail, usecases.NewAuthCommandSignIn, usecases.NewAuthCommandExchangeOtp, usecases.NewAuthQueryMe, usecases.NewAuthCommandRefresh, user.NewBootloader, routers2.NewUsersRouter, usecases2.NewUserQueryOne, profiler.NewProfiler, components.NewLogger, components.NewJWT, components.MustConnect, wire.NewSet(wire.Bind(new(contracts.EnvLoader), new(*env.Loader)), env.NewLoader), wire.NewSet(wire.Bind(new(contracts.OtpGenerator), new(*otp.Generator)), otp.NewGenerator), config.NewApp, config.NewDB, config.NewMail, config.NewAuth, config.NewHttp, config.NewObservability, config.NewRedis, dal.NewUserRepository, otp2.NewOTPRedisRepository, otp2.NewOTPPostgresqlRepository,
+var sAll = wire.NewSet(internal.Bootloaders, bootstrap.NewRunner, cmd.NewBootloader, cmd.NewKernel, http.NewKernel, cmds.NewServe, cmds.NewRoute, cmds.NewRouteList, errorsmap.NewBootloader, http2.NewErrorsMapMiddleware, http2.NewErrorsMapRouter, redis.NewBootloader, components2.NewRedisClient, swagger.NewBootloader, http3.NewSwaggerRouter, observability.NewBootloader, middlewares.NewObservabilityMiddleware, routers.NewHealthRouter, routers.NewObservabilityRouter, routers.NewPprofRouter, wire.NewSet(tracer.NewTracerProvider, wire.Bind(new(trace.TracerProvider), new(*trace2.TracerProvider))), tracer.NewTracer, auth.NewBootloader, http4.NewMiddleware, http4.NewRouter, mailers.NewOTPMail, usecases.NewAuthCommandSignIn, usecases.NewAuthCommandExchangeOtp, usecases.NewAuthQueryMe, usecases.NewAuthCommandRefresh, user.NewBootloader, routers2.NewUsersRouter, usecases2.NewUserQueryOne, profiler.NewProfiler, homepage.NewBootloader, http5.NewHomePageRouter, generator.NewGenerator, components.NewLogger, components.NewJWT, components.MustConnect, wire.NewSet(wire.Bind(new(contracts.EnvLoader), new(*env.Loader)), env.NewLoader), wire.NewSet(wire.Bind(new(contracts.OtpGenerator), new(*otp.Generator)), otp.NewGenerator), config.NewApp, config.NewDB, config.NewMail, config.NewAuth, config.NewHttp, config.NewObservability, config.NewRedis, dal.NewUserRepository, otp2.NewOTPRedisRepository, otp2.NewOTPPostgresqlRepository,
 )
