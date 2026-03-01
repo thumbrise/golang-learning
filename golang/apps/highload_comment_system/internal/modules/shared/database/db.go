@@ -14,10 +14,10 @@ import (
 
 type DB struct {
 	pool   *pgxpool.Pool
-	config DB
+	config Config
 }
 
-func NewDB(lc fx.Lifecycle, config DB) *DB {
+func NewDB(lc fx.Lifecycle, config Config) *DB {
 	db := &DB{config: config}
 
 	lc.Append(fx.Hook{
