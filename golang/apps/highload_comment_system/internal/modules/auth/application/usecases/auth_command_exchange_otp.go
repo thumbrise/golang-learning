@@ -6,21 +6,21 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
 	dal2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 	domainerrors "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/domain/errors"
 )
 
 type AuthCommandExchangeOtp struct {
 	logger         *slog.Logger
-	jwt            *components.JWT
+	jwt            *jwt.JWT
 	otpRepository  *otp.OTPRedisRepository
 	userRepository *dal2.UserRepository
 }
 
-func NewAuthCommandExchangeOtp(logger *slog.Logger, jwt *components.JWT, otpRepository *otp.OTPRedisRepository, userRepository *dal2.UserRepository) *AuthCommandExchangeOtp {
+func NewAuthCommandExchangeOtp(logger *slog.Logger, jwt *jwt.JWT, otpRepository *otp.OTPRedisRepository, userRepository *dal2.UserRepository) *AuthCommandExchangeOtp {
 	return &AuthCommandExchangeOtp{logger: logger, jwt: jwt, otpRepository: otpRepository, userRepository: userRepository}
 }
 
@@ -46,7 +46,7 @@ func (a *AuthCommandExchangeOtp) Handle(ctx context.Context, input AuthCommandEx
 
 	user, err := a.userRepository.FindByEmail(ctx, input.Email)
 	if err != nil {
-		if dal.IsNotFound(err) {
+		if database.IsNotFound(err) {
 			a.logger.Debug("AuthCommandExchangeOtp.Handle: failed find user by email", slog.Any("email", input.Email))
 
 			return nil, domainerrors.NewUnauthenticatedError("unauthorized")
@@ -61,7 +61,7 @@ func (a *AuthCommandExchangeOtp) Handle(ctx context.Context, input AuthCommandEx
 
 	otpExists, err := a.otpRepository.ExistsValid(ctx, user.ID, input.Otp)
 	if err != nil {
-		if dal.IsNotFound(err) {
+		if database.IsNotFound(err) {
 			a.logger.Debug("AuthCommandExchangeOtp.Handle: failed check otp exists", slog.Any("email", input.Email))
 
 			return nil, domainerrors.NewUnauthenticatedError("unauthorized")

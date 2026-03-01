@@ -7,6 +7,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
 	"go.uber.org/fx"
 )
 
@@ -35,6 +36,7 @@ func (b *Bootloader) Bind() []fx.Option {
 		fx.Provide(dal.NewUserRepository),
 		fx.Provide(otp.NewOTPRedisRepository),
 		fx.Provide(otp.NewOTPPostgresqlRepository),
+		fx.Provide(jwt.NewJWT),
 	}
 }
 

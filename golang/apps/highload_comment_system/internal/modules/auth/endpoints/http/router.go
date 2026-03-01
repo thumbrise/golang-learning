@@ -4,15 +4,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
 	usecases2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
 	bootstraphttp "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
 type Router struct {
 	kernel                 *bootstraphttp.Kernel
 	authMiddleware         *Middleware
-	jwt                    *components.JWT
+	jwt                    *jwt.JWT
 	authCommandSignIn      *usecases2.AuthCommandSignIn
 	authCommandExchangeOtp *usecases2.AuthCommandExchangeOtp
 	authQueryMe            *usecases2.AuthQueryMe
@@ -26,7 +26,7 @@ func NewRouter(
 	authQueryMe *usecases2.AuthQueryMe,
 	authCommandRefresh *usecases2.AuthCommandRefresh,
 	authMiddleware *Middleware,
-	jwt *components.JWT,
+	jwt *jwt.JWT,
 ) *Router {
 	return &Router{
 		kernel:                 kernel,

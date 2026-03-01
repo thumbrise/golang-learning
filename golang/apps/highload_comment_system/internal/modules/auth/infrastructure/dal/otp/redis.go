@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 )
 
 type OTPRedisRepository struct {
@@ -22,7 +22,7 @@ func (r *OTPRedisRepository) Create(ctx context.Context, otp *OTP) error {
 
 	resp := r.redis.Set(ctx, key, true, time.Until(otp.ExpiresAt))
 	if err := resp.Err(); err != nil {
-		return fmt.Errorf("%w: %w", dal.ErrFailedQuery, err)
+		return fmt.Errorf("%w: %w", database.ErrFailedQuery, err)
 	}
 
 	return nil
@@ -33,7 +33,7 @@ func (r *OTPRedisRepository) ExistsValid(ctx context.Context, userID int, code s
 
 	resp, err := r.redis.Exists(ctx, key).Result()
 	if err != nil {
-		return false, fmt.Errorf("%w: %w", dal.ErrFailedQuery, err)
+		return false, fmt.Errorf("%w: %w", database.ErrFailedQuery, err)
 	}
 
 	return resp > 0, nil

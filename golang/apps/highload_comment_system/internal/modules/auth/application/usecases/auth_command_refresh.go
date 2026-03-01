@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
 )
 
 type AuthCommandRefresh struct {
 	logger *slog.Logger
-	jwt    *components.JWT
+	jwt    *jwt.JWT
 }
 
-func NewAuthCommandRefresh(logger *slog.Logger, jwt *components.JWT) *AuthCommandRefresh {
+func NewAuthCommandRefresh(logger *slog.Logger, jwt *jwt.JWT) *AuthCommandRefresh {
 	return &AuthCommandRefresh{logger: logger, jwt: jwt}
 }
 

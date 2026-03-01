@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
 )
 
 type Middleware struct {
-	jwt *components.JWT
+	jwt *jwt.JWT
 }
 
-func NewMiddleware(jwt *components.JWT) *Middleware {
+func NewMiddleware(jwt *jwt.JWT) *Middleware {
 	return &Middleware{jwt: jwt}
 }
 
@@ -35,7 +35,7 @@ func (m *Middleware) Handler() gin.HandlerFunc {
 			return
 		}
 
-		c.Set(components.JWTContextKeyUser, claims)
+		c.Set(jwt.JWTContextKeyUser, claims)
 
 		c.Next()
 	}

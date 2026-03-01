@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.uber.org/fx"
@@ -42,6 +43,7 @@ func (b *Bootloader) Bind() []fx.Option {
 		fx.Provide(routers.NewPprofRouter),
 		fx.Provide(profiler.NewProfiler),
 		fx.Provide(trace.NewTracerProvider),
+		fx.Provide(logger.NewLogger),
 	}
 }
 

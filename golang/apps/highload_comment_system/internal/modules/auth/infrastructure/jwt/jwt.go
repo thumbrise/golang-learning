@@ -1,4 +1,4 @@
-package components
+package jwt
 
 import (
 	"errors"

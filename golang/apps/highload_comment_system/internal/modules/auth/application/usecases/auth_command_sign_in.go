@@ -10,10 +10,10 @@ import (
 
 	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
 	dal2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 )
 
 type AuthCommandSignIn struct {
@@ -94,7 +94,7 @@ func (a *AuthCommandSignIn) Handle(ctx context.Context, input AuthCommandSignInI
 func (a *AuthCommandSignIn) ensureExists(ctx context.Context, email string) (*dal2.User, error) {
 	user, err := a.userRepository.FindByEmail(ctx, email)
 	if err != nil {
-		if dal.IsNotFound(err) {
+		if database.IsNotFound(err) {
 			return a.createUser(ctx, email)
 		}
 

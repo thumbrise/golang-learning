@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 )
 
@@ -21,7 +20,7 @@ func (r *OTPPostresqlRepository) Create(ctx context.Context, otp *OTP) error {
 
 	var id int
 	if err := r.db.Pool().QueryRow(ctx, sql, otp.UserID, otp.Code, otp.ExpiresAt, otp.CreatedAt).Scan(&id); err != nil {
-		return fmt.Errorf("%w: %w", dal.ErrFailedQuery, err)
+		return fmt.Errorf("%w: %w", database.ErrFailedQuery, err)
 	}
 
 	otp.ID = id
@@ -34,7 +33,7 @@ func (r *OTPPostresqlRepository) ExistsValid(ctx context.Context, userID int, co
 
 	var exists bool
 	if err := r.db.Pool().QueryRow(ctx, sql, userID, code).Scan(&exists); err != nil {
-		return false, fmt.Errorf("%w: %w", dal.ErrFailedQuery, err)
+		return false, fmt.Errorf("%w: %w", database.ErrFailedQuery, err)
 	}
 
 	return exists, nil

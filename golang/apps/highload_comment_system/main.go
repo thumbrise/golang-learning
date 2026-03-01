@@ -7,12 +7,12 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/modules"
 	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	authusecases "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	authhttp "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
 	otp3 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
 	authmailers "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	homepagehttp "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
@@ -20,6 +20,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	observabilitymiddlewares "github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	observabilityrouters "github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	observabilityprofiler "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
 	observabilitytracer "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
@@ -132,8 +133,8 @@ var ModuleHomepage = fx.Options(
 // ModuleInfrastructure предоставляет общие компоненты инфраструктуры
 var ModuleInfrastructure = fx.Options(
 	fx.Provide(
-		components.NewLogger,
-		components.NewJWT,
+		logger.NewLogger,
+		jwt.NewJWT,
 		// fx.Annotate(
 		database.NewDB,
 		database.NewBootloader,
