@@ -1,12 +1,12 @@
 package internal
 
 import (
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/cmd"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/contracts"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/auth"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/observability"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/shared/errorsmap"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/swagger"
+	"github.com/thumbrise/demo/golang-demo/cmd"
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
 )
 
 func Bootloaders(

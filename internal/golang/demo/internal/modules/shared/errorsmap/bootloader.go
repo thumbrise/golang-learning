@@ -3,7 +3,7 @@ package errorsmap
 import (
 	"context"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/shared/errorsmap/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
 )
 
 type Bootloader struct {

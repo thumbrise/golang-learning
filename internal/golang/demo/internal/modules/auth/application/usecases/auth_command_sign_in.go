@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/config"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/dal"
-	otp2 "gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/dal/otp"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/auth/infrastructure/mailers"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/pkg/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
+	otp2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
+	"github.com/thumbrise/demo/golang-demo/pkg/otp"
 )
 
 type AuthCommandSignIn struct {

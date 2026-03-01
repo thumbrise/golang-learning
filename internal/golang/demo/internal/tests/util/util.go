@@ -11,9 +11,9 @@ import (
 	"testing"
 
 	"github.com/steinfletcher/apitest"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/bootstrap/container"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/config"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/pkg/env"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
+	"github.com/thumbrise/demo/golang-demo/internal/config"
+	"github.com/thumbrise/demo/golang-demo/pkg/env"
 )
 
 var cfg *config.Http

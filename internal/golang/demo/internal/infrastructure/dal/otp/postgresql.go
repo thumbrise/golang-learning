@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/components"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/dal"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
 )
 
 type OTPPostresqlRepository struct {

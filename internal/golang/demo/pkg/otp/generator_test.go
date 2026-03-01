@@ -5,7 +5,7 @@ package otp_test
 import (
 	"testing"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/pkg/otp"
+	"github.com/thumbrise/demo/golang-demo/pkg/otp"
 )
 
 func TestGenerator_Generate(t *testing.T) {

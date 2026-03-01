@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/components"
-	bootstraphttp "gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/kernels/http"
-	usecases2 "gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/auth/application/usecases"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
+	bootstraphttp "github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
+	usecases2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 )
 
 type Router struct {

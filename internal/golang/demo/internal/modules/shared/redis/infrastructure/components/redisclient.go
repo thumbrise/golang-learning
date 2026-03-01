@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
 const (

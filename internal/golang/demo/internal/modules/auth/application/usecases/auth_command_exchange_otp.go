@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/components"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/dal"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/dal/otp"
-	domainerrors "gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/shared/errorsmap/domain/errors"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal/otp"
+	domainerrors "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/domain/errors"
 )
 
 type AuthCommandExchangeOtp struct {

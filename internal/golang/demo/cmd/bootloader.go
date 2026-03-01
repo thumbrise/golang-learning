@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/cmd/cmds"
+	"github.com/thumbrise/demo/golang-demo/cmd/cmds"
 )
 
 type Bootloader struct {

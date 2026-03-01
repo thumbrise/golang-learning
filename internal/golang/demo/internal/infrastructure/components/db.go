@@ -8,7 +8,7 @@ import (
 	"net"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
 type DB struct {

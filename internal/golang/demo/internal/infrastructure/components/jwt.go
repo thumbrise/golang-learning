@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
 const JWTContextKeyUser = "jwt"

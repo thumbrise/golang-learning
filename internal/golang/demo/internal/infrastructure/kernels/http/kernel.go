@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	sloggin "github.com/samber/slog-gin"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/config"
 )
 
 type Kernel struct {

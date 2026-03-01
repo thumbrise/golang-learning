@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/bootstrap/container"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
 )
 
 func main() {

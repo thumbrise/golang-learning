@@ -1,4 +1,4 @@
-module gitlab.com/thumbrise-task-manager/task-manager-backend
+module github.com/thumbrise/demo/golang-demo
 
 go 1.25.3
 

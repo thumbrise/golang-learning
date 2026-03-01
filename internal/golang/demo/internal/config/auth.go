@@ -1,7 +1,7 @@
 package config
 
 import (
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/contracts"
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 )
 
 type Auth struct {

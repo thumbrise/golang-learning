@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"github.com/wneessen/go-mail"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/config"
 )
 
 type OTPMailer struct {

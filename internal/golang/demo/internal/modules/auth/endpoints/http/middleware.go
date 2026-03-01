@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
 )
 
 type Middleware struct {

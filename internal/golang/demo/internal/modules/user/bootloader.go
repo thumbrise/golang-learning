@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/user/endpoints/http/routers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/user/endpoints/http/routers"
 )
 
 type Bootloader struct {

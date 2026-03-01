@@ -2,8 +2,8 @@ package cmds
 
 import (
 	"github.com/spf13/cobra"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/bootstrap"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/kernels/http"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 )
 
 type Serve struct {

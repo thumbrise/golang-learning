@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/cmd"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/bootstrap"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/contracts"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/kernels/http"
+	"github.com/thumbrise/demo/golang-demo/cmd"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 )
 
 var (

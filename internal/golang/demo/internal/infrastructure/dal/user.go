@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
 )
 
 type User struct {

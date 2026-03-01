@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/observability/endpoints/http/routers"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/observability/infrastructure/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 

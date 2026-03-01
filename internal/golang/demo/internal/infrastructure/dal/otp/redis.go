@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/dal"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
 )
 
 type OTPRedisRepository struct {

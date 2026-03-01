@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	bootstraphttp "gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/kernels/http"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/user/application/usecases"
+	bootstraphttp "github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/user/application/usecases"
 )
 
 type UsersRouter struct {

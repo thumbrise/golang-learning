@@ -3,7 +3,7 @@ package swagger
 import (
 	"context"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/swagger/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger/endpoints/http"
 )
 
 type Bootloader struct {

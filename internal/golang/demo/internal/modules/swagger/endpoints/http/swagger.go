@@ -21,8 +21,8 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	_ "gitlab.com/thumbrise-task-manager/task-manager-backend/docs"
-	http2 "gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/kernels/http"
+	_ "github.com/thumbrise/demo/golang-demo/docs"
+	http2 "github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 )
 
 type SwaggerRouter struct {

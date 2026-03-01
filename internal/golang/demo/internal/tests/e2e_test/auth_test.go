@@ -7,7 +7,7 @@ import (
 
 	"github.com/steinfletcher/apitest"
 	"github.com/steinfletcher/apitest-jsonpath"
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/tests/util"
+	"github.com/thumbrise/demo/golang-demo/internal/tests/util"
 )
 
 func TestAuthSignIn(t *testing.T) {

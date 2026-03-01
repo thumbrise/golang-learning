@@ -1,7 +1,7 @@
 package http
 
 import (
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/kernels/http"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/kernels/http"
 )
 
 type ErrorsMapRouter struct {

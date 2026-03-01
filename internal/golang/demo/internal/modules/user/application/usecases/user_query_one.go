@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"time"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/dal"
-	domainerrors "gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/shared/errorsmap/domain/errors"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/dal"
+	domainerrors "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/domain/errors"
 )
 
 type UserQueryOne struct {

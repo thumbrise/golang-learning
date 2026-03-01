@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	errors3 "gitlab.com/thumbrise-task-manager/task-manager-backend/internal/modules/shared/errorsmap/domain/errors"
+	errors3 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/domain/errors"
 )
 
 type ErrorsMapMiddleware struct {

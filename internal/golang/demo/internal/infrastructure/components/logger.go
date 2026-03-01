@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"os"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/config"
+	"github.com/thumbrise/demo/golang-demo/internal/config"
 	"go.opentelemetry.io/otel/trace"
 )
 

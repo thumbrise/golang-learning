@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"gitlab.com/thumbrise-task-manager/task-manager-backend/internal/infrastructure/components"
+	"github.com/thumbrise/demo/golang-demo/internal/infrastructure/components"
 )
 
 type AuthQueryMe struct {
