@@ -1,8 +1,9 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
-	"io"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -23,8 +24,10 @@ func NewKernel() *Kernel {
 	return cmdRoot
 }
 
-func (k *Kernel) Execute(ctx context.Context, buf io.Writer) error {
+func (k *Kernel) Execute(ctx context.Context) error {
+	buf := bytes.NewBuffer(make([]byte, 0))
 	k.command.SetOut(buf)
+	defer fmt.Print(buf.String())
 
 	return k.command.ExecuteContext(ctx)
 }

@@ -1,12 +1,18 @@
 package main
 
 import (
-	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/modules"
-	"go.uber.org/fx"
+	"context"
+	"fmt"
+
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
 )
 
 func main() {
-	fx.New(
-		modules.Build()...,
-	).Run()
+	//fx.New(
+	//	modules.Build()...,
+	//).Run()
+	ctx := context.Background()
+	c := container.InitializeContainer(ctx)
+	fmt.Printf("c = %#v\n", c)
+	fmt.Println("WOW")
 }

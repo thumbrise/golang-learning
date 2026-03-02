@@ -1,6 +1,8 @@
 package cmds
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
@@ -16,16 +18,18 @@ func NewServe(runner *bootstrap.Runner, httpKernel *http.Kernel, lc fx.Lifecycle
 		Use:   "serve",
 		Short: "Start http server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// lc.Append(fx.Hook{
-			//	OnStart: func(ctx context.Context) error {
-			//		return httpKernel.Start(ctx)
-			//	},
-			//	OnStop: func(ctx context.Context) error {
-			//		return httpKernel.Shutdown(ctx)
-			//	},
-			//})
-			return runner.Run(cmd.Context(), httpKernel)
-			// return nil
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					go func() {
+						_ = httpKernel.Start(ctx)
+					}()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					return httpKernel.Shutdown(ctx)
+				},
+			})
+			return nil
 		},
 	}
 
