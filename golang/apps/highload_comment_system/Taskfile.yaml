@@ -85,3 +85,8 @@ tasks:
       -e K6_WEB_DASHBOARD_EXPORT=/app/tmp/k6/k6_export.html
       -p 5665:5665
       grafana/k6 run /app/db/loads/test.ts
+
+  redis:
+    desc: redis cli
+    interactive: true
+    cmd: task c -- exec redis redis-cli

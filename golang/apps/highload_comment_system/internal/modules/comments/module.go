@@ -5,12 +5,14 @@ import (
 
 	"github.com/google/wire"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/cmd"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/usecases"
 )
 
 var Bindings = wire.NewSet(
 	NewModule,
 	cmd.NewComments,
 	cmd.NewCommentsProduce,
+	usecases.NewCommentsCommandProduce,
 )
 
 type Module struct{}
