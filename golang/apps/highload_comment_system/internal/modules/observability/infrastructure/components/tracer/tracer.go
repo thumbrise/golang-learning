@@ -8,7 +8,7 @@ import (
 
 // NewTracer creates tracer
 //
-//nolint:ireturn // specific
+//nolint:ireturn // spec
 func NewTracer(cfg app.Config) trace.Tracer {
 	return otel.GetTracerProvider().Tracer(cfg.Name)
 }

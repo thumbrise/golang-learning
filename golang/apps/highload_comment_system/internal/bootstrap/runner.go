@@ -76,6 +76,9 @@ func (h *Runner) startProcesses(ctx context.Context, processes []*Process, grp *
 func (h *Runner) shutdownProcesses(ctx context.Context, processes []*Process) {
 	for _, pp := range processes {
 		p := pp
+		if p.Shutdown == nil {
+			return
+		}
 
 		err := p.Shutdown(ctx)
 		h.logger.Log("Process", p.Name, "shutdown", err)
