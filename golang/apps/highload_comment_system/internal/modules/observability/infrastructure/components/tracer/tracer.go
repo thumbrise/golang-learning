@@ -7,6 +7,6 @@ import (
 )
 
 // NewTracer creates tracer
-func NewTracer(cfg app.Config, provider trace.TracerProvider) trace.Tracer { //nolint:ireturn // otel returns interface, cant fix that
+func NewTracer(cfg app.Config, provider trace.TracerProvider) trace.Tracer {
 	return otel.GetTracerProvider().Tracer(cfg.Name)
 }
