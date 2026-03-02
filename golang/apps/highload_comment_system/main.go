@@ -13,22 +13,21 @@ func main() {
 
 	c, err := wire.InitializeContainer(ctx)
 	if err != nil {
-		log.Fatalf("Error initialize container: %s", err.Error())
+		log.Fatalf("error initialize container: %s", err.Error())
 	}
 
 	err = c.Bootstrapper.Bootstrap(ctx, c.Modules)
 	if err != nil {
-		log.Fatalf("Error bootstrap modules: %s", err.Error())
+		log.Fatalf("error bootstrap modules: %s", err.Error())
 	}
 
 	err = c.CmdKernel.Execute(ctx)
 	if err != nil {
-		msg := "main CmdKernel.Execute " + err.Error()
-		slog.Error(msg)
+		slog.Error("main CmdKernel.Execute " + err.Error())
 	}
 
 	err = c.Bootstrapper.Shutdown(ctx, c.Modules)
 	if err != nil {
-		log.Fatalf("Error shutdown modules: %s", err.Error())
+		slog.Error("main CmdKernel.Execute " + err.Error())
 	}
 }
