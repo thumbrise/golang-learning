@@ -16,8 +16,8 @@ type Module struct {
 	db *DB
 }
 
-func NewModule() *Module {
-	return &Module{}
+func NewModule(db *DB) *Module {
+	return &Module{db: db}
 }
 
 func (m *Module) Name() string {

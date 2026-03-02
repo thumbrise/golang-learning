@@ -23,6 +23,9 @@ func NewDB(config Config) *DB {
 }
 
 func (db *DB) Connect(ctx context.Context) error {
+	if db == nil {
+		panic("db is nil")
+	}
 	if db.pool != nil {
 		log.Fatal(ErrPoolAlreadyOpen)
 	}
