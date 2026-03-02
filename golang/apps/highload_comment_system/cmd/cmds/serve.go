@@ -37,5 +37,6 @@ func NewServe(r contracts.CmdRegistrar, runner *bootstrap.Runner, httpKernel *ht
 		},
 	}
 	r.Register(c)
+
 	return &Serve{c}
 }

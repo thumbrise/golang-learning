@@ -27,8 +27,7 @@ var Bindings = wire.NewSet(
 	),
 )
 
-type Module struct {
-}
+type Module struct{}
 
 func NewModule() *Module {
 	return &Module{}

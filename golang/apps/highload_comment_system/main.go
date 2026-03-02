@@ -24,6 +24,7 @@ func main() {
 	}
 
 	buf := bytes.NewBuffer(make([]byte, 0))
+
 	err = c.CmdKernel.Execute(ctx, buf)
 	if err != nil {
 		slog.Error("main CmdKernel.Execute " + err.Error())
@@ -33,5 +34,6 @@ func main() {
 	if err != nil {
 		slog.Error("main CmdKernel.Execute " + err.Error())
 	}
+
 	fmt.Print(buf.String())
 }

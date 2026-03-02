@@ -17,6 +17,7 @@ func NewRoute(r contracts.CmdRegistrar) *Route {
 		Short: "Route commands",
 	}
 	r.Register(c)
+
 	return &Route{c}
 }
 
