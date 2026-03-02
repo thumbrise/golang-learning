@@ -2,8 +2,6 @@ package bootstrap
 
 import (
 	"context"
-	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 
@@ -11,43 +9,75 @@ import (
 )
 
 type Runner struct {
-	logger *slog.Logger
+	logger *EventLogger
 }
 
 func NewRunner(
-	logger *slog.Logger,
+	logger *EventLogger,
 ) *Runner {
 	return &Runner{
 		logger: logger,
 	}
 }
 
-type Kernel interface {
-	Start(ctx context.Context) error
-	Shutdown(ctx context.Context) error
-	Name() string
-}
+type (
+	StartFunc    func(ctx context.Context) error
+	ShutdownFunc func(ctx context.Context) error
+	Process      struct {
+		Name     string
+		Start    StartFunc
+		Shutdown ShutdownFunc
+	}
+)
 
-func (h *Runner) Run(ctx context.Context, kernel Kernel) error {
-	msg := fmt.Sprintf("starting %s kernel", kernel.Name())
-	h.logger.Info(msg)
-
+func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 	defer cancel()
 
 	grp, ctx := errgroup.WithContext(ctx)
+	h.startProcesses(ctx, processes, grp)
 
 	grp.Go(func() error {
-		return kernel.Start(ctx)
-	})
-
-	grp.Go(func() error {
-		h.logger.Info("waiting for signal")
+		var err error = nil
+		h.logger.Log("Process", "Graceful Shutdown", "waiting for signal", err)
 		<-ctx.Done()
-		h.logger.Info("received signal to exit")
 
-		return kernel.Shutdown(ctx)
+		var err2 error = nil
+		h.logger.Log("Process", "Graceful Shutdown", "received signal to exit", err2)
+
+		h.shutdownProcesses(ctx, processes)
+
+		return nil
 	})
 
-	return grp.Wait()
+	h.logger.Log("Process", "ErrorGroup", "Wait", grp.Wait())
+
+	return nil
+}
+
+func (h *Runner) startProcesses(ctx context.Context, processes []*Process, grp *errgroup.Group) {
+	for _, pp := range processes {
+		p := pp
+
+		var err error = nil
+		h.logger.Log("Process", p.Name, "start", err)
+
+		grp.Go(func() error {
+			err := p.Start(ctx)
+			if err != nil {
+				h.logger.Log("Process", p.Name, "long run", err)
+			}
+
+			return err
+		})
+	}
+}
+
+func (h *Runner) shutdownProcesses(ctx context.Context, processes []*Process) {
+	for _, pp := range processes {
+		p := pp
+
+		err := p.Shutdown(ctx)
+		h.logger.Log("Process", p.Name, "shutdown", err)
+	}
 }

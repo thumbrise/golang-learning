@@ -3,6 +3,7 @@ package cmds
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
@@ -10,11 +11,12 @@ type Route struct {
 	*cobra.Command
 }
 
-func NewRoute() *Route {
+func NewRoute(r contracts.CMDAdder) *Route {
 	c := &cobra.Command{
 		Use:   "route",
 		Short: "Route commands",
 	}
+	r.Add(c)
 
 	return &Route{c}
 }
@@ -23,7 +25,7 @@ type RouteList struct {
 	*cobra.Command
 }
 
-func NewRouteList(httpKernel *http.Kernel) *RouteList {
+func NewRouteList(r *Route, httpKernel *http.Kernel) *RouteList {
 	c := &cobra.Command{
 		Use:   "list",
 		Short: "List all app routes",
@@ -42,6 +44,7 @@ func NewRouteList(httpKernel *http.Kernel) *RouteList {
 			return nil
 		},
 	}
+	r.AddCommand(c)
 
 	return &RouteList{c}
 }

@@ -1,8 +1,8 @@
-package cmd
+package core
 
 import (
+	"bytes"
 	"context"
-	"io"
 
 	"github.com/spf13/cobra"
 )
@@ -23,13 +23,13 @@ func NewKernel() *Kernel {
 	return cmdRoot
 }
 
-func (k *Kernel) Execute(ctx context.Context, buf io.Writer) error {
+func (k *Kernel) Execute(ctx context.Context, buf *bytes.Buffer) error {
 	k.command.SetOut(buf)
 
 	return k.command.ExecuteContext(ctx)
 }
 
-func (k *Kernel) AddCommand(cmd *cobra.Command) {
+func (k *Kernel) Add(cmd *cobra.Command) {
 	k.command.AddCommand(cmd)
 }
 

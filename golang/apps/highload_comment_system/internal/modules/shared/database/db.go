@@ -9,7 +9,6 @@ import (
 	"net"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"go.uber.org/fx"
 )
 
 type DB struct {
@@ -17,24 +16,17 @@ type DB struct {
 	config Config
 }
 
-func NewDB(lc fx.Lifecycle, config Config) *DB {
+func NewDB(config Config) *DB {
 	db := &DB{config: config}
-
-	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			return db.Connect(ctx)
-		},
-		OnStop: func(ctx context.Context) error {
-			db.pool.Close()
-
-			return nil
-		},
-	})
 
 	return db
 }
 
 func (db *DB) Connect(ctx context.Context) error {
+	if db == nil {
+		panic("db is nil")
+	}
+
 	if db.pool != nil {
 		log.Fatal(ErrPoolAlreadyOpen)
 	}
