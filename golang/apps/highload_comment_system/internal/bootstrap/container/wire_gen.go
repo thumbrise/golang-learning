@@ -8,24 +8,112 @@ package container
 
 import (
 	"context"
-
 	"github.com/thumbrise/demo/golang-demo/cmd"
+	"github.com/thumbrise/demo/golang-demo/cmd/cmds"
+	"github.com/thumbrise/demo/golang-demo/internal"
+	"github.com/thumbrise/demo/golang-demo/internal/app"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
+	http4 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
+	otp2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
+	http5 "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
+	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/mail"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
+	http3 "github.com/thumbrise/demo/golang-demo/internal/modules/swagger/endpoints/http"
 )
 
 // Injectors from container.go:
 
-func InitializeContainer(ctx context.Context) *Container {
+func InitializeContainer(ctx context.Context) (*Container, error) {
+	loader := app.NewLoader()
+	config := app.NewConfig(loader)
+	slogLogger := logger.NewLogger(config)
+	eventLogger := bootstrap.NewEventLogger(slogLogger)
+	bootstrapper := bootstrap.NewBootstrapper(eventLogger)
 	kernel := cmd.NewKernel()
-	container := NewContainer(kernel)
-	return container
+	httpConfig := http.NewConfig(loader)
+	engine := http.NewGinEngine(slogLogger)
+	httpKernel := http.NewKernel(httpConfig, slogLogger, engine)
+	route := cmds.NewRoute()
+	routeList := cmds.NewRouteList(httpKernel)
+	runner := bootstrap.NewRunner(eventLogger)
+	serve := cmds.NewServe(runner, httpKernel)
+	module := cmd.NewModule(kernel, route, routeList, serve)
+	httpModule := http.NewModule()
+	databaseModule := database.NewModule()
+	mailModule := mail.NewModule()
+	redisConfig := redis.NewConfig(loader)
+	client, err := redis.NewClient(redisConfig)
+	if err != nil {
+		return nil, err
+	}
+	redisModule := redis.NewModule(client)
+	errorsMapMiddleware := http2.NewErrorsMapMiddleware(slogLogger)
+	errorsMapRouter := http2.NewErrorsMapRouter(errorsMapMiddleware, httpKernel)
+	errorsmapModule := errorsmap.NewModule(errorsMapRouter)
+	swaggerRouter := http3.NewSwaggerRouter(httpKernel)
+	swaggerModule := swagger.NewModule(swaggerRouter)
+	healthRouter := routers.NewHealthRouter(httpKernel)
+	profilerConfig := profiler.NewConfig(loader)
+	profilerProfiler := profiler.NewProfiler(config, profilerConfig, slogLogger)
+	observabilityMiddleware := middlewares.NewObservabilityMiddleware(config, profilerProfiler, slogLogger)
+	observabilityRouter := routers.NewObservabilityRouter(httpKernel, observabilityMiddleware)
+	pprofRouter := routers.NewPprofRouter(httpKernel)
+	observabilityModule := observability.NewModule(healthRouter, observabilityRouter, pprofRouter, profilerProfiler)
+	mailConfig := mail.NewConfig(loader)
+	otpMailer := mailers.NewOTPMail(mailConfig)
+	otpConfig := otp.NewConfig(loader)
+	otpGenerator := otp.NewGenerator()
+	databaseConfig := database.NewConfig(loader)
+	db := database.NewDB(databaseConfig)
+	userRepository := dal.NewUserRepository(db)
+	otpRedisRepository := otp2.NewOTPRedisRepository(client)
+	otpPostresqlRepository := otp2.NewOTPPostgresqlRepository(db)
+	authCommandSignIn := usecases.NewAuthCommandSignIn(slogLogger, otpMailer, otpConfig, otpGenerator, userRepository, otpRedisRepository, otpPostresqlRepository)
+	jwtConfig := jwt.NewConfig(loader)
+	jwtJWT := jwt.NewJWT(jwtConfig)
+	authCommandExchangeOtp := usecases.NewAuthCommandExchangeOtp(slogLogger, jwtJWT, otpRedisRepository, userRepository)
+	authQueryMe := usecases.NewAuthQueryMe(slogLogger)
+	authCommandRefresh := usecases.NewAuthCommandRefresh(slogLogger, jwtJWT)
+	middleware := http4.NewMiddleware(jwtJWT)
+	router := http4.NewRouter(httpKernel, authCommandSignIn, authCommandExchangeOtp, authQueryMe, authCommandRefresh, middleware, jwtJWT)
+	authModule := auth.NewModule(router)
+	generatorGenerator := generator.NewGenerator()
+	homePageRouter := http5.NewHomePageRouter(generatorGenerator, httpKernel)
+	homepageModule := homepage.NewModule(homePageRouter)
+	v := internal.Modules(module, httpModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, observabilityModule, authModule, homepageModule)
+	container := NewContainer(bootstrapper, kernel, httpKernel, v, runner)
+	return container, nil
 }
 
 // container.go:
 
 type Container struct {
-	*cmd.Kernel
+	Modules      []contracts.Module
+	Runner       *bootstrap.Runner
+	Bootstrapper *bootstrap.Bootstrapper
+	HttpKernel   *http.Kernel
+	CmdKernel    *cmd.Kernel
 }
 
-func NewContainer(kernel *cmd.Kernel) *Container {
-	return &Container{Kernel: kernel}
+func NewContainer(bootstrapper *bootstrap.Bootstrapper, cmdKernel *cmd.Kernel, httpKernel *http.Kernel, modules []contracts.Module, runner *bootstrap.Runner) *Container {
+	return &Container{Bootstrapper: bootstrapper, CmdKernel: cmdKernel, HttpKernel: httpKernel, Modules: modules, Runner: runner}
 }

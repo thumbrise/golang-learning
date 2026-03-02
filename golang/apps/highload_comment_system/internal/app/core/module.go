@@ -12,6 +12,8 @@ import (
 var Bindings = wire.NewSet(
 	NewModule,
 	app.NewConfig,
+	bootstrap.NewEventLogger,
+	bootstrap.NewBootstrapper,
 	bootstrap.NewRunner,
 	app.NewLoader,
 	wire.Bind(

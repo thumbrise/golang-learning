@@ -46,8 +46,8 @@ type Module struct {
 	router *http.Router
 }
 
-func NewModule(router *http.Router) Module {
-	return Module{
+func NewModule(router *http.Router) *Module {
+	return &Module{
 		router: router,
 	}
 }

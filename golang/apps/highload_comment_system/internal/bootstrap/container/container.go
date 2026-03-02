@@ -12,33 +12,22 @@ import (
 )
 
 type Container struct {
-	Modules    []contracts.Module
-	Runner     *bootstrap.Runner
-	HttpKernel *http.Kernel
-	CmdKernel  *cmd.Kernel
+	Modules      []contracts.Module
+	Runner       *bootstrap.Runner
+	Bootstrapper *bootstrap.Bootstrapper
+	HttpKernel   *http.Kernel
+	CmdKernel    *cmd.Kernel
 }
 
-func NewContainer(
-	modules []contracts.Module,
-	runner *bootstrap.Runner,
-	httpKernel *http.Kernel,
-	cmdKernel *cmd.Kernel,
-) *Container {
-	c := &Container{
-		Modules:    modules,
-		Runner:     runner,
-		HttpKernel: httpKernel,
-		CmdKernel:  cmdKernel,
-	}
-
-	return c
+func NewContainer(bootstrapper *bootstrap.Bootstrapper, cmdKernel *cmd.Kernel, httpKernel *http.Kernel, modules []contracts.Module, runner *bootstrap.Runner) *Container {
+	return &Container{Bootstrapper: bootstrapper, CmdKernel: cmdKernel, HttpKernel: httpKernel, Modules: modules, Runner: runner}
 }
 
-func InitializeContainer(ctx context.Context) *Container {
+func InitializeContainer(ctx context.Context) (*Container, error) {
 	wire.Build(
 		NewContainer,
 		internal.Bindings,
 	)
 
-	return &Container{}
+	return &Container{}, nil
 }

@@ -2,21 +2,18 @@ package bootstrap
 
 import (
 	"context"
-	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 
-	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"golang.org/x/sync/errgroup"
 )
 
 type Runner struct {
-	logger *slog.Logger
+	logger *EventLogger
 }
 
 func NewRunner(
-	logger *slog.Logger,
+	logger *EventLogger,
 ) *Runner {
 	return &Runner{
 		logger: logger,
@@ -33,19 +30,17 @@ type (
 	}
 )
 
-func (h *Runner) Run(ctx context.Context, processes []*Process, modules []contracts.Module) error {
+func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 	defer cancel()
-
-	h.bootstrapModules(ctx, modules)
 
 	grp, ctx := errgroup.WithContext(ctx)
 	h.startProcesses(ctx, processes, grp)
 
 	grp.Go(func() error {
-		h.logger.Info("waiting for signal")
+		h.logEvent("Process", "Gracefull Shutdown", "waiting for signal", nil)
 		<-ctx.Done()
-		h.logger.Info("received signal to exit")
+		h.logEvent("Process", "Gracefull Shutdown", "received signal to exit", nil)
 
 		h.shutdownProcesses(ctx, processes)
 
@@ -53,8 +48,6 @@ func (h *Runner) Run(ctx context.Context, processes []*Process, modules []contra
 	})
 
 	h.logEvent("Process", "ErrorGroup", "Wait", grp.Wait())
-
-	h.shutdownModules(ctx, modules)
 
 	return nil
 }
@@ -85,42 +78,6 @@ func (h *Runner) shutdownProcesses(ctx context.Context, processes []*Process) {
 	}
 }
 
-func (h *Runner) bootstrapModules(ctx context.Context, modules []contracts.Module) {
-	for _, mm := range modules {
-		m := mm
-		h.logEvent("Module", m.Name(), "got", nil)
-	}
-
-	for _, mm := range modules {
-		m := mm
-
-		err := m.BeforeStart(ctx)
-		h.logEvent("Module", m.Name(), "before start", err)
-	}
-
-	for _, mm := range modules {
-		m := mm
-
-		err := m.OnStart(ctx)
-		h.logEvent("Module", m.Name(), "on start", err)
-	}
-}
-
-func (h *Runner) shutdownModules(ctx context.Context, modules []contracts.Module) {
-	for _, mm := range modules {
-		m := mm
-
-		err := m.Shutdown(ctx)
-		h.logEvent("Module", m.Name(), "shutdown", err)
-	}
-}
-
 func (h *Runner) logEvent(kind, name, event string, err error) {
-	msg := fmt.Sprintf("%s %s: event %s", kind, name, event)
-	if err != nil {
-		msg = fmt.Sprintf("%s ERROR: %s", msg, err)
-		h.logger.Error(msg)
-	} else {
-		h.logger.Info(msg)
-	}
+	h.logger.Log(kind, name, event, err)
 }
