@@ -4,7 +4,7 @@
 //go:build !wireinject
 // +build !wireinject
 
-package container
+package wire
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
-	"github.com/thumbrise/demo/golang-demo/internal/contracts"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	http4 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
@@ -40,9 +40,9 @@ import (
 	http3 "github.com/thumbrise/demo/golang-demo/internal/modules/swagger/endpoints/http"
 )
 
-// Injectors from container.go:
+// Injectors from wire.go:
 
-func InitializeContainer(ctx context.Context) (*Container, error) {
+func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	loader := app.NewLoader()
 	config := app.NewConfig(loader)
 	slogLogger := logger.NewLogger(config)
@@ -100,20 +100,6 @@ func InitializeContainer(ctx context.Context) (*Container, error) {
 	homePageRouter := http5.NewHomePageRouter(generatorGenerator, httpKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
 	v := internal.Modules(module, httpModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, observabilityModule, authModule, homepageModule)
-	container := NewContainer(bootstrapper, kernel, httpKernel, v, runner)
-	return container, nil
-}
-
-// container.go:
-
-type Container struct {
-	Modules      []contracts.Module
-	Runner       *bootstrap.Runner
-	Bootstrapper *bootstrap.Bootstrapper
-	HttpKernel   *http.Kernel
-	CmdKernel    *cmd.Kernel
-}
-
-func NewContainer(bootstrapper *bootstrap.Bootstrapper, cmdKernel *cmd.Kernel, httpKernel *http.Kernel, modules []contracts.Module, runner *bootstrap.Runner) *Container {
-	return &Container{Bootstrapper: bootstrapper, CmdKernel: cmdKernel, HttpKernel: httpKernel, Modules: modules, Runner: runner}
+	containerContainer := container.NewContainer(bootstrapper, kernel, httpKernel, v, runner)
+	return containerContainer, nil
 }

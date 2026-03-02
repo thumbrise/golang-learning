@@ -6,13 +6,13 @@ import (
 	"log"
 	"log/slog"
 
-	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container/wire"
 )
 
 func main() {
 	ctx := context.Background()
 
-	c, err := container.InitializeContainer(ctx)
+	c, err := wire.InitializeContainer(ctx)
 	if err != nil {
 		log.Fatalf("Error initialize container: %s", err.Error())
 	}
