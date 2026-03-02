@@ -10,11 +10,12 @@ import (
 var Bindings = wire.NewSet(
 	NewModule,
 	cmd.NewComments,
+	cmd.NewCommentsProduce,
 )
 
 type Module struct{}
 
-func NewModule(*cmd.Comments) *Module {
+func NewModule(*cmd.Comments, *cmd.CommentsProduce) *Module {
 	return &Module{}
 }
 

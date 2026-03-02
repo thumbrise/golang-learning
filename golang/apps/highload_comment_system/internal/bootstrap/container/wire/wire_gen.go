@@ -103,7 +103,8 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	homePageRouter := http5.NewHomePageRouter(generatorGenerator, httpKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
 	cmdComments := cmd2.NewComments(kernel)
-	commentsModule := comments.NewModule(cmdComments)
+	commentsProduce := cmd2.NewCommentsProduce(cmdComments)
+	commentsModule := comments.NewModule(cmdComments, commentsProduce)
 	v2 := internal.Modules(module, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, observabilityModule, authModule, homepageModule, commentsModule)
 	containerContainer := container.NewContainer(bootstrapper, kernel, v, httpKernel, v2, runner)
 	return containerContainer, nil
