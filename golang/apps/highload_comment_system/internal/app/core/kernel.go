@@ -1,9 +1,8 @@
-package cmd
+package core
 
 import (
 	"bytes"
 	"context"
-	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -24,21 +23,18 @@ func NewKernel() *Kernel {
 	return cmdRoot
 }
 
-func (k *Kernel) Execute(ctx context.Context) error {
-	buf := bytes.NewBuffer(make([]byte, 0))
-
+func (k *Kernel) Execute(ctx context.Context, buf *bytes.Buffer) error {
 	k.command.SetOut(buf)
-	defer fmt.Print(buf.String())
 
 	return k.command.ExecuteContext(ctx)
 }
 
-func (k *Kernel) AddCommand(cmd *cobra.Command) {
+func (k *Kernel) Register(cmd *cobra.Command) {
 	k.command.AddCommand(cmd)
 }
 
 // AddGroup adds commands, likely first command is parent of the rest commands
-func (k *Kernel) AddGroup(cmds ...*cobra.Command) {
+func (k *Kernel) RegisterGroup(cmds ...*cobra.Command) {
 	var groupHead *cobra.Command
 	for _, cmd := range cmds {
 		if groupHead == nil {

@@ -32,7 +32,6 @@ var Bindings = wire.NewSet(
 )
 
 func Modules(
-	cmdModule *cmd.Module,
 	httpModule *http.Module,
 	databaseModule *database.Module,
 	mailModule *mail.Module,
@@ -44,7 +43,6 @@ func Modules(
 	homepageModule *homepage.Module,
 ) []contracts.Module {
 	return []contracts.Module{
-		cmdModule,
 		httpModule,
 		databaseModule,
 		mailModule,

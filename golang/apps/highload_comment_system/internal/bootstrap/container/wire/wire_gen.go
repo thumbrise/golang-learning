@@ -12,6 +12,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/cmd/cmds"
 	"github.com/thumbrise/demo/golang-demo/internal"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
+	"github.com/thumbrise/demo/golang-demo/internal/app/core"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
@@ -48,16 +49,16 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	slogLogger := logger.NewLogger(config)
 	eventLogger := bootstrap.NewEventLogger(slogLogger)
 	bootstrapper := bootstrap.NewBootstrapper(eventLogger)
-	kernel := cmd.NewKernel()
+	kernel := core.NewKernel()
+	runner := bootstrap.NewRunner(eventLogger)
 	httpConfig := http.NewConfig(loader)
 	engine := http.NewGinEngine(slogLogger)
 	httpKernel := http.NewKernel(httpConfig, slogLogger, engine)
-	route := cmds.NewRoute()
-	routeList := cmds.NewRouteList(httpKernel)
-	runner := bootstrap.NewRunner(eventLogger)
-	serve := cmds.NewServe(runner, httpKernel)
-	module := cmd.NewModule(kernel, route, routeList, serve)
-	httpModule := http.NewModule()
+	serve := cmds.NewServe(kernel, runner, httpKernel)
+	route := cmds.NewRoute(kernel)
+	routeList := cmds.NewRouteList(kernel, httpKernel)
+	v := cmd.Commands(serve, route, routeList)
+	module := http.NewModule()
 	databaseConfig := database.NewConfig(loader)
 	db := database.NewDB(databaseConfig)
 	databaseModule := database.NewModule(db)
@@ -99,7 +100,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	generatorGenerator := generator.NewGenerator()
 	homePageRouter := http5.NewHomePageRouter(generatorGenerator, httpKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
-	v := internal.Modules(module, httpModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, observabilityModule, authModule, homepageModule)
-	containerContainer := container.NewContainer(bootstrapper, kernel, httpKernel, v, runner)
+	v2 := internal.Modules(module, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, observabilityModule, authModule, homepageModule)
+	containerContainer := container.NewContainer(bootstrapper, kernel, v, httpKernel, v2, runner)
 	return containerContainer, nil
 }

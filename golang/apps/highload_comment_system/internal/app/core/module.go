@@ -11,6 +11,7 @@ import (
 
 var Bindings = wire.NewSet(
 	NewModule,
+	NewKernel,
 	app.NewConfig,
 	bootstrap.NewEventLogger,
 	bootstrap.NewBootstrapper,
@@ -20,9 +21,14 @@ var Bindings = wire.NewSet(
 		new(contracts.EnvLoader),
 		new(*app.Loader),
 	),
+	wire.Bind(
+		new(contracts.CmdRegistrar),
+		new(*Kernel),
+	),
 )
 
-type Module struct{}
+type Module struct {
+}
 
 func NewModule() *Module {
 	return &Module{}
