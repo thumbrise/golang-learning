@@ -18,7 +18,7 @@ func NewServe(runner *bootstrap.Runner, httpKernel *http.Kernel) *Serve {
 		Short: "Start http server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			processes := []*bootstrap.Process{
-				&bootstrap.Process{
+				{
 					Name: "http kernel",
 					Start: func(ctx context.Context) error {
 						return httpKernel.Start(ctx)

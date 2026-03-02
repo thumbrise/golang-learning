@@ -26,13 +26,15 @@ func NewRunner(
 	}
 }
 
-type StartFunc func(ctx context.Context) error
-type ShutdownFunc func(ctx context.Context) error
-type Process struct {
-	Name     string
-	Start    StartFunc
-	Shutdown ShutdownFunc
-}
+type (
+	StartFunc    func(ctx context.Context) error
+	ShutdownFunc func(ctx context.Context) error
+	Process      struct {
+		Name     string
+		Start    StartFunc
+		Shutdown ShutdownFunc
+	}
+)
 
 func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
@@ -49,6 +51,7 @@ func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 		h.logger.Info("received signal to exit")
 
 		h.shutdownProcesses(ctx, processes)
+
 		return nil
 	})
 
@@ -58,6 +61,7 @@ func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 
 	return nil
 }
+
 func (h *Runner) startProcesses(ctx context.Context, processes []*Process, grp *errgroup.Group) {
 	for _, pp := range processes {
 		p := pp
@@ -74,6 +78,7 @@ func (h *Runner) startProcesses(ctx context.Context, processes []*Process, grp *
 		})
 	}
 }
+
 func (h *Runner) shutdownProcesses(ctx context.Context, processes []*Process) {
 	for _, pp := range processes {
 		p := pp

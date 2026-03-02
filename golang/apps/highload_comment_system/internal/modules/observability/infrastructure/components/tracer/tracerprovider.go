@@ -20,6 +20,7 @@ var ErrTraceExporter = errors.New("failed to create trace exporter")
 func NewSDKTracerProvider() *sdktrace.TracerProvider {
 	return &sdktrace.TracerProvider{}
 }
+
 func ConfigureTracerProvider(ctx context.Context, cfgTrace Config, cfgApp app.Config) error {
 	exp, err := otlptracehttp.New(ctx,
 		otlptracehttp.WithEndpoint(cfgTrace.OTLPURL),
