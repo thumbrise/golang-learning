@@ -56,7 +56,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	httpKernel := http.NewKernel(httpConfig, slogLogger, engine)
 	serve := cmds.NewServe(kernel, runner, httpKernel)
 	route := cmds.NewRoute(kernel)
-	routeList := cmds.NewRouteList(kernel, httpKernel)
+	routeList := cmds.NewRouteList(route, httpKernel)
 	v := cmd.Commands(serve, route, routeList)
 	module := http.NewModule()
 	databaseConfig := database.NewConfig(loader)

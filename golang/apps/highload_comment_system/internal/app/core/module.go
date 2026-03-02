@@ -22,7 +22,7 @@ var Bindings = wire.NewSet(
 		new(*app.Loader),
 	),
 	wire.Bind(
-		new(contracts.CmdRegistrar),
+		new(contracts.CMDAdder),
 		new(*Kernel),
 	),
 )

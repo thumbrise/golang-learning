@@ -11,12 +11,12 @@ type Route struct {
 	*cobra.Command
 }
 
-func NewRoute(r contracts.CmdRegistrar) *Route {
+func NewRoute(r contracts.CMDAdder) *Route {
 	c := &cobra.Command{
 		Use:   "route",
 		Short: "Route commands",
 	}
-	r.Register(c)
+	r.Add(c)
 
 	return &Route{c}
 }
@@ -25,7 +25,7 @@ type RouteList struct {
 	*cobra.Command
 }
 
-func NewRouteList(r contracts.CmdRegistrar, httpKernel *http.Kernel) *RouteList {
+func NewRouteList(r *Route, httpKernel *http.Kernel) *RouteList {
 	c := &cobra.Command{
 		Use:   "list",
 		Short: "List all app routes",
@@ -44,7 +44,7 @@ func NewRouteList(r contracts.CmdRegistrar, httpKernel *http.Kernel) *RouteList 
 			return nil
 		},
 	}
-	r.Register(c)
+	r.AddCommand(c)
 
 	return &RouteList{c}
 }

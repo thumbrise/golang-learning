@@ -13,7 +13,7 @@ type Serve struct {
 	*cobra.Command
 }
 
-func NewServe(r contracts.CmdRegistrar, runner *bootstrap.Runner, httpKernel *http.Kernel) *Serve {
+func NewServe(r contracts.CMDAdder, runner *bootstrap.Runner, httpKernel *http.Kernel) *Serve {
 	c := &cobra.Command{
 		Use:   "serve",
 		Short: "Start http server",
@@ -36,7 +36,7 @@ func NewServe(r contracts.CmdRegistrar, runner *bootstrap.Runner, httpKernel *ht
 			)
 		},
 	}
-	r.Register(c)
+	r.Add(c)
 
 	return &Serve{c}
 }

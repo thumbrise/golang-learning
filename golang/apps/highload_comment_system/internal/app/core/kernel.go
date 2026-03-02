@@ -29,12 +29,12 @@ func (k *Kernel) Execute(ctx context.Context, buf *bytes.Buffer) error {
 	return k.command.ExecuteContext(ctx)
 }
 
-func (k *Kernel) Register(cmd *cobra.Command) {
+func (k *Kernel) Add(cmd *cobra.Command) {
 	k.command.AddCommand(cmd)
 }
 
 // AddGroup adds commands, likely first command is parent of the rest commands
-func (k *Kernel) RegisterGroup(cmds ...*cobra.Command) {
+func (k *Kernel) AddGroup(cmds ...*cobra.Command) {
 	var groupHead *cobra.Command
 	for _, cmd := range cmds {
 		if groupHead == nil {
