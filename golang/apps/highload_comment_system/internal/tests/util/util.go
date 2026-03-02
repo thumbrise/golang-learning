@@ -14,7 +14,7 @@ import (
 
 	"github.com/steinfletcher/apitest"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
-	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/modules"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container/wire"
 	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
 )
 
@@ -43,12 +43,12 @@ var handler http.Handler
 
 func Handler(ctx context.Context) http.Handler {
 	if handler == nil {
-		c, err := modules.InitializeContainer(ctx)
+		c, err := wire.InitializeContainer(ctx)
 		if err != nil {
 			panic(err)
 		}
 
-		err = c.Boot(ctx)
+		err = c.Bootstrapper.Bootstrap(ctx, c.Modules)
 		if err != nil {
 			panic(err)
 		}

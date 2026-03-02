@@ -44,5 +44,6 @@ func (b *Bootstrapper) Shutdown(ctx context.Context, modules []contracts.Module)
 		err := m.Shutdown(ctx)
 		b.logger.Log("Module", m.Name(), "shutdown", err)
 	}
+
 	return nil
 }

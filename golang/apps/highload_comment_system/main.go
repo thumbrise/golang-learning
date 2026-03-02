@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"log/slog"
 
@@ -16,6 +15,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error initialize container: %s", err.Error())
 	}
+
 	err = c.Bootstrapper.Bootstrap(ctx, c.Modules)
 	if err != nil {
 		log.Fatalf("Error bootstrap modules: %s", err.Error())
@@ -23,7 +23,7 @@ func main() {
 
 	err = c.CmdKernel.Execute(ctx)
 	if err != nil {
-		msg := fmt.Sprintf("main CmdKernel.Execute %s", err.Error())
+		msg := "main CmdKernel.Execute " + err.Error()
 		slog.Error(msg)
 	}
 
