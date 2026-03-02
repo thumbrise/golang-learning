@@ -12,17 +12,14 @@ import (
 )
 
 type Runner struct {
-	logger  *slog.Logger
-	modules []contracts.Module
+	logger *slog.Logger
 }
 
 func NewRunner(
 	logger *slog.Logger,
-	modules []contracts.Module,
 ) *Runner {
 	return &Runner{
-		logger:  logger,
-		modules: modules,
+		logger: logger,
 	}
 }
 
@@ -36,11 +33,11 @@ type (
 	}
 )
 
-func (h *Runner) Run(ctx context.Context, processes []*Process) error {
+func (h *Runner) Run(ctx context.Context, processes []*Process, modules []contracts.Module) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 	defer cancel()
 
-	h.bootstrapModules(ctx)
+	h.bootstrapModules(ctx, modules)
 
 	grp, ctx := errgroup.WithContext(ctx)
 	h.startProcesses(ctx, processes, grp)
@@ -57,7 +54,7 @@ func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 
 	h.logEvent("Process", "ErrorGroup", "Wait", grp.Wait())
 
-	h.shutdownModules(ctx)
+	h.shutdownModules(ctx, modules)
 
 	return nil
 }
@@ -88,20 +85,20 @@ func (h *Runner) shutdownProcesses(ctx context.Context, processes []*Process) {
 	}
 }
 
-func (h *Runner) bootstrapModules(ctx context.Context) {
-	for _, mm := range h.modules {
+func (h *Runner) bootstrapModules(ctx context.Context, modules []contracts.Module) {
+	for _, mm := range modules {
 		m := mm
 		h.logEvent("Module", m.Name(), "got", nil)
 	}
 
-	for _, mm := range h.modules {
+	for _, mm := range modules {
 		m := mm
 
 		err := m.BeforeStart(ctx)
 		h.logEvent("Module", m.Name(), "before start", err)
 	}
 
-	for _, mm := range h.modules {
+	for _, mm := range modules {
 		m := mm
 
 		err := m.OnStart(ctx)
@@ -109,8 +106,8 @@ func (h *Runner) bootstrapModules(ctx context.Context) {
 	}
 }
 
-func (h *Runner) shutdownModules(ctx context.Context) {
-	for _, mm := range h.modules {
+func (h *Runner) shutdownModules(ctx context.Context, modules []contracts.Module) {
+	for _, mm := range modules {
 		m := mm
 
 		err := m.Shutdown(ctx)
