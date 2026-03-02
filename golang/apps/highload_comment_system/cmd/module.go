@@ -8,7 +8,7 @@ import (
 )
 
 var Bindings = wire.NewSet(
-	NewWireModule,
+	NewModule,
 	NewKernel,
 	cmds.NewServe,
 	cmds.NewRoute,
@@ -22,7 +22,7 @@ type Module struct {
 	serve     *cmds.Serve
 }
 
-func NewWireModule(kernel *Kernel, route *cmds.Route, routeList *cmds.RouteList, serve *cmds.Serve) *Module {
+func NewModule(kernel *Kernel, route *cmds.Route, routeList *cmds.RouteList, serve *cmds.Serve) *Module {
 	return &Module{kernel: kernel, route: route, routeList: routeList, serve: serve}
 }
 func (m *Module) Name() string {

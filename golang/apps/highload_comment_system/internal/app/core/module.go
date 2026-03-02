@@ -1,32 +1,37 @@
-package errorsmap
+package core
 
 import (
 	"context"
 
 	"github.com/google/wire"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/app"
+	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
+	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 )
 
 var Bindings = wire.NewSet(
 	NewModule,
-	http.NewErrorsMapRouter,
-	http.NewErrorsMapMiddleware,
+	app.NewConfig,
+	bootstrap.NewRunner,
+	app.NewLoader,
+	wire.Bind(
+		new(contracts.EnvLoader),
+		new(*app.Loader),
+	),
 )
 
 type Module struct {
-	router *http.ErrorsMapRouter
 }
 
-func NewModule(router *http.ErrorsMapRouter) *Module {
-	return &Module{router: router}
+func NewModule() *Module {
+	return &Module{}
 }
 
 func (m Module) Name() string {
-	return "errorsmap"
+	return "core"
 }
 
 func (m Module) BeforeStart(ctx context.Context) error {
-	m.router.Register()
 	return nil
 }
 
