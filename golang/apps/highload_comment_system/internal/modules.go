@@ -6,6 +6,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/app/core"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/comments"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
@@ -29,6 +30,7 @@ var Bindings = wire.NewSet(
 	swagger.Bindings,
 	observability.Bindings,
 	homepage.Bindings,
+	comments.Bindings,
 )
 
 func Modules(
@@ -41,6 +43,7 @@ func Modules(
 	observabilityModule *observability.Module,
 	authModule *auth.Module,
 	homepageModule *homepage.Module,
+	commentsModule *comments.Module,
 ) []contracts.Module {
 	return []contracts.Module{
 		httpModule,
@@ -52,5 +55,6 @@ func Modules(
 		observabilityModule,
 		authModule,
 		homepageModule,
+		commentsModule,
 	}
 }

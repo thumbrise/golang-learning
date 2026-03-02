@@ -23,6 +23,8 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/comments"
+	cmd2 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/cmd"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	http5 "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
@@ -100,7 +102,9 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	generatorGenerator := generator.NewGenerator()
 	homePageRouter := http5.NewHomePageRouter(generatorGenerator, httpKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
-	v2 := internal.Modules(module, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, observabilityModule, authModule, homepageModule)
+	cmdComments := cmd2.NewComments(kernel)
+	commentsModule := comments.NewModule(cmdComments)
+	v2 := internal.Modules(module, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, observabilityModule, authModule, homepageModule, commentsModule)
 	containerContainer := container.NewContainer(bootstrapper, kernel, v, httpKernel, v2, runner)
 	return containerContainer, nil
 }
