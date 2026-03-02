@@ -23,12 +23,14 @@ func NewServe(runner *bootstrap.Runner, httpKernel *http.Kernel, lc fx.Lifecycle
 					go func() {
 						_ = httpKernel.Start(ctx)
 					}()
+
 					return nil
 				},
 				OnStop: func(ctx context.Context) error {
 					return httpKernel.Shutdown(ctx)
 				},
 			})
+
 			return nil
 		},
 	}

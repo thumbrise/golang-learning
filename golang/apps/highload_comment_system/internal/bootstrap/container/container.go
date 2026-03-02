@@ -33,10 +33,12 @@ func NewContainer(
 
 	return c
 }
+
 func InitializeContainer(ctx context.Context) *Container {
 	wire.Build(
 		NewContainer,
 		internal.Bindings,
 	)
+
 	return &Container{}
 }

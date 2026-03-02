@@ -26,6 +26,7 @@ func NewKernel() *Kernel {
 
 func (k *Kernel) Execute(ctx context.Context) error {
 	buf := bytes.NewBuffer(make([]byte, 0))
+
 	k.command.SetOut(buf)
 	defer fmt.Print(buf.String())
 

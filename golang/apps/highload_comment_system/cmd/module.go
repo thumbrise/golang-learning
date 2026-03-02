@@ -25,6 +25,7 @@ type Module struct {
 func NewModule(kernel *Kernel, route *cmds.Route, routeList *cmds.RouteList, serve *cmds.Serve) *Module {
 	return &Module{kernel: kernel, route: route, routeList: routeList, serve: serve}
 }
+
 func (m *Module) Name() string {
 	return "cmd"
 }
@@ -36,11 +37,14 @@ func (m *Module) LongRun(ctx context.Context) error {
 func (m *Module) BeforeStart(context.Context) error {
 	m.kernel.AddGroup(m.route.Command, m.routeList.Command)
 	m.kernel.AddCommand(m.serve.Command)
+
 	return nil
 }
+
 func (m *Module) OnStart(ctx context.Context) error {
 	return nil
 }
+
 func (m *Module) Shutdown(ctx context.Context) error {
 	return nil
 }

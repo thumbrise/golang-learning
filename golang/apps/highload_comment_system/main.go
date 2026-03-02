@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	//fx.New(
+	// fx.New(
 	//	modules.Build()...,
-	//).Run()
+	// ).Run()
 	ctx := context.Background()
 	c := container.InitializeContainer(ctx)
 	fmt.Printf("c = %#v\n", c)

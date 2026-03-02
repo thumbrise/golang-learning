@@ -22,6 +22,7 @@ var (
 	ErrStartTracer      = errors.New("start tracer")
 	ErrShutdownTracer   = errors.New("shutdown tracer")
 )
+
 var Bindings = wire.NewSet(
 	NewModule,
 	profiler.NewConfig,

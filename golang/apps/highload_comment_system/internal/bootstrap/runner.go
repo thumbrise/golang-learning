@@ -47,6 +47,7 @@ func (h *Runner) Run(ctx context.Context, modules []contracts.Module) error {
 	}
 
 	grp, ctx := errgroup.WithContext(ctx)
+
 	for _, mm := range modules {
 		m := mm
 
@@ -68,12 +69,14 @@ func (h *Runner) Run(ctx context.Context, modules []contracts.Module) error {
 		h.logger.Info("received signal to exit")
 
 		grpShutdown, ctxShutdown := errgroup.WithContext(ctx)
+
 		for _, mm := range modules {
 			m := mm
 
 			grpShutdown.Go(func() error {
 				err := m.Shutdown(ctxShutdown)
 				h.logHook("Shutdown", m.Name(), err)
+
 				return err
 			})
 		}
