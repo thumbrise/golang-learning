@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"golang.org/x/sync/errgroup"
@@ -42,11 +41,28 @@ func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 	h.bootstrapModules(ctx)
 
 	grp, ctx := errgroup.WithContext(ctx)
+	h.startProcesses(ctx, processes, grp)
 
+	grp.Go(func() error {
+		h.logger.Info("waiting for signal")
+		<-ctx.Done()
+		h.logger.Info("received signal to exit")
+
+		h.shutdownProcesses(ctx, processes)
+		return nil
+	})
+
+	h.logEvent("Process", "ErrorGroup", "Wait", grp.Wait())
+
+	h.shutdownModules(ctx)
+
+	return nil
+}
+func (h *Runner) startProcesses(ctx context.Context, processes []*Process, grp *errgroup.Group) {
 	for _, pp := range processes {
 		p := pp
 
-		h.logEvent("Process", p.Name, "long run", nil)
+		h.logEvent("Process", p.Name, "start", nil)
 
 		grp.Go(func() error {
 			err := p.Start(ctx)
@@ -57,26 +73,14 @@ func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 			return err
 		})
 	}
+}
+func (h *Runner) shutdownProcesses(ctx context.Context, processes []*Process) {
+	for _, pp := range processes {
+		p := pp
 
-	grp.Go(func() error {
-		h.logger.Info("waiting for signal")
-		<-ctx.Done()
-		h.logger.Info("received signal to exit")
-		for _, pp := range processes {
-			p := pp
-
-			h.logEvent("Process", p.Name, "shutdown", nil)
-		}
-
-		ctxShutdown, cancel := context.WithTimeout(ctx, 5*time.Second)
-		defer cancel()
-
-		h.shutdownModules(ctxShutdown)
-
-		return nil
-	})
-
-	return grp.Wait()
+		err := p.Shutdown(ctx)
+		h.logEvent("Process", p.Name, "shutdown", err)
+	}
 }
 
 func (h *Runner) bootstrapModules(ctx context.Context) {
