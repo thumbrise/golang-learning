@@ -30,10 +30,6 @@ func (m *Module) Name() string {
 	return "cmd"
 }
 
-func (m *Module) LongRun(ctx context.Context) error {
-	return m.kernel.Execute(ctx)
-}
-
 func (m *Module) BeforeStart(context.Context) error {
 	m.kernel.AddGroup(m.route.Command, m.routeList.Command)
 	m.kernel.AddCommand(m.serve.Command)

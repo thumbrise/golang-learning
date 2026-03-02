@@ -33,7 +33,3 @@ func (m *Module) OnStart(ctx context.Context) error {
 func (m *Module) Shutdown(ctx context.Context) error {
 	return nil
 }
-
-func (m *Module) LongRun(ctx context.Context) error {
-	return nil
-}

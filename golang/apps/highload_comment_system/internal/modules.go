@@ -22,14 +22,12 @@ var Bindings = wire.NewSet(
 	cmd.Bindings,
 	http.Bindings,
 	auth.Bindings,
-	homepage.Bindings,
 	database.Bindings,
 	mail.Bindings,
 	redis.Bindings,
 	errorsmap.Bindings,
 	swagger.Bindings,
 	observability.Bindings,
-	auth.Bindings,
 	homepage.Bindings,
 )
 
