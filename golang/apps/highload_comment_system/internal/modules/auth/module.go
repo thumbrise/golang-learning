@@ -31,7 +31,7 @@ var Bindings = wire.NewSet(
 	otp.NewConfig,
 	otpdal.NewOTPRedisRepository,
 	otpdal.NewOTPPostgresqlRepository,
-	otp.NewGenerator,
+
 	otp.NewGenerator,
 	wire.Bind(
 		new(contracts.OtpGenerator),

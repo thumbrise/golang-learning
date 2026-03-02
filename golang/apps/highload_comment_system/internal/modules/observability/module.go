@@ -33,9 +33,6 @@ var Bindings = wire.NewSet(
 	observabilitytracer.NewConfig,
 	observabilitytracer.NewTracer,
 	sdktrace.NewTracerProvider,
-	func() *sdktrace.TracerProvider {
-		return &sdktrace.TracerProvider{}
-	},
 	wire.Bind(new(oteltracer.TracerProvider), new(*sdktrace.TracerProvider)),
 
 	routers.NewHealthRouter,
