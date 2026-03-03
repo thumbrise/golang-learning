@@ -5,8 +5,10 @@ go 1.25.3
 require (
 	github.com/gin-contrib/pprof v1.5.3
 	github.com/gin-gonic/gin v1.11.0
+	github.com/go-faker/faker/v4 v4.7.0
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.7.0
 	github.com/grafana/pyroscope-go v1.2.7
 	github.com/ilyakaznacheev/cleanenv v1.5.0
@@ -28,6 +30,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.40.0
 	go.opentelemetry.io/otel/trace v1.40.0
 	golang.org/x/sync v0.19.0
+	golang.org/x/time v0.14.0
 )
 
 require (
@@ -80,7 +83,6 @@ require (
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/google/subcommands v1.2.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.9 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.8 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
