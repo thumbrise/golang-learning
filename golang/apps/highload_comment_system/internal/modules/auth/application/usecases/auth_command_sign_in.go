@@ -26,7 +26,8 @@ type AuthCommandSignIn struct {
 	otpPostgresqlRepository *otpdal.OTPPostresqlRepository
 }
 
-func NewAuthCommandSignIn(logger *slog.Logger,
+func NewAuthCommandSignIn(
+	logger *slog.Logger,
 	otpMailer *mailers.OTPMailer,
 	config otp.Config,
 	otpGenerator contracts.OtpGenerator,
