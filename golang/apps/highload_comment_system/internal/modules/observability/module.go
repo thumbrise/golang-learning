@@ -31,6 +31,7 @@ var Bindings = wire.NewSet(
 	profiler.NewProfiler,
 
 	logger.NewLogger,
+	logger.NewCommonAttributesProvider,
 
 	metrics.NewRegistry,
 
