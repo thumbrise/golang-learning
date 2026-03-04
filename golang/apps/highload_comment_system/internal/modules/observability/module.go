@@ -32,7 +32,8 @@ var Bindings = wire.NewSet(
 
 	observabilitytracer.NewConfig,
 	observabilitytracer.NewTracer,
-	sdktrace.NewTracerProvider,
+	observabilitytracer.NewSDKTracerProvider,
+	observabilitytracer.NewErrorHandler,
 	wire.Bind(new(oteltracer.TracerProvider), new(*sdktrace.TracerProvider)),
 
 	routers.NewHealthRouter,
@@ -50,10 +51,11 @@ type Module struct {
 	tracerConfig        observabilitytracer.Config
 	appConfig           app.Config
 	traceProvider       *sdktrace.TracerProvider
+	tracerErrorHandler  *observabilitytracer.ErrorHandler
 }
 
-func NewModule(healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, profiler *profiler.Profiler) *Module {
-	return &Module{healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, profiler: profiler}
+func NewModule(appConfig app.Config, healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, profiler *profiler.Profiler, traceProvider *sdktrace.TracerProvider, tracerConfig observabilitytracer.Config, tracerErrorHandler *observabilitytracer.ErrorHandler) *Module {
+	return &Module{appConfig: appConfig, healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, profiler: profiler, traceProvider: traceProvider, tracerConfig: tracerConfig, tracerErrorHandler: tracerErrorHandler}
 }
 
 func (m *Module) Name() string {
@@ -79,7 +81,7 @@ func (m *Module) BeforeStart(ctx context.Context) error {
 }
 
 func (m *Module) OnStart(ctx context.Context) error {
-	return observabilitytracer.ConfigureTracerProvider(ctx, m.tracerConfig, m.appConfig)
+	return observabilitytracer.ConfigureTracerProvider(ctx, m.tracerConfig, m.appConfig, m.tracerErrorHandler)
 }
 
 func (m *Module) Shutdown(ctx context.Context) error {
