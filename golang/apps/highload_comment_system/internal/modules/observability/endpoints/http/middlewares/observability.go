@@ -1,3 +1,5 @@
+// Package middlewares
+// TODO: Отрефакторить этот отвратительный кошмар
 package middlewares
 
 import (
@@ -12,7 +14,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -22,10 +23,11 @@ type ObservabilityMiddleware struct {
 	cfgApp          app.Config
 	pyroscopeClient *profiler.Profiler
 	logger          *slog.Logger
+	tracer          trace.Tracer
 }
 
-func NewObservabilityMiddleware(cfgApp app.Config, pyroscopeClient *profiler.Profiler, logger *slog.Logger) *ObservabilityMiddleware {
-	return &ObservabilityMiddleware{cfgApp: cfgApp, pyroscopeClient: pyroscopeClient, logger: logger}
+func NewObservabilityMiddleware(cfgApp app.Config, logger *slog.Logger, pyroscopeClient *profiler.Profiler, tracer trace.Tracer) *ObservabilityMiddleware {
+	return &ObservabilityMiddleware{cfgApp: cfgApp, logger: logger, pyroscopeClient: pyroscopeClient, tracer: tracer}
 }
 
 // Метрики Prometheus
@@ -55,7 +57,7 @@ var (
 )
 
 func (m *ObservabilityMiddleware) Handler() gin.HandlerFunc {
-	tracer := otel.Tracer("gin-http-server")
+	tracer := m.tracer
 
 	return func(c *gin.Context) {
 		start := time.Now()

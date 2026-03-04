@@ -11,6 +11,7 @@ var Bindings = wire.NewSet(
 	NewGinEngine,
 	NewKernel,
 	NewConfig,
+	NewSlogginConfig,
 )
 
 type Module struct{}

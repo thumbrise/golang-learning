@@ -7,9 +7,10 @@ import (
 	sloggin "github.com/samber/slog-gin"
 )
 
-func NewGinEngine(logger *slog.Logger) *gin.Engine {
+func NewGinEngine(logger *slog.Logger, slogginConfig sloggin.Config) *gin.Engine {
 	engine := gin.New()
-	engine.Use(sloggin.New(logger))
+
+	engine.Use(sloggin.NewWithConfig(logger, slogginConfig))
 	engine.Use(gin.Recovery())
 
 	return engine

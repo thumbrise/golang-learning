@@ -33,6 +33,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/metrics"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
@@ -56,7 +57,8 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	kernel := core.NewKernel()
 	runner := bootstrap.NewRunner(eventLogger)
 	httpConfig := http.NewConfig(loader)
-	engine := http.NewGinEngine(slogLogger)
+	slogginConfig := http.NewSlogginConfig()
+	engine := http.NewGinEngine(slogLogger, slogginConfig)
 	httpKernel := http.NewKernel(httpConfig, slogLogger, engine)
 	serve := cmds.NewServe(kernel, runner, httpKernel)
 	route := cmds.NewRoute(kernel)
@@ -81,8 +83,10 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	healthRouter := routers.NewHealthRouter(httpKernel)
 	profilerConfig := profiler.NewConfig(loader)
 	profilerProfiler := profiler.NewProfiler(config, profilerConfig, slogLogger)
-	observabilityMiddleware := middlewares.NewObservabilityMiddleware(config, profilerProfiler, slogLogger)
-	observabilityRouter := routers.NewObservabilityRouter(httpKernel, observabilityMiddleware)
+	traceTracer := tracer.NewTracer(config)
+	observabilityMiddleware := middlewares.NewObservabilityMiddleware(config, slogLogger, profilerProfiler, traceTracer)
+	registry := metrics.NewRegistry()
+	observabilityRouter := routers.NewObservabilityRouter(httpKernel, observabilityMiddleware, registry)
 	pprofRouter := routers.NewPprofRouter(httpKernel)
 	tracerProvider := tracer.NewSDKTracerProvider()
 	tracerConfig := tracer.NewConfig(loader)

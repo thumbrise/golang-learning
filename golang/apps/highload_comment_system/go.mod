@@ -24,7 +24,6 @@ require (
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
 	github.com/wneessen/go-mail v0.7.2
-	github.com/zsais/go-gin-prometheus v1.0.2
 	go.opentelemetry.io/otel v1.40.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.40.0
 	go.opentelemetry.io/otel/sdk v1.40.0
@@ -122,7 +121,6 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
-	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
