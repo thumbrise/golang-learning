@@ -10,6 +10,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/metrics"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
 	observabilitytracer "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -25,10 +26,13 @@ var (
 
 var Bindings = wire.NewSet(
 	NewModule,
+
 	profiler.NewConfig,
 	profiler.NewProfiler,
 
 	logger.NewLogger,
+
+	metrics.NewRegistry,
 
 	observabilitytracer.NewConfig,
 	observabilitytracer.NewTracer,
@@ -50,12 +54,13 @@ type Module struct {
 	observabilityRouter *routers.ObservabilityRouter
 	tracerConfig        observabilitytracer.Config
 	appConfig           app.Config
-	traceProvider       *sdktrace.TracerProvider
+	sdkTraceProvider    *sdktrace.TracerProvider
+	otelTracer          oteltracer.Tracer
 	tracerErrorHandler  *observabilitytracer.ErrorHandler
 }
 
 func NewModule(appConfig app.Config, healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, profiler *profiler.Profiler, traceProvider *sdktrace.TracerProvider, tracerConfig observabilitytracer.Config, tracerErrorHandler *observabilitytracer.ErrorHandler) *Module {
-	return &Module{appConfig: appConfig, healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, profiler: profiler, traceProvider: traceProvider, tracerConfig: tracerConfig, tracerErrorHandler: tracerErrorHandler}
+	return &Module{appConfig: appConfig, healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, profiler: profiler, sdkTraceProvider: traceProvider, tracerConfig: tracerConfig, tracerErrorHandler: tracerErrorHandler}
 }
 
 func (m *Module) Name() string {
@@ -67,11 +72,6 @@ func (m *Module) BeforeStart(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrStartProfiler, err)
 	}
-	// TODO: инкапсулировать все компоненты обсервабилити
-	// err := b.traceProvider.Start()
-	// if err != nil {
-	//	return fmt.Errorf("%w: %w", ErrStartTracer, err)
-	//}
 
 	m.healthRouter.Register()
 	m.pprofRouter.Register()
@@ -90,7 +90,7 @@ func (m *Module) Shutdown(ctx context.Context) error {
 		return fmt.Errorf("%w: %w", ErrShutdownProfiler, err)
 	}
 
-	err = observabilitytracer.Shutdown(ctx, m.traceProvider)
+	err = observabilitytracer.Shutdown(ctx, m.sdkTraceProvider)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrShutdownTracer, err)
 	}
