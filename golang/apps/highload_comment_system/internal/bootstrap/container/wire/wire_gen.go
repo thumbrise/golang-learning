@@ -34,6 +34,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
@@ -83,7 +84,10 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	observabilityMiddleware := middlewares.NewObservabilityMiddleware(config, profilerProfiler, slogLogger)
 	observabilityRouter := routers.NewObservabilityRouter(httpKernel, observabilityMiddleware)
 	pprofRouter := routers.NewPprofRouter(httpKernel)
-	observabilityModule := observability.NewModule(healthRouter, observabilityRouter, pprofRouter, profilerProfiler)
+	tracerProvider := tracer.NewSDKTracerProvider()
+	tracerConfig := tracer.NewConfig(loader)
+	errorHandler := tracer.NewErrorHandler(slogLogger)
+	observabilityModule := observability.NewModule(config, healthRouter, observabilityRouter, pprofRouter, profilerProfiler, tracerProvider, tracerConfig, errorHandler)
 	mailConfig := mail.NewConfig(loader)
 	otpMailer := mailers.NewOTPMail(mailConfig)
 	otpConfig := otp.NewConfig(loader)
