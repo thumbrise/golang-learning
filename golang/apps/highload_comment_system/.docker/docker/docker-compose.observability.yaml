@@ -49,21 +49,21 @@ services:
 #      timeout: 5s
 #      retries: 3
 
-#  jaeger:
-#    image: jaegertracing/all-in-one
+  jaeger:
+    image: jaegertracing/all-in-one
 #    environment:
 #      - COLLECTOR_OTLP_ENABLED=true
-#    ports:
-#      - "16686:16686"  # UI
-#      - "4317:4317"    # OTLP gRPC
-#      - "4318:4318"    # OTLP HTTP
-#    command:
-#      - "--collector.otlp.enabled=true"
+    ports:
+      - "127.0.0.1:${DOCKER_PORT_JAEGER_UI:?}:16686"  # UI
+#      - ":4317"    # OTLP gRPC
+#      - ":4318"    # OTLP HTTP
+    command:
+      - "--collector.otlp.enabled=true"
 
   pyroscope:
     image: grafana/pyroscope:latest
     ports:
-      - "4040:4040"
+      - "127.0.0.1:${DOCKER_PORT_PYROSCOPE:?}:4040"
 
 volumes:
   grafana_data:
