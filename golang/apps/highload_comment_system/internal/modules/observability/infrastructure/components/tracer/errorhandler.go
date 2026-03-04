@@ -1,9 +1,20 @@
 package tracer
 
-import "fmt"
+import (
+	"log/slog"
+)
 
-type ErrorHandler struct{}
+type ErrorHandler struct {
+	logger *slog.Logger
+}
 
-func (l ErrorHandler) Handle(err error) {
-	fmt.Printf("OpenTelemetry error: %v\n", err)
+func NewErrorHandler(logger *slog.Logger) *ErrorHandler {
+	return &ErrorHandler{logger: logger}
+}
+
+func (l *ErrorHandler) Handle(err error) {
+	l.logger.Error(
+		"openTelemetry error",
+		slog.String("err", err.Error()),
+	)
 }

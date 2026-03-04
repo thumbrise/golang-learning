@@ -18,10 +18,10 @@ import (
 var ErrTraceExporter = errors.New("failed to create trace exporter")
 
 func NewSDKTracerProvider() *sdktrace.TracerProvider {
-	return &sdktrace.TracerProvider{}
+	return sdktrace.NewTracerProvider()
 }
 
-func ConfigureTracerProvider(ctx context.Context, cfgTrace Config, cfgApp app.Config) error {
+func ConfigureTracerProvider(ctx context.Context, cfgTrace Config, cfgApp app.Config, errhandler *ErrorHandler) error {
 	exp, err := otlptracehttp.New(ctx,
 		otlptracehttp.WithEndpoint(cfgTrace.OTLPURL),
 		otlptracehttp.WithInsecure(),
@@ -70,7 +70,7 @@ func ConfigureTracerProvider(ctx context.Context, cfgTrace Config, cfgApp app.Co
 		),
 	)
 	otel.SetTracerProvider(tp)
-	otel.SetErrorHandler(ErrorHandler{})
+	otel.SetErrorHandler(errhandler)
 
 	return nil
 }
