@@ -2,6 +2,7 @@ name: "golang-demo"
 
 include:
   - ./.docker/docker/docker-compose.observability.yaml
+  - ./.docker/docker/docker-compose.load.yaml
 
 services:
   app:
@@ -103,8 +104,6 @@ services:
       MP_DATABASE: /data/mailpit.db
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
-
-
 
 volumes:
   app_gopath:

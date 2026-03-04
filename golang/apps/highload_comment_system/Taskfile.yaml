@@ -75,16 +75,9 @@ tasks:
       - go test ./internal/tests/e2e_test/... -tags=test
 
   load:
-    desc: Load test (VREMENNO)
+    desc: Нагрузить систему
     interactive: true
-    cmd: docker run --rm -it --network=task_manager_default
-      -v ./:/app
-      -e K6_WEB_DASHBOARD=true
-      -e K6_WEB_DASHBOARD_HOST=0.0.0.0
-      -e K6_WEB_DASHBOARD_PERIOD=5s
-      -e K6_WEB_DASHBOARD_EXPORT=/app/tmp/k6/k6_export.html
-      -p 5665:5665
-      grafana/k6 run /app/db/loads/test.ts
+    cmd: task c -- --profile load up k6
 
   redis:
     desc: redis cli

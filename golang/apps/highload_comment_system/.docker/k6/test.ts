@@ -1,0 +1,41 @@
+import http from 'k6/http';
+import {Options} from 'k6/options';
+import exec from 'k6/execution';
+
+export const options: Options = {
+    // vus: 10,
+    // duration: '10s',
+    summaryTrendStats: ['avg', 'med', 'p(90)', 'p(95)', 'p(99)'],
+    scenarios: {
+        'base': {
+            executor: "constant-arrival-rate",
+            rate: 3000,
+            duration: '10s',
+            preAllocatedVUs: 10,
+        }
+    }
+
+}
+
+interface Payload {
+    email: string
+}
+
+function payload() {
+    let id = exec.vu.iterationInInstance
+    return {
+        email: `murat${id}@k6.io`
+    }
+}
+
+export default function () {
+    let body = JSON.stringify(payload());
+
+    let headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    }
+    http.post(`http://app:8080/api/auth/sign-in`, body, {
+        headers: headers
+    })
+}

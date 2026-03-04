@@ -5,7 +5,6 @@ import (
 )
 
 type Config struct {
-	OTLPURL      string `env:"OBSERVABILITY_OTLP_URL"      env-required:"true"`
 	PyroscopeURL string `env:"OBSERVABILITY_PYROSCOPE_URL" env-required:"true"`
 }
 
