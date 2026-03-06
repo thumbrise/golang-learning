@@ -1,4 +1,4 @@
-package infrastructure
+package components
 
 import "github.com/thumbrise/demo/golang-demo/internal/contracts"
 

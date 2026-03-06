@@ -1,6 +1,3 @@
-//
-// TODO: Перенести в плагины. Должны быть разделены понятия Sharedmodules и Pluginmodules. Одни предоставляют переносимый функционал. А другие переиспользуемый в рамках разных бизнес модулей
-
 package observability
 
 import (
@@ -9,12 +6,11 @@ import (
 	"fmt"
 
 	"github.com/google/wire"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/meter"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/logger"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/meter"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/tracer"
 )
 
 var (
@@ -22,7 +18,7 @@ var (
 	Bindings              = wire.NewSet(
 		NewModule,
 
-		infrastructure.NewOTLPConfig,
+		components.NewOTLPConfig,
 
 		components.NewResource,
 		components.NewRegistrar,

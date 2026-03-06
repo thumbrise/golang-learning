@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	mail2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/mail"
+	mail2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/mail"
 	"github.com/wneessen/go-mail"
 )
 

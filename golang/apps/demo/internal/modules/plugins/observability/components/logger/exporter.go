@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 )
 
-func NewExporter(ctx context.Context, cfg infrastructure.OTLPConfig) (*otlploggrpc.Exporter, error) {
+func NewExporter(ctx context.Context, cfg components.OTLPConfig) (*otlploggrpc.Exporter, error) {
 	return otlploggrpc.New(
 		ctx,
 		otlploggrpc.WithEndpoint(cfg.URL),

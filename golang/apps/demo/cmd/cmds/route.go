@@ -4,7 +4,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
 )
 
 type Route struct {

@@ -9,7 +9,7 @@ import (
 	dal2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/database"
 	domainerrors "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/domain/errors"
 )
 

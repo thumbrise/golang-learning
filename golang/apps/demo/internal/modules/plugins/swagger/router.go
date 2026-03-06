@@ -1,4 +1,4 @@
-package http
+package swagger
 
 //	@title						Demo API
 //	@version					1.0
@@ -22,7 +22,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "github.com/thumbrise/demo/golang-demo/apidocs"
-	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
+	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
 )
 
 type SwaggerRouter struct {

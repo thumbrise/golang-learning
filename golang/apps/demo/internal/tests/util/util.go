@@ -15,7 +15,7 @@ import (
 	"github.com/steinfletcher/apitest"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container/wire"
-	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
+	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
 )
 
 var cfg *http2.Config

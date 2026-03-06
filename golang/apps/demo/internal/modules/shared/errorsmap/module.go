@@ -4,21 +4,22 @@ import (
 	"context"
 
 	"github.com/google/wire"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
 )
 
 var Bindings = wire.NewSet(
 	NewModule,
-	http.NewErrorsMapRouter,
 	http.NewErrorsMapMiddleware,
 )
 
 type Module struct {
-	router *http.ErrorsMapRouter
+	mapErrorsMiddleware *http.ErrorsMapMiddleware
+	kernel              *components.Kernel
 }
 
-func NewModule(router *http.ErrorsMapRouter) *Module {
-	return &Module{router: router}
+func NewModule(kernel *components.Kernel, mapErrorsMiddleware *http.ErrorsMapMiddleware) *Module {
+	return &Module{kernel: kernel, mapErrorsMiddleware: mapErrorsMiddleware}
 }
 
 func (m *Module) Name() string {
@@ -26,7 +27,7 @@ func (m *Module) Name() string {
 }
 
 func (m *Module) BeforeStart(ctx context.Context) error {
-	m.router.Register()
+	m.kernel.Gin().Use(m.mapErrorsMiddleware.Handler())
 
 	return nil
 }

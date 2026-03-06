@@ -8,9 +8,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/tracer"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"

@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
 )
 
 type Produce struct {

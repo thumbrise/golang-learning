@@ -4,19 +4,18 @@ import (
 	"context"
 
 	"github.com/google/wire"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger/endpoints/http"
 )
 
 var Bindings = wire.NewSet(
 	NewModule,
-	http.NewSwaggerRouter,
+	NewSwaggerRouter,
 )
 
 type Module struct {
-	swaggerRouter *http.SwaggerRouter
+	swaggerRouter *SwaggerRouter
 }
 
-func NewModule(swaggerRouter *http.SwaggerRouter) *Module {
+func NewModule(swaggerRouter *SwaggerRouter) *Module {
 	return &Module{swaggerRouter: swaggerRouter}
 }
 
