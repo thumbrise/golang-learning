@@ -28,7 +28,7 @@ func (m *ErrorsMapMiddleware) Handler() gin.HandlerFunc {
 
 		err := c.Errors.Last().Err
 
-		m.logger.Info("error",
+		m.logger.InfoContext(c.Request.Context(), "error",
 			slog.String("method", c.Request.Method),
 			slog.String("path", c.Request.URL.Path),
 			slog.String("error", c.Errors.String()),

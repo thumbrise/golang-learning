@@ -175,7 +175,7 @@ func (m *ObservabilityMiddleware) Handler() gin.HandlerFunc {
 
 		// 13. Логируем медленные запросы
 		if duration > 1.0 { // Более 1 секунды
-			m.logger.Warn("Slow request",
+			m.logger.WarnContext(ctx, "Slow request",
 				"method", c.Request.Method,
 				"path", c.FullPath(),
 				"duration", duration,

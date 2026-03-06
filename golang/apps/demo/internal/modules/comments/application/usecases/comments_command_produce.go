@@ -55,12 +55,12 @@ func (c *CommentsCommandProduce) Handle(ctx context.Context, input CommentsComma
 				Values:     values,
 			}).Result()
 			if err != nil {
-				c.logger.Error("XAdd failed",
+				c.logger.ErrorContext(ctx, "XAdd failed",
 					slog.String("error", err.Error()),
 					slog.Any("values", values),
 				)
 			} else {
-				c.logger.Debug("XAdd succeeded",
+				c.logger.DebugContext(ctx, "XAdd succeeded",
 					slog.String("result", result),
 					slog.Any("values", values),
 				)

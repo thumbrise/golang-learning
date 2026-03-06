@@ -25,7 +25,7 @@ type AuthQueryMeOutput struct {
 }
 
 func (a *AuthQueryMe) Handle(ctx context.Context, input AuthQueryMeInput) (*AuthQueryMeOutput, error) {
-	a.logger.Info("AuthQueryMe",
+	a.logger.InfoContext(ctx, "AuthQueryMe",
 		slog.Any("input", input),
 	)
 

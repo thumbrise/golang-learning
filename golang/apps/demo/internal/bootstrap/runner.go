@@ -39,18 +39,18 @@ func (h *Runner) Run(ctx context.Context, processes []*Process) error {
 
 	grp.Go(func() error {
 		var err error = nil
-		h.logger.Log("Process", "Graceful Shutdown", "waiting for signal", err)
+		h.logger.Log(ctx, "Process", "Graceful Shutdown", "waiting for signal", err)
 		<-ctx.Done()
 
 		var err2 error = nil
-		h.logger.Log("Process", "Graceful Shutdown", "received signal to exit", err2)
+		h.logger.Log(ctx, "Process", "Graceful Shutdown", "received signal to exit", err2)
 
 		h.shutdownProcesses(ctx, processes)
 
 		return nil
 	})
 
-	h.logger.Log("Process", "ErrorGroup", "Wait", grp.Wait())
+	h.logger.Log(ctx, "Process", "ErrorGroup", "Wait", grp.Wait())
 
 	return nil
 }
@@ -60,12 +60,12 @@ func (h *Runner) startProcesses(ctx context.Context, processes []*Process, grp *
 		p := pp
 
 		var err error = nil
-		h.logger.Log("Process", p.Name, "start", err)
+		h.logger.Log(ctx, "Process", p.Name, "start", err)
 
 		grp.Go(func() error {
 			err := p.Start(ctx)
 			if err != nil {
-				h.logger.Log("Process", p.Name, "long run", err)
+				h.logger.Log(ctx, "Process", p.Name, "long run", err)
 			}
 
 			return err
@@ -81,6 +81,6 @@ func (h *Runner) shutdownProcesses(ctx context.Context, processes []*Process) {
 		}
 
 		err := p.Shutdown(ctx)
-		h.logger.Log("Process", p.Name, "shutdown", err)
+		h.logger.Log(ctx, "Process", p.Name, "shutdown", err)
 	}
 }

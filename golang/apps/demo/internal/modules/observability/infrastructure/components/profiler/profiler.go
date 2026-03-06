@@ -1,6 +1,7 @@
 package profiler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -30,7 +31,7 @@ func NewProfiler(
 
 var ErrPyroscopeStart = errors.New("failed to start pyroscope")
 
-func (p *Profiler) Start() error {
+func (p *Profiler) Start(ctx context.Context) error {
 	cfgPyroscope := pyroscopeConfig(p.cfgApp.Name, p.cfgObservability.PyroscopeURL, p.logger)
 
 	profiler, err := pyroscope.Start(cfgPyroscope)
@@ -40,16 +41,16 @@ func (p *Profiler) Start() error {
 
 	p.profiler = profiler
 
-	p.logger.Info("Pyroscope profiler started",
+	p.logger.InfoContext(ctx, "Pyroscope profiler started",
 		"url", p.cfgObservability.PyroscopeURL,
 	)
 
 	return nil
 }
 
-func (p *Profiler) Shutdown() error {
+func (p *Profiler) Shutdown(ctx context.Context) error {
 	if p.profiler != nil {
-		p.logger.Info("Shutting down pyroscope profiler")
+		p.logger.InfoContext(ctx, "Shutting down pyroscope profiler")
 
 		return p.profiler.Stop()
 	}
