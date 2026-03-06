@@ -27,6 +27,7 @@ require (
 	github.com/wneessen/go-mail v0.7.2
 	go.opentelemetry.io/contrib/bridges/otelslog v0.16.0
 	go.opentelemetry.io/otel v1.41.0
+	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.17.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.41.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.41.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.41.0

@@ -19,7 +19,6 @@ func NewResource(ctx context.Context, cfgApp app.Config) (*resource.Resource, er
 			semconv.ServiceVersion(cfgApp.Version),
 			semconv.DeploymentEnvironment(cfgApp.Environment),
 		),
-		resource.WithFromEnv(),
 		resource.WithTelemetrySDK(),
 		resource.WithHost(),
 		resource.WithContainer(),

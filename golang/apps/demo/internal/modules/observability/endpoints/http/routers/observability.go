@@ -27,6 +27,6 @@ func (h *ObservabilityRouter) Register() {
 //)
 //
 // opts := promhttp.HandlerOpts{}
-//handler := gin.WrapH(promhttp.HandlerFor(h.prometheusRegistry, opts))
+// handler := gin.WrapH(promhttp.HandlerFor(h.prometheusRegistry, opts))
 //h.kernel.Gin().GET("/metrics", handler)
 //}

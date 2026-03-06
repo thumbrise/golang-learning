@@ -8,6 +8,7 @@ import (
 	"github.com/google/wire"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/meter"
@@ -22,6 +23,8 @@ var (
 	Bindings              = wire.NewSet(
 		NewModule,
 
+		infrastructure.NewOTLPConfig,
+
 		components.NewResource,
 		components.NewRegistrar,
 		components.NewErrorHandler,
@@ -32,11 +35,11 @@ var (
 		logger.NewLogger,
 		logger.NewOTELSDKProvider,
 		logger.NewProvider,
+		logger.NewExporter,
 
 		meter.NewOTELSDKProvider,
 		meter.NewProvider,
 
-		observabilitytracer.NewConfig,
 		observabilitytracer.NewProvider,
 		observabilitytracer.NewOTELSampler,
 		observabilitytracer.NewOTELExporter,
