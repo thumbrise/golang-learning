@@ -3,14 +3,12 @@ import {Options} from 'k6/options';
 import exec from 'k6/execution';
 
 export const options: Options = {
-    // vus: 10,
-    // duration: '10s',
     summaryTrendStats: ['avg', 'med', 'p(90)', 'p(95)', 'p(99)'],
     scenarios: {
         'base': {
             executor: "constant-arrival-rate",
             rate: 3000,
-            duration: '10s',
+            duration: '30s',
             preAllocatedVUs: 10,
         }
     }

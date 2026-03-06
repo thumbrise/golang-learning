@@ -58,7 +58,7 @@ func (m *OTELMiddleware) Handler(_ context.Context) gin.HandlerFunc {
 			fmt.Sprintf("%s %s", c.Request.Method, c.FullPath()),
 			trace.WithAttributes(
 				semconv.HTTPMethod(c.Request.Method),
-				semconv.HTTPTarget(c.FullPath()),
+				semconv.HTTPTarget(c.Request.URL.String()),
 				semconv.UserAgentOriginal(c.Request.UserAgent()),
 				semconv.URLScheme(c.Request.URL.Scheme),
 				semconv.HTTPRequestBodySize(int(reqSize)),
