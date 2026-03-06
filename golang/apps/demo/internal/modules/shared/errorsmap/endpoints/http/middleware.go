@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	errors3 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/domain/errors"
+	domainerrors "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/domain/errors"
 )
 
 type ErrorsMapMiddleware struct {
@@ -28,7 +28,7 @@ func (m *ErrorsMapMiddleware) Handler() gin.HandlerFunc {
 
 		err := c.Errors.Last().Err
 
-		m.logger.InfoContext(c.Request.Context(), "error",
+		m.logger.ErrorContext(c.Request.Context(), "error",
 			slog.String("method", c.Request.Method),
 			slog.String("path", c.Request.URL.Path),
 			slog.String("error", c.Errors.String()),
@@ -41,35 +41,35 @@ func (m *ErrorsMapMiddleware) Handler() gin.HandlerFunc {
 			return
 		}
 
-		var domainNotFoundErr *errors3.NotFoundError
+		var domainNotFoundErr *domainerrors.NotFoundError
 		if errors.As(err, &domainNotFoundErr) {
 			m.handleDomainNotFound(c, domainNotFoundErr)
 
 			return
 		}
 
-		var domainForbiddenErr *errors3.ForbiddenError
+		var domainForbiddenErr *domainerrors.ForbiddenError
 		if errors.As(err, &domainForbiddenErr) {
 			m.handleForbidden(c, domainForbiddenErr)
 
 			return
 		}
 
-		var domainInvalidArgumentErr *errors3.InvalidArgumentError
+		var domainInvalidArgumentErr *domainerrors.InvalidArgumentError
 		if errors.As(err, &domainInvalidArgumentErr) {
 			m.handleInvalidArgument(c, domainInvalidArgumentErr)
 
 			return
 		}
 
-		var domainPreconditionFailure *errors3.PreconditionFailureError
+		var domainPreconditionFailure *domainerrors.PreconditionFailureError
 		if errors.As(err, &domainPreconditionFailure) {
 			m.handlePreconditionFailure(c, domainPreconditionFailure)
 
 			return
 		}
 
-		var domainUnauthenticatedError *errors3.UnauthenticatedError
+		var domainUnauthenticatedError *domainerrors.UnauthenticatedError
 		if errors.As(err, &domainUnauthenticatedError) {
 			m.handleUnauthenticated(c, domainUnauthenticatedError)
 
@@ -107,31 +107,31 @@ func (m *ErrorsMapMiddleware) handleUnknown(c *gin.Context, err error) {
 	})
 }
 
-func (m *ErrorsMapMiddleware) handleDomainNotFound(c *gin.Context, err *errors3.NotFoundError) {
+func (m *ErrorsMapMiddleware) handleDomainNotFound(c *gin.Context, err *domainerrors.NotFoundError) {
 	c.JSON(http.StatusNotFound, map[string]any{
 		"message": err.Error(),
 	})
 }
 
-func (m *ErrorsMapMiddleware) handleForbidden(c *gin.Context, err *errors3.ForbiddenError) {
+func (m *ErrorsMapMiddleware) handleForbidden(c *gin.Context, err *domainerrors.ForbiddenError) {
 	c.JSON(http.StatusForbidden, map[string]any{
 		"message": err.Error(),
 	})
 }
 
-func (m *ErrorsMapMiddleware) handleInvalidArgument(c *gin.Context, err *errors3.InvalidArgumentError) {
+func (m *ErrorsMapMiddleware) handleInvalidArgument(c *gin.Context, err *domainerrors.InvalidArgumentError) {
 	c.JSON(http.StatusUnprocessableEntity, map[string]any{
 		"message": err.Error(),
 	})
 }
 
-func (m *ErrorsMapMiddleware) handlePreconditionFailure(c *gin.Context, err *errors3.PreconditionFailureError) {
+func (m *ErrorsMapMiddleware) handlePreconditionFailure(c *gin.Context, err *domainerrors.PreconditionFailureError) {
 	c.JSON(http.StatusPreconditionFailed, map[string]any{
 		"message": err.Error(),
 	})
 }
 
-func (m *ErrorsMapMiddleware) handleUnauthenticated(c *gin.Context, err *errors3.UnauthenticatedError) {
+func (m *ErrorsMapMiddleware) handleUnauthenticated(c *gin.Context, err *domainerrors.UnauthenticatedError) {
 	c.JSON(http.StatusUnauthorized, map[string]any{
 		"message": err.Error(),
 	})
