@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"

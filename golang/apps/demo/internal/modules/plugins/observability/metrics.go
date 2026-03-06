@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/meter"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/histogram"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/meter"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/histogram"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"

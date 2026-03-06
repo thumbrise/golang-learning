@@ -3,7 +3,7 @@ package meter
 import (
 	"context"
 
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 )
 

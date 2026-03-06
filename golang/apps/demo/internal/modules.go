@@ -8,7 +8,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
