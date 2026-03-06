@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
-	httpkernel "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
+	httpkernel "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
 )
 
 type HomePageRouter struct {

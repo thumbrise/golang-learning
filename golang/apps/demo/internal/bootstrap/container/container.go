@@ -5,7 +5,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/app/core"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
 )
 
 type Container struct {

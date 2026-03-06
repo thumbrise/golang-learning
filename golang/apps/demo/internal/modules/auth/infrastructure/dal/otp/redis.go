@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/database"
 )
 
 type OTPRedisRepository struct {

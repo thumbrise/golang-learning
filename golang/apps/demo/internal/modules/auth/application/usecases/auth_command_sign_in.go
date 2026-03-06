@@ -13,7 +13,7 @@ import (
 	otpdal "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/database"
 )
 
 type AuthCommandSignIn struct {

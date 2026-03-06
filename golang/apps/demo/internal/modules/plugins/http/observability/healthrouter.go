@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
+	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
 )
 
 type HealthRouter struct {

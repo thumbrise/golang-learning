@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/wire"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger/endpoints/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/swagger/endpoints/http"
 )
 
 var Bindings = wire.NewSet(

@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/database"
+	database2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/database"
 )
 
 type OTPPostresqlRepository struct {
-	db *database.DB
+	db *database2.DB
 }
 
-func NewOTPPostgresqlRepository(db *database.DB) *OTPPostresqlRepository {
+func NewOTPPostgresqlRepository(db *database2.DB) *OTPPostresqlRepository {
 	return &OTPPostresqlRepository{db: db}
 }
 
@@ -20,7 +20,7 @@ func (r *OTPPostresqlRepository) Create(ctx context.Context, otp *OTP) error {
 
 	var id int
 	if err := r.db.Pool().QueryRow(ctx, sql, otp.UserID, otp.Code, otp.ExpiresAt, otp.CreatedAt).Scan(&id); err != nil {
-		return fmt.Errorf("%w: %w", database.ErrFailedQuery, err)
+		return fmt.Errorf("%w: %w", database2.ErrFailedQuery, err)
 	}
 
 	otp.ID = id
@@ -33,7 +33,7 @@ func (r *OTPPostresqlRepository) ExistsValid(ctx context.Context, userID int, co
 
 	var exists bool
 	if err := r.db.Pool().QueryRow(ctx, sql, userID, code).Scan(&exists); err != nil {
-		return false, fmt.Errorf("%w: %w", database.ErrFailedQuery, err)
+		return false, fmt.Errorf("%w: %w", database2.ErrFailedQuery, err)
 	}
 
 	return exists, nil
