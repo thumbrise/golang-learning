@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/thumbrise/demo/golang-demo/internal/app"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/profiler"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/propagation"

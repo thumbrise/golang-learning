@@ -1,4 +1,4 @@
-package http
+package swagger
 
 //	@title						Demo API
 //	@version					1.0

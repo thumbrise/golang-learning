@@ -17,7 +17,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
-	http4 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
+	http3 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
 	otp2 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/jwt"
@@ -27,7 +27,7 @@ import (
 	cmd2 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/cmd"
 	usecases2 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/usecases"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
-	http5 "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
+	http4 "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/database"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http"
@@ -35,15 +35,13 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/mail"
 	observability2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/logger"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/meter"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/profiler"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/tracer"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/logger"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/meter"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/tracer"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/redis"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/swagger"
-	http3 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/swagger/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
 )
@@ -57,7 +55,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	if err != nil {
 		return nil, err
 	}
-	otlpConfig := infrastructure.NewOTLPConfig(loader)
+	otlpConfig := components.NewOTLPConfig(loader)
 	exporter, err := logger.NewExporter(ctx, otlpConfig)
 	if err != nil {
 		return nil, err
@@ -113,9 +111,8 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	}
 	redisModule := redis.NewModule(client)
 	errorsMapMiddleware := http2.NewErrorsMapMiddleware(slogLogger)
-	errorsMapRouter := http2.NewErrorsMapRouter(errorsMapMiddleware, componentsKernel)
-	errorsmapModule := errorsmap.NewModule(errorsMapRouter)
-	swaggerRouter := http3.NewSwaggerRouter(componentsKernel)
+	errorsmapModule := errorsmap.NewModule(componentsKernel, errorsMapMiddleware)
+	swaggerRouter := swagger.NewSwaggerRouter(componentsKernel)
 	swaggerModule := swagger.NewModule(swaggerRouter)
 	mailConfig := mail.NewConfig(loader)
 	otpMailer := mailers.NewOTPMail(mailConfig)
@@ -130,11 +127,11 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	authCommandExchangeOtp := usecases.NewAuthCommandExchangeOtp(slogLogger, jwtJWT, otpRedisRepository, userRepository)
 	authQueryMe := usecases.NewAuthQueryMe(slogLogger)
 	authCommandRefresh := usecases.NewAuthCommandRefresh(slogLogger, jwtJWT)
-	middleware := http4.NewMiddleware(jwtJWT)
-	router := http4.NewRouter(componentsKernel, authCommandSignIn, authCommandExchangeOtp, authQueryMe, authCommandRefresh, middleware, jwtJWT)
+	middleware := http3.NewMiddleware(jwtJWT)
+	router := http3.NewRouter(componentsKernel, authCommandSignIn, authCommandExchangeOtp, authQueryMe, authCommandRefresh, middleware, jwtJWT)
 	authModule := auth.NewModule(router)
 	generatorGenerator := generator.NewGenerator()
-	homePageRouter := http5.NewHomePageRouter(generatorGenerator, componentsKernel)
+	homePageRouter := http4.NewHomePageRouter(generatorGenerator, componentsKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
 	cmdComments := cmd2.NewComments(kernel)
 	commentsCommandProduce := usecases2.NewCommentsCommandProduce(slogLogger, client)

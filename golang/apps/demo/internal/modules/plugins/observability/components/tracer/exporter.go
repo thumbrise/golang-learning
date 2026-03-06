@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -14,7 +14,7 @@ import (
 
 var ErrTraceExporterNew = errors.New("failed to create trace exporter")
 
-func NewOTELExporter(ctx context.Context, cfg infrastructure.OTLPConfig) (*otlptrace.Exporter, error) {
+func NewOTELExporter(ctx context.Context, cfg components.OTLPConfig) (*otlptrace.Exporter, error) {
 	exp, err := otlptracegrpc.New(ctx,
 		otlptracegrpc.WithEndpoint(cfg.URL),
 		otlptracegrpc.WithInsecure(),

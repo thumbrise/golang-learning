@@ -6,12 +6,11 @@ import (
 	"fmt"
 
 	"github.com/google/wire"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure"
-	components2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components"
-	logger2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/logger"
-	meter2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/meter"
-	profiler2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/profiler"
-	tracer2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/infrastructure/components/tracer"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/logger"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/meter"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/profiler"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/tracer"
 )
 
 var (
@@ -19,40 +18,40 @@ var (
 	Bindings              = wire.NewSet(
 		NewModule,
 
-		infrastructure.NewOTLPConfig,
+		components.NewOTLPConfig,
 
-		components2.NewResource,
-		components2.NewRegistrar,
-		components2.NewErrorHandler,
+		components.NewResource,
+		components.NewRegistrar,
+		components.NewErrorHandler,
 
-		profiler2.NewConfig,
-		profiler2.NewProfiler,
+		profiler.NewConfig,
+		profiler.NewProfiler,
 
-		logger2.NewLogger,
-		logger2.NewOTELSDKProvider,
-		logger2.NewProvider,
-		logger2.NewExporter,
+		logger.NewLogger,
+		logger.NewOTELSDKProvider,
+		logger.NewProvider,
+		logger.NewExporter,
 
-		meter2.NewOTELSDKProvider,
-		meter2.NewProvider,
-		meter2.NewExporter,
+		meter.NewOTELSDKProvider,
+		meter.NewProvider,
+		meter.NewExporter,
 
-		tracer2.NewProvider,
-		tracer2.NewOTELSampler,
-		tracer2.NewOTELExporter,
-		tracer2.NewOTELSDKProvider,
-		tracer2.NewStdOutExporter,
+		tracer.NewProvider,
+		tracer.NewOTELSampler,
+		tracer.NewOTELExporter,
+		tracer.NewOTELSDKProvider,
+		tracer.NewStdOutExporter,
 
 		NewHTTPMetrics,
 	)
 )
 
 type Module struct {
-	tracerErrorHandler *components2.ErrorHandler
-	registrar          *components2.Registrar
+	tracerErrorHandler *components.ErrorHandler
+	registrar          *components.Registrar
 }
 
-func NewModule(registrar *components2.Registrar, tracerErrorHandler *components2.ErrorHandler) *Module {
+func NewModule(registrar *components.Registrar, tracerErrorHandler *components.ErrorHandler) *Module {
 	return &Module{registrar: registrar, tracerErrorHandler: tracerErrorHandler}
 }
 
