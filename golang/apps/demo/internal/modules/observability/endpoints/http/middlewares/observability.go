@@ -18,6 +18,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -73,7 +74,7 @@ func (m *ObservabilityMiddleware) Handler() gin.HandlerFunc {
 		}
 
 		// 2. Измеряем размер запроса
-		reqSize := float64(c.Request.ContentLength)
+		reqSize := c.Request.ContentLength
 		if reqSize < 0 {
 			reqSize = 0
 		}
@@ -82,16 +83,16 @@ func (m *ObservabilityMiddleware) Handler() gin.HandlerFunc {
 			c.Request.Context(),
 			fmt.Sprintf("%s %s", c.Request.Method, c.FullPath()),
 			trace.WithAttributes(
-				attribute.String("http.method", c.Request.Method),
-				attribute.String("http.path", c.FullPath()),
+				semconv.HTTPMethod(c.Request.Method),
+				semconv.HTTPTarget(c.FullPath()),
+				semconv.UserAgentOriginal(c.Request.UserAgent()),
+				semconv.URLScheme(c.Request.URL.Scheme),
+				semconv.HTTPRequestBodySize(int(reqSize)),
+				// TODO: match semconv
 				attribute.String("http.handler", handler),
-				attribute.String("http.user_agent", c.Request.UserAgent()),
-				attribute.String("http.scheme", c.Request.URL.Scheme),
 				attribute.String("http.host", c.Request.Host),
-				attribute.Float64("http.request.size", reqSize),
 			),
 		)
-		fmt.Printf("trace=#%v\nspan=%#v\n", trc, span)
 
 		// 4. Добавляем теги Pyroscope в контекст (опционально)
 		if m.profiler != nil {
@@ -117,7 +118,7 @@ func (m *ObservabilityMiddleware) Handler() gin.HandlerFunc {
 
 		// 8. Получаем статус ответа
 		status := c.Writer.Status()
-		respSize := float64(c.Writer.Size())
+		respSize := c.Writer.Size()
 
 		// 9. Записываем метрики Prometheus
 		// cnt, err := mtr.Int64Counter(
@@ -143,19 +144,18 @@ func (m *ObservabilityMiddleware) Handler() gin.HandlerFunc {
 		httpRequestSize.WithLabelValues(
 			c.Request.Method,
 			c.FullPath(),
-		).Observe(reqSize)
+		).Observe(float64(reqSize))
 
 		httpResponseSize.WithLabelValues(
 			c.Request.Method,
 			c.FullPath(),
-		).Observe(respSize)
+		).Observe(float64(respSize))
 
 		// 10. Обновляем спан (трейс)
 		span.SetAttributes(
-			attribute.Int("http.status_code", status),
+			semconv.HTTPResponseStatusCode(status),
+			semconv.HTTPResponseBodySize(respSize),
 			attribute.Float64("http.duration_seconds", duration),
-			attribute.Float64("http.response.size", respSize),
-			attribute.Int("http.response.headers", len(c.Writer.Header())),
 		)
 
 		// 11. Помечаем ошибки в трейсе

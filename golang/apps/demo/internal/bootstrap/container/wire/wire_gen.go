@@ -32,6 +32,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/meter"
@@ -56,7 +57,12 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	if err != nil {
 		return nil, err
 	}
-	loggerProvider := logger.NewOTELSDKProvider(resource)
+	otlpConfig := infrastructure.NewOTLPConfig(loader)
+	exporter, err := logger.NewExporter(ctx, otlpConfig)
+	if err != nil {
+		return nil, err
+	}
+	loggerProvider := logger.NewOTELSDKProvider(resource, exporter)
 	slogLogger := logger.NewLogger(config, loggerProvider)
 	eventLogger := bootstrap.NewEventLogger(slogLogger)
 	bootstrapper := bootstrap.NewBootstrapper(eventLogger)
@@ -76,8 +82,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	provider := meter.NewProvider(config, meterProvider)
 	profilerConfig := profiler.NewConfig(loader)
 	profilerProfiler := profiler.NewProfiler(config, profilerConfig, slogLogger)
-	tracerConfig := tracer.NewConfig(loader)
-	exporter, err := tracer.NewOTELExporter(ctx, tracerConfig)
+	otlptraceExporter, err := tracer.NewOTELExporter(ctx, otlpConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +91,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	if err != nil {
 		return nil, err
 	}
-	tracerProvider := tracer.NewOTELSDKProvider(resource, exporter, sampler, stdouttraceExporter)
+	tracerProvider := tracer.NewOTELSDKProvider(resource, otlptraceExporter, sampler, stdouttraceExporter)
 	provider2 := tracer.NewProvider(config, tracerProvider)
 	observabilityMiddleware := middlewares.NewObservabilityMiddleware(config, slogLogger, provider, profilerProfiler, provider2)
 	observabilityRouter := routers.NewObservabilityRouter(httpKernel, observabilityMiddleware)
