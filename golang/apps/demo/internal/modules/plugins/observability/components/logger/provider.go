@@ -15,6 +15,6 @@ func NewProvider(cfg app.Config, p *sdklog.LoggerProvider) *Provider {
 	return &Provider{cfg: cfg, p: p}
 }
 
-func (t *Provider) Logger() log.Logger {
+func (t *Provider) Logger() log.Logger { //nolint:ireturn //specific case
 	return t.p.Logger(t.cfg.Name)
 }

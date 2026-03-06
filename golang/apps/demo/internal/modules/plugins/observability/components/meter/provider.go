@@ -15,6 +15,6 @@ func NewProvider(cfg app.Config, p *sdkmetric.MeterProvider) *Provider {
 	return &Provider{cfg: cfg, p: p}
 }
 
-func (t *Provider) Meter() metric.Meter {
+func (t *Provider) Meter() metric.Meter { //nolint:ireturn //specific case
 	return t.p.Meter(t.cfg.Name)
 }

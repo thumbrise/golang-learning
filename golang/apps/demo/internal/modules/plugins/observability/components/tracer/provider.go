@@ -15,6 +15,6 @@ func NewProvider(cfg app.Config, p *sdktrace.TracerProvider) *Provider {
 	return &Provider{cfg: cfg, p: p}
 }
 
-func (t *Provider) Tracer() trace.Tracer {
+func (t *Provider) Tracer() trace.Tracer { //nolint:ireturn //specific case
 	return t.p.Tracer(t.cfg.Name)
 }
