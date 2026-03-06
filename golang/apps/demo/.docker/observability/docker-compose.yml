@@ -1,0 +1,98 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8.15.35
+    restart: on-failure
+    environment:
+      CLICKHOUSE_USER: uptrace
+      CLICKHOUSE_PASSWORD: uptrace
+      CLICKHOUSE_DB: uptrace
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'localhost:8123/ping']
+      interval: 1s
+      timeout: 1s
+      retries: 30
+    volumes:
+      - ch_data:/var/lib/clickhouse
+    ports:
+#      - '8123:8123' # api
+      - '${DOCKER_PORT_CLICKHOUSE_UI:?}:9000' # web
+
+  uptrace:
+    image: 'uptrace/uptrace:2.1.0-beta'
+    restart: on-failure
+    volumes:
+      - ./uptrace.yml:/etc/uptrace/config.yml
+#      - ./certs/server.crt:/etc/uptrace/server.crt
+#      - ./certs/server.key:/etc/uptrace/server.key
+    env_file:
+      - ../../.env
+    environment:
+      - DEBUG=2
+    ports:
+      - '${DOCKER_PORT_UPTRACE_GRPC:?}:4317' # GRPC
+      - '${DOCKER_PORT_UPTRACE_HTTP:?}:80' # HTTP
+    depends_on:
+      - clickhouse
+      - db
+
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:0.123.0
+    restart: on-failure
+    volumes:
+      - ./otel-collector.yaml:/etc/otelcol-contrib/config.yaml
+    env_file:
+      - ../../.env
+#    ports:
+#      - '4317:4317'
+#      - '4318:4318'
+#    extra_hosts:
+#      - 'host.docker.internal:host-gateway'
+    depends_on:
+      - uptrace
+
+  vector:
+    image: timberio/vector:0.28.X-alpine
+    volumes:
+      - ./vector.toml:/etc/vector/vector.toml:ro
+
+  grafana:
+    image: grafana/grafana:12.0.0
+    restart: on-failure
+    volumes:
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./grafana/custom.ini:/etc/grafana/grafana.ini
+    ports:
+      - '${DOCKER_PORT_GRAFANA:?}:3000'
+#    extra_hosts:
+#      - 'host.docker.internal:host-gateway'
+
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    env_file:
+      - ../../.env
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+    network_mode: host
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro'
+
+volumes:
+  ch_data:
+  prometheus_data:

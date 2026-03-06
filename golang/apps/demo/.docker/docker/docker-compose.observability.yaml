@@ -1,3 +1,5 @@
+include:
+  - ../observability/docker-compose.yml
 services:
 #  prometheus:
 #    image: prom/prometheus:latest
@@ -49,10 +51,10 @@ services:
 #      timeout: 5s
 #      retries: 3
 
-  jaeger:
-    image: cr.jaegertracing.io/jaegertracing/jaeger:2.15.0
-    ports:
-      - "127.0.0.1:${DOCKER_PORT_JAEGER_UI:?}:16686"
+#  jaeger:
+#    image: cr.jaegertracing.io/jaegertracing/jaeger:2.15.0
+#    ports:
+#      - "127.0.0.1:${DOCKER_PORT_JAEGER_UI:?}:16686"
 
   pyroscope:
     image: grafana/pyroscope:latest
