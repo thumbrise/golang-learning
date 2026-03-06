@@ -7,19 +7,17 @@ import (
 	"time"
 
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 )
 
 var ErrTraceExporterNew = errors.New("failed to create trace exporter")
 
 func NewOTELExporter(ctx context.Context, cfg Config) (*otlptrace.Exporter, error) {
-	exp, err := otlptracehttp.New(ctx,
-		otlptracehttp.WithEndpoint(cfg.OTLPURL),
-		otlptracehttp.WithInsecure(),
-		otlptracehttp.WithURLPath("/v1/traces"),
-		otlptracehttp.WithCompression(otlptracehttp.GzipCompression),
-		otlptracehttp.WithTimeout(5*time.Second),
+	exp, err := otlptracegrpc.New(ctx,
+		otlptracegrpc.WithEndpoint(cfg.OTLPURL),
+		otlptracegrpc.WithInsecure(),
+		otlptracegrpc.WithTimeout(5*time.Second),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrTraceExporterNew, err)

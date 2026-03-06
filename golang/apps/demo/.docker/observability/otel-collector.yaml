@@ -9,6 +9,7 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: 0.0.0.0:4317
       http:
   hostmetrics:
     collection_interval: 10s
@@ -30,6 +31,7 @@ receivers:
   jaeger:
     protocols:
       grpc:
+        endpoint: 0.0.0.0:14317
   postgresql:
     endpoint: ${DB_HOST}:${DB_PORT}
     transport: tcp
@@ -56,15 +58,17 @@ processors:
 
 exporters:
   otlp/uptrace:
-    endpoint: http://uptrace:4317
+    endpoint: uptrace:4317
     tls:
       insecure: true
-    headers: { 'uptrace-dsn': 'http://project1_secret@localhost?grpc=14317' }
+    headers:
+      uptrace-dsn: 'http://project1_secret@uptrace:4317'
   prometheusremotewrite/uptrace:
-    endpoint: 'http://uptrace:8080/api/v1/prometheus/write'
+    endpoint: 'http://uptrace:80/api/v1/prometheus/write'
     tls:
       insecure: true
-    headers: { 'uptrace-dsn': 'http://project1_secret@localhost?grpc=14317' }
+    headers:
+      uptrace-dsn: 'http://project1_secret@uptrace:4317'
 
 service:
   telemetry:
