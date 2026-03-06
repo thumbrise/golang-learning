@@ -40,14 +40,14 @@ var (
 )
 
 func (a *AuthCommandExchangeOtp) Handle(ctx context.Context, input AuthCommandExchangeOtpInput) (*AuthCommandExchangeOtpOutput, error) {
-	a.logger.Info("AuthCommandExchangeOtp",
+	a.logger.InfoContext(ctx, "AuthCommandExchangeOtp",
 		slog.Any("input", input),
 	)
 
 	user, err := a.userRepository.FindByEmail(ctx, input.Email)
 	if err != nil {
 		if database.IsNotFound(err) {
-			a.logger.Debug("AuthCommandExchangeOtp.Handle: failed find user by email", slog.Any("email", input.Email))
+			a.logger.DebugContext(ctx, "AuthCommandExchangeOtp.Handle: failed find user by email", slog.Any("email", input.Email))
 
 			return nil, domainerrors.NewUnauthenticatedError("unauthorized")
 		}
@@ -62,7 +62,7 @@ func (a *AuthCommandExchangeOtp) Handle(ctx context.Context, input AuthCommandEx
 	otpExists, err := a.otpRepository.ExistsValid(ctx, user.ID, input.Otp)
 	if err != nil {
 		if database.IsNotFound(err) {
-			a.logger.Debug("AuthCommandExchangeOtp.Handle: failed check otp exists", slog.Any("email", input.Email))
+			a.logger.DebugContext(ctx, "AuthCommandExchangeOtp.Handle: failed check otp exists", slog.Any("email", input.Email))
 
 			return nil, domainerrors.NewUnauthenticatedError("unauthorized")
 		}

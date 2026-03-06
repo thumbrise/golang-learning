@@ -35,7 +35,7 @@ func NewRegistrar(cfg app.Config, errHandler *ErrorHandler, profiler *profiler.P
 	return &Registrar{cfg: cfg, errHandler: errHandler, profiler: profiler, sdkLoggerProvider: sdkLoggerProvider, sdkMeterProvider: sdkMeterProvider, sdkTracerProvider: sdkTracerProvider}
 }
 
-func (t *Registrar) Configure(context.Context) error {
+func (t *Registrar) Configure(ctx context.Context) error {
 	// Настраиваем глобальный провайдер
 	otel.SetTextMapPropagator(
 		propagation.NewCompositeTextMapPropagator(
@@ -49,7 +49,7 @@ func (t *Registrar) Configure(context.Context) error {
 	// otel.SetLoggerProvider(t.sdkLoggerProvider)
 	otel.SetErrorHandler(t.errHandler)
 
-	err := t.profiler.Start()
+	err := t.profiler.Start(ctx)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrStartProfiler, err)
 	}
@@ -60,7 +60,7 @@ func (t *Registrar) Configure(context.Context) error {
 func (t *Registrar) Shutdown(ctx context.Context) error {
 	var errs error
 
-	if err := t.profiler.Shutdown(); err != nil {
+	if err := t.profiler.Shutdown(ctx); err != nil {
 		errs = errors.Join(
 			errs,
 			fmt.Errorf("%w: %w", ErrShutdownProfiler, err),

@@ -1,6 +1,7 @@
 package components
 
 import (
+	"context"
 	"log/slog"
 )
 
@@ -13,7 +14,7 @@ func NewErrorHandler(logger *slog.Logger) *ErrorHandler {
 }
 
 func (l *ErrorHandler) Handle(err error) {
-	l.logger.Error(
+	l.logger.ErrorContext(context.Background(),
 		"openTelemetry error",
 		slog.String("err", err.Error()),
 	)

@@ -64,7 +64,7 @@ var (
 )
 
 func (a *AuthCommandSignIn) Handle(ctx context.Context, input AuthCommandSignInInput) (*AuthCommandSignInOutput, error) {
-	a.logger.Info("AuthCommandSignIn",
+	a.logger.InfoContext(ctx, "AuthCommandSignIn",
 		slog.Any("input", input),
 	)
 

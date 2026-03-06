@@ -29,8 +29,8 @@ type AuthCommandRefreshOutput struct {
 
 var ErrFailedParseRefreshToken = errors.New("failed to parse refresh token")
 
-func (a *AuthCommandRefresh) Handle(_ context.Context, input AuthCommandRefreshInput) (*AuthCommandRefreshOutput, error) {
-	a.logger.Info("AuthCommandRefresh",
+func (a *AuthCommandRefresh) Handle(ctx context.Context, input AuthCommandRefreshInput) (*AuthCommandRefreshOutput, error) {
+	a.logger.InfoContext(ctx, "AuthCommandRefresh",
 		slog.Any("input", input),
 	)
 	//nolint:godox

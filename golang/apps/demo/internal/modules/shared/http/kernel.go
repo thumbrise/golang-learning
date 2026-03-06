@@ -46,7 +46,7 @@ func (k *Kernel) Gin() *gin.Engine {
 
 func (k *Kernel) Start(ctx context.Context) error {
 	msg := "started server on http://localhost:" + k.config.Port
-	k.logger.Info(msg)
+	k.logger.InfoContext(ctx, msg)
 
 	return k.srv.ListenAndServe()
 }
