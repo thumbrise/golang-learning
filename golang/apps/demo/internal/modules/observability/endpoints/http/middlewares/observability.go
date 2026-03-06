@@ -91,7 +91,6 @@ func (m *ObservabilityMiddleware) Handler() gin.HandlerFunc {
 				attribute.Float64("http.request.size", reqSize),
 			),
 		)
-		fmt.Printf("trace=#%v\nspan=%#v\n", trc, span)
 
 		// 4. Добавляем теги Pyroscope в контекст (опционально)
 		if m.profiler != nil {
