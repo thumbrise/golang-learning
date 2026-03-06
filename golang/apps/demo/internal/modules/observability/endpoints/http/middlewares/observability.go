@@ -63,6 +63,10 @@ var (
 func (m *ObservabilityMiddleware) Handler() gin.HandlerFunc {
 	trc := m.tracerProvider.Tracer()
 	// mtr := m.meterProvider.Meter()
+	//counter, err := mtr.Int64Counter("")
+	//if err != nil {
+	//	return nil
+	//}
 
 	return func(c *gin.Context) {
 		start := time.Now()

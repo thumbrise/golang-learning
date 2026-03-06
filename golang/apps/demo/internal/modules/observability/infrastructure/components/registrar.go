@@ -8,6 +8,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/propagation"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	sdkmeter "go.opentelemetry.io/otel/sdk/metric"
@@ -36,7 +37,6 @@ func NewRegistrar(cfg app.Config, errHandler *ErrorHandler, profiler *profiler.P
 }
 
 func (t *Registrar) Configure(ctx context.Context) error {
-	// Настраиваем глобальный провайдер
 	otel.SetTextMapPropagator(
 		propagation.NewCompositeTextMapPropagator(
 			propagation.TraceContext{},
@@ -46,8 +46,9 @@ func (t *Registrar) Configure(ctx context.Context) error {
 
 	otel.SetTracerProvider(t.sdkTracerProvider)
 	otel.SetMeterProvider(t.sdkMeterProvider)
-	// otel.SetLoggerProvider(t.sdkLoggerProvider)
 	otel.SetErrorHandler(t.errHandler)
+	// Experimental
+	global.SetLoggerProvider(t.sdkLoggerProvider)
 
 	err := t.profiler.Start(ctx)
 	if err != nil {

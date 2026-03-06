@@ -13,9 +13,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/meter"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/profiler"
-	observabilitytracer "github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	oteltracer "go.opentelemetry.io/otel/trace"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/tracer"
 )
 
 var (
@@ -39,14 +37,13 @@ var (
 
 		meter.NewOTELSDKProvider,
 		meter.NewProvider,
+		meter.NewExporter,
 
-		observabilitytracer.NewProvider,
-		observabilitytracer.NewOTELSampler,
-		observabilitytracer.NewOTELExporter,
-		observabilitytracer.NewOTELSDKProvider,
-		observabilitytracer.NewStdOutExporter,
-
-		wire.Bind(new(oteltracer.TracerProvider), new(*sdktrace.TracerProvider)),
+		tracer.NewProvider,
+		tracer.NewOTELSampler,
+		tracer.NewOTELExporter,
+		tracer.NewOTELSDKProvider,
+		tracer.NewStdOutExporter,
 
 		routers.NewHealthRouter,
 		routers.NewObservabilityRouter,

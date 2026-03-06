@@ -78,7 +78,11 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	v := cmd.Commands(serve, route, routeList)
 	module := http.NewModule()
 	healthRouter := routers.NewHealthRouter(httpKernel)
-	meterProvider := meter.NewOTELSDKProvider()
+	otlpmetricgrpcExporter, err := meter.NewExporter(ctx, otlpConfig)
+	if err != nil {
+		return nil, err
+	}
+	meterProvider := meter.NewOTELSDKProvider(resource, otlpmetricgrpcExporter)
 	provider := meter.NewProvider(config, meterProvider)
 	profilerConfig := profiler.NewConfig(loader)
 	profilerProfiler := profiler.NewProfiler(config, profilerConfig, slogLogger)
