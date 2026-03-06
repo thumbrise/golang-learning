@@ -1,3 +1,6 @@
+//
+// TODO: Перенести в плагины. Должны быть разделены понятия Sharedmodules и Pluginmodules. Одни предоставляют переносимый функционал. А другие переиспользуемый в рамках разных бизнес модулей
+
 package observability
 
 import (
@@ -6,8 +9,6 @@ import (
 	"fmt"
 
 	"github.com/google/wire"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
@@ -45,24 +46,17 @@ var (
 		tracer.NewOTELSDKProvider,
 		tracer.NewStdOutExporter,
 
-		routers.NewHealthRouter,
-		routers.NewObservabilityRouter,
-		routers.NewPprofRouter,
-
-		middlewares.NewObservabilityMiddleware,
+		NewHTTPMetrics,
 	)
 )
 
 type Module struct {
-	healthRouter        *routers.HealthRouter
-	pprofRouter         *routers.PprofRouter
-	observabilityRouter *routers.ObservabilityRouter
-	tracerErrorHandler  *components.ErrorHandler
-	registrar           *components.Registrar
+	tracerErrorHandler *components.ErrorHandler
+	registrar          *components.Registrar
 }
 
-func NewModule(healthRouter *routers.HealthRouter, observabilityRouter *routers.ObservabilityRouter, pprofRouter *routers.PprofRouter, telemetry *components.Registrar, tracerErrorHandler *components.ErrorHandler) *Module {
-	return &Module{healthRouter: healthRouter, observabilityRouter: observabilityRouter, pprofRouter: pprofRouter, registrar: telemetry, tracerErrorHandler: tracerErrorHandler}
+func NewModule(registrar *components.Registrar, tracerErrorHandler *components.ErrorHandler) *Module {
+	return &Module{registrar: registrar, tracerErrorHandler: tracerErrorHandler}
 }
 
 func (m *Module) Name() string {
@@ -74,10 +68,6 @@ func (m *Module) BeforeStart(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrConfigureRegistrar, err)
 	}
-
-	m.observabilityRouter.Register()
-	m.healthRouter.Register()
-	m.pprofRouter.Register()
 
 	return nil
 }

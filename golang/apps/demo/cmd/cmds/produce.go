@@ -6,14 +6,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
 )
 
 type Produce struct {
 	*cobra.Command
 }
 
-func NewProduce(r contracts.CMDAdder, runner *bootstrap.Runner, httpKernel *http.Kernel) *Produce {
+func NewProduce(r contracts.CMDAdder, runner *bootstrap.Runner, httpKernel *components.Kernel) *Produce {
 	c := &cobra.Command{
 		Use:   "produce",
 		Short: "Produce messages",
