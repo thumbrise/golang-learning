@@ -5,18 +5,18 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/app/core"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
 )
 
 type Container struct {
 	Modules      []contracts.Module
 	Runner       *bootstrap.Runner
 	Bootstrapper *bootstrap.Bootstrapper
-	HttpKernel   *http.Kernel
+	HttpKernel   *components.Kernel
 	CmdKernel    *core.Kernel
 	Commands     []*cobra.Command
 }
 
-func NewContainer(bootstrapper *bootstrap.Bootstrapper, cmdKernel *core.Kernel, commands []*cobra.Command, httpKernel *http.Kernel, modules []contracts.Module, runner *bootstrap.Runner) *Container {
+func NewContainer(bootstrapper *bootstrap.Bootstrapper, cmdKernel *core.Kernel, commands []*cobra.Command, httpKernel *components.Kernel, modules []contracts.Module, runner *bootstrap.Runner) *Container {
 	return &Container{Bootstrapper: bootstrapper, CmdKernel: cmdKernel, Commands: commands, HttpKernel: httpKernel, Modules: modules, Runner: runner}
 }

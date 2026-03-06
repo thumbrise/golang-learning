@@ -4,7 +4,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
 )
 
 type Route struct {
@@ -25,7 +25,7 @@ type RouteList struct {
 	*cobra.Command
 }
 
-func NewRouteList(r *Route, httpKernel *http.Kernel) *RouteList {
+func NewRouteList(r *Route, httpKernel *components.Kernel) *RouteList {
 	c := &cobra.Command{
 		Use:   "list",
 		Short: "List all app routes",

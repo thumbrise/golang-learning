@@ -6,14 +6,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
 )
 
 type Serve struct {
 	*cobra.Command
 }
 
-func NewServe(r contracts.CMDAdder, runner *bootstrap.Runner, httpKernel *http.Kernel) *Serve {
+func NewServe(r contracts.CMDAdder, runner *bootstrap.Runner, httpKernel *components.Kernel) *Serve {
 	c := &cobra.Command{
 		Use:   "serve",
 		Short: "Start http server",

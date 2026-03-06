@@ -29,9 +29,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	http5 "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/middlewares"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/endpoints/http/routers"
+	observability2 "github.com/thumbrise/demo/golang-demo/internal/modules/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/observability/infrastructure/components/logger"
@@ -42,6 +40,8 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap"
 	http2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/errorsmap/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http"
+	components2 "github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/http/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/mail"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/shared/redis"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/swagger"
@@ -68,22 +68,22 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	bootstrapper := bootstrap.NewBootstrapper(eventLogger)
 	kernel := core.NewKernel()
 	runner := bootstrap.NewRunner(eventLogger)
-	httpConfig := http.NewConfig(loader)
-	slogginConfig := http.NewSlogginConfig()
-	engine := http.NewGinEngine(slogLogger, slogginConfig)
-	httpKernel := http.NewKernel(httpConfig, slogLogger, engine)
-	serve := cmds.NewServe(kernel, runner, httpKernel)
+	componentsConfig := components2.NewConfig(loader)
+	slogginConfig := components2.NewSlogginConfig()
+	engine := components2.NewGinEngine(slogLogger, slogginConfig)
+	componentsKernel := components2.NewKernel(componentsConfig, slogLogger, engine)
+	serve := cmds.NewServe(kernel, runner, componentsKernel)
 	route := cmds.NewRoute(kernel)
-	routeList := cmds.NewRouteList(route, httpKernel)
+	routeList := cmds.NewRouteList(route, componentsKernel)
 	v := cmd.Commands(serve, route, routeList)
-	module := http.NewModule()
-	healthRouter := routers.NewHealthRouter(httpKernel)
+	healthRouter := observability.NewHealthRouter(componentsKernel)
 	otlpmetricgrpcExporter, err := meter.NewExporter(ctx, otlpConfig)
 	if err != nil {
 		return nil, err
 	}
 	meterProvider := meter.NewOTELSDKProvider(resource, otlpmetricgrpcExporter)
 	provider := meter.NewProvider(config, meterProvider)
+	httpMetrics := observability2.NewHTTPMetrics(provider)
 	profilerConfig := profiler.NewConfig(loader)
 	profilerProfiler := profiler.NewProfiler(config, profilerConfig, slogLogger)
 	otlptraceExporter, err := tracer.NewOTELExporter(ctx, otlpConfig)
@@ -97,12 +97,11 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	}
 	tracerProvider := tracer.NewOTELSDKProvider(resource, otlptraceExporter, sampler, stdouttraceExporter)
 	provider2 := tracer.NewProvider(config, tracerProvider)
-	observabilityMiddleware := middlewares.NewObservabilityMiddleware(config, slogLogger, provider, profilerProfiler, provider2)
-	observabilityRouter := routers.NewObservabilityRouter(httpKernel, observabilityMiddleware)
-	pprofRouter := routers.NewPprofRouter(httpKernel)
+	otelMiddleware := observability.NewOTELMiddleware(config, httpMetrics, slogLogger, profilerProfiler, provider2)
+	module := http.NewModule(healthRouter, componentsKernel, otelMiddleware)
 	errorHandler := components.NewErrorHandler(slogLogger)
 	registrar := components.NewRegistrar(config, errorHandler, profilerProfiler, loggerProvider, meterProvider, tracerProvider)
-	observabilityModule := observability.NewModule(healthRouter, observabilityRouter, pprofRouter, registrar, errorHandler)
+	observabilityModule := observability2.NewModule(registrar, errorHandler)
 	databaseConfig := database.NewConfig(loader)
 	db := database.NewDB(databaseConfig)
 	databaseModule := database.NewModule(db)
@@ -114,9 +113,9 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	}
 	redisModule := redis.NewModule(client)
 	errorsMapMiddleware := http2.NewErrorsMapMiddleware(slogLogger)
-	errorsMapRouter := http2.NewErrorsMapRouter(errorsMapMiddleware, httpKernel)
+	errorsMapRouter := http2.NewErrorsMapRouter(errorsMapMiddleware, componentsKernel)
 	errorsmapModule := errorsmap.NewModule(errorsMapRouter)
-	swaggerRouter := http3.NewSwaggerRouter(httpKernel)
+	swaggerRouter := http3.NewSwaggerRouter(componentsKernel)
 	swaggerModule := swagger.NewModule(swaggerRouter)
 	mailConfig := mail.NewConfig(loader)
 	otpMailer := mailers.NewOTPMail(mailConfig)
@@ -132,16 +131,16 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	authQueryMe := usecases.NewAuthQueryMe(slogLogger)
 	authCommandRefresh := usecases.NewAuthCommandRefresh(slogLogger, jwtJWT)
 	middleware := http4.NewMiddleware(jwtJWT)
-	router := http4.NewRouter(httpKernel, authCommandSignIn, authCommandExchangeOtp, authQueryMe, authCommandRefresh, middleware, jwtJWT)
+	router := http4.NewRouter(componentsKernel, authCommandSignIn, authCommandExchangeOtp, authQueryMe, authCommandRefresh, middleware, jwtJWT)
 	authModule := auth.NewModule(router)
 	generatorGenerator := generator.NewGenerator()
-	homePageRouter := http5.NewHomePageRouter(generatorGenerator, httpKernel)
+	homePageRouter := http5.NewHomePageRouter(generatorGenerator, componentsKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
 	cmdComments := cmd2.NewComments(kernel)
 	commentsCommandProduce := usecases2.NewCommentsCommandProduce(slogLogger, client)
 	commentsProduce := cmd2.NewCommentsProduce(cmdComments, runner, commentsCommandProduce)
 	commentsModule := comments.NewModule(cmdComments, commentsProduce)
 	v2 := internal.Modules(module, observabilityModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, authModule, homepageModule, commentsModule)
-	containerContainer := container.NewContainer(bootstrapper, kernel, v, httpKernel, v2, runner)
+	containerContainer := container.NewContainer(bootstrapper, kernel, v, componentsKernel, v2, runner)
 	return containerContainer, nil
 }
