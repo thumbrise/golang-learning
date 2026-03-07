@@ -81,7 +81,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	}
 	meterProvider := meter.NewOTELSDKProvider(resource, otlpmetricgrpcExporter)
 	provider := meter.NewProvider(config, meterProvider)
-	httpMetrics := observability2.NewHTTPMetrics(provider)
+	httpMetrics := observability.NewHTTPMetrics(provider)
 	profilerConfig := profiler.NewConfig(loader)
 	profilerProfiler := profiler.NewProfiler(config, profilerConfig, slogLogger)
 	otlptraceExporter, err := tracer.NewOTELExporter(ctx, otlpConfig)

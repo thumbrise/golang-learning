@@ -41,8 +41,6 @@ var (
 		tracer.NewOTELExporter,
 		tracer.NewOTELSDKProvider,
 		tracer.NewStdOutExporter,
-
-		NewHTTPMetrics,
 	)
 )
 
