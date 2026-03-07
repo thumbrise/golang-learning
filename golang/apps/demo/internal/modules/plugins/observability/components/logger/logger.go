@@ -12,9 +12,14 @@ import (
 )
 
 func NewLogger(cfg app.Config, provider *sdklog.LoggerProvider) *slog.Logger {
+	lvl := slog.LevelInfo
+	if cfg.Debug {
+		lvl = slog.LevelDebug
+	}
+
 	handlerOptions := &slog.HandlerOptions{
 		AddSource: false,
-		Level:     slog.LevelDebug,
+		Level:     lvl,
 	}
 	jsonHandler := slog.NewJSONHandler(os.Stdout, handlerOptions)
 

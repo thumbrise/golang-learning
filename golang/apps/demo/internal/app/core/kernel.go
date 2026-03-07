@@ -14,17 +14,16 @@ type Kernel struct {
 func NewKernel() *Kernel {
 	cmdRoot := &Kernel{
 		command: &cobra.Command{
-			Use:     "demo",
-			Aliases: []string{"go run ."},
-			Short:   "CLI",
+			Use: "demo",
 		},
 	}
 
 	return cmdRoot
 }
 
-func (k *Kernel) Execute(ctx context.Context, buf *bytes.Buffer) error {
-	k.command.SetOut(buf)
+func (k *Kernel) Execute(ctx context.Context, bufout *bytes.Buffer, buferr *bytes.Buffer) error {
+	k.command.SetOut(bufout)
+	k.command.SetErr(buferr)
 
 	return k.command.ExecuteContext(ctx)
 }

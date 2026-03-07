@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"context"
-
 	"github.com/spf13/cobra"
-	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/usecases"
 )
@@ -15,8 +12,7 @@ type Comments struct {
 
 func NewComments(r contracts.CMDAdder) *Comments {
 	c := &cobra.Command{
-		Use:   "comments",
-		Short: "comments",
+		Use: "comments",
 	}
 	r.Add(c)
 
@@ -27,25 +23,20 @@ type CommentsProduce struct {
 	*cobra.Command
 }
 
-func NewCommentsProduce(r *Comments, runner *bootstrap.Runner, produce *usecases.CommentsCommandProduce) *CommentsProduce {
+func NewCommentsProduce(r *Comments, produce *usecases.CommentsCommandPublish) *CommentsProduce {
 	c := &cobra.Command{
-		Use:   "produce",
-		Short: "produce",
+		Use: "produce",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			processes := []*bootstrap.Process{
-				{
-					Name: "CommentsCommandProduce",
-					Start: func(ctx context.Context) error {
-						in := usecases.CommentsCommandProduceInput{}
-						_, err := produce.Handle(ctx, in)
+			in := usecases.CommentsCommandPublishInput{}
 
-						return err
-					},
-					Shutdown: nil,
-				},
+			out, err := produce.Handle(cmd.Context(), in)
+			if err != nil {
+				return err
 			}
 
-			return runner.Run(cmd.Context(), processes)
+			cmd.Printf("out: %+v\n", out)
+
+			return nil
 		},
 	}
 	r.AddCommand(c)

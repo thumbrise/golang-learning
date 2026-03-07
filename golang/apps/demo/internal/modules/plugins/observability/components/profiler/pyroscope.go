@@ -14,7 +14,7 @@ type pyroscopeLogger struct {
 }
 
 func (p *pyroscopeLogger) Infof(format string, args ...interface{}) {
-	p.logger.Info(fmt.Sprintf(format, args...))
+	p.logger.Debug(fmt.Sprintf(format, args...))
 }
 
 func (p *pyroscopeLogger) Debugf(format string, args ...interface{}) {
