@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/thumbrise/demo/golang-demo/internal/app"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/profiler"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/tracer"
 	"go.opentelemetry.io/otel/attribute"
@@ -25,13 +24,13 @@ type (
 		profiler       *profiler.Profiler
 		logger         *slog.Logger
 		tracerProvider *tracer.Provider
-		httpMetrics    *observability.HTTPMetrics
+		httpMetrics    *HTTPMetrics
 	}
 )
 
 const profilerContextValue profilerContextKey = "profiler"
 
-func NewOTELMiddleware(cfgApp app.Config, httpMetrics *observability.HTTPMetrics, logger *slog.Logger, profiler *profiler.Profiler, tracerProvider *tracer.Provider) *OTELMiddleware {
+func NewOTELMiddleware(cfgApp app.Config, httpMetrics *HTTPMetrics, logger *slog.Logger, profiler *profiler.Profiler, tracerProvider *tracer.Provider) *OTELMiddleware {
 	return &OTELMiddleware{cfgApp: cfgApp, httpMetrics: httpMetrics, logger: logger, profiler: profiler, tracerProvider: tracerProvider}
 }
 
