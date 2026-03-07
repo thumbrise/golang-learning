@@ -41,18 +41,16 @@ func (m *OTELMiddleware) Handler(_ context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
-		// 1. Получаем путь обработчика (если доступен)
 		handler := "unknown"
 		if c.HandlerName() != "" {
 			handler = c.HandlerName()
 		}
 
-		// 2. Измеряем размер запроса
 		reqSize := c.Request.ContentLength
 		if reqSize < 0 {
 			reqSize = 0
 		}
-		// 3. Начинаем трейс (спан) для этого запроса
+
 		ctx, span := trc.Start(
 			c.Request.Context(),
 			fmt.Sprintf("%s %s", c.Request.Method, c.FullPath()),
