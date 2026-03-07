@@ -2,81 +2,106 @@ package usecases
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"log/slog"
-	"strconv"
 	"time"
 
-	"github.com/go-faker/faker/v4"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"golang.org/x/time/rate"
 )
 
-type CommentsCommandProduce struct {
+var ErrFailedToSaveComments = errors.New("failed to save comments")
+
+type CommentsCommandPublish struct {
 	logger *slog.Logger
 	redis  *redis.Client
 }
 
-func NewCommentsCommandProduce(logger *slog.Logger, redis *redis.Client) *CommentsCommandProduce {
-	return &CommentsCommandProduce{logger: logger, redis: redis}
+func NewCommentsCommandProduce(logger *slog.Logger, redis *redis.Client) *CommentsCommandPublish {
+	return &CommentsCommandPublish{logger: logger, redis: redis}
 }
 
-type CommentsCommandProduceInput struct {
-	Comments []string // получаем комментарии из входных данных
+type CommentsCommandPublishInput struct {
+	UserUUID string
+	PostUUID string
+	Content  string
 }
 
-type CommentsCommandProduceOutput struct{}
+type CommentsCommandPublishOutput struct {
+	Comment *Comment
+}
 
-func (c *CommentsCommandProduce) Handle(ctx context.Context, input CommentsCommandProduceInput) (*CommentsCommandProduceOutput, error) {
+const stream = "comments_unprocessed"
+
+type Comment struct {
+	UUID      string    `json:"uuid,omitempty"`
+	PostUUID  string    `json:"postUUID,omitempty"`
+	Content   string    `json:"content,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+func (c *CommentsCommandPublish) Handle(ctx context.Context, input CommentsCommandPublishInput) (*CommentsCommandPublishOutput, error) {
 	// TODO: Вынести лимит в конфиг
 	// TODO: Добавить консюмера
 	// TODO: Вынести общую логику стриминга в инфраструктуру
 	// TODO: Добавить возможность настройки количества горутин. Обязательно с shared limiter
+	comment := &Comment{
+		UUID:      uuid.New().String(),
+		PostUUID:  input.PostUUID,
+		Content:   input.Content,
+		CreatedAt: time.Now(),
+	}
+	// values := map[string]interface{}{
+	//	"uuid":      "",
+	//	"timestamp": strconv.FormatInt(time.Now().Unix(), 10),
+	//	"post_uuid": input.PostUUID,
+	//	"content":   input.Content,
+	//}
+	var err error
 
-	limiter := rate.NewLimiter(rate.Limit(3000), 1)
+	values, err := json.Marshal(comment)
+	if err != nil {
+		c.logger.ErrorContext(ctx, "Error marshalling comment",
+			slog.String("error", err.Error()),
+			slog.Any("comment", comment),
+		)
 
-	inputComments := input.Comments // получаем комментарии из входных данных
+		return nil, err
+	}
 
-	for _, comment := range inputComments {
-		values := map[string]interface{}{
-			"uuid":      uuid.New().String(),
-			"timestamp": strconv.FormatInt(time.Now().Unix(), 10),
-			"content":   faker.Paragraph(),
-		}
+	_, err = c.redis.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+		var err error
 
-		tx, err := c.redis.TxPipelined(ctx)
-		if err != nil {
-			return &CommentsCommandProduceOutput{}, err
-		}
-		defer tx.Close()
-
-		result, err := tx.XAdd(ctx, &redis.XAddArgs{
-			Stream:     "comments_unprocessed",
-			NoMkStream: false,
-			ID:         "*",
-			Values:     values,
+		_, err = c.redis.XAdd(ctx, &redis.XAddArgs{
+			Stream: stream,
+			ID:     "*",
+			Values: values,
 		}).Result()
 		if err != nil {
-			return &CommentsCommandProduceOutput{}, err
+			return fmt.Errorf("redis xAdd error: %w", err)
 		}
 
 		cacheKey := "comments:" + uuid.New().String()
-		err = tx.HSet(ctx, cacheKey, values).Err()
+
+		err = c.redis.HSet(ctx, cacheKey, comment).Err()
 		if err != nil {
-			return &CommentsCommandProduceOutput{}, err
+			return fmt.Errorf("redis hSet error: %w", err)
 		}
 
-		// Commit transaction
-		_, err = tx.Exec(ctx)
-		if err != nil {
-			return &CommentsCommandProduceOutput{}, err
-		}
-
-		c.logger.DebugContext(ctx, "Comment saved successfully",
-			slog.String("result", result),
-			slog.Any("values", values),
+		return nil
+	})
+	if err != nil {
+		c.logger.ErrorContext(ctx, "TxPipelined error",
+			slog.String("error", err.Error()),
+			slog.Any("comment", comment),
 		)
 
-		return &CommentsCommandProduceOutput{}, nil
+		return nil, ErrFailedToSaveComments
 	}
+
+	return &CommentsCommandPublishOutput{
+		Comment: comment,
+	}, nil
 }
