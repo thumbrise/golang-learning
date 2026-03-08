@@ -4,21 +4,31 @@ import (
 	"context"
 
 	"github.com/google/wire"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/cmd"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/usecases"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/endpoints/cmd"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/endpoints/http"
 )
 
 var Bindings = wire.NewSet(
 	NewModule,
 	cmd.NewComments,
 	cmd.NewCommentsProduce,
-	usecases.NewCommentsCommandProduce,
+	usecases.NewCommentsCommandPublish,
+	http.NewRouter,
 )
 
-type Module struct{}
+type Module struct {
+	cmd        *cmd.Comments
+	cmdProduce *cmd.CommentsProduce
+	router     *http.Router
+}
 
-func NewModule(*cmd.Comments, *cmd.CommentsProduce) *Module {
-	return &Module{}
+func NewModule(cmd *cmd.Comments, cmdProduce *cmd.CommentsProduce, router *http.Router) *Module {
+	return &Module{
+		router:     router,
+		cmd:        cmd,
+		cmdProduce: cmdProduce,
+	}
 }
 
 func (m *Module) Name() string {
@@ -26,6 +36,8 @@ func (m *Module) Name() string {
 }
 
 func (m *Module) BeforeStart(ctx context.Context) error {
+	m.router.Register()
+
 	return nil
 }
 
