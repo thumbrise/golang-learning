@@ -77,8 +77,6 @@ tasks:
   load:
     desc: Нагрузить систему. Например task load -- run api/comments/publish.ts
     interactive: true
-#    cmd: task c -- --profile=load up k6 "{{.CLI_ARGS}}"
-#    cmd: task c -- up k6 run - api/comments/publish.ts
     cmd: task c -- run --rm -it k6 {{.CLI_ARGS}}
 
   redis:
