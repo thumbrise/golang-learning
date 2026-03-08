@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/go-faker/faker/v4"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"github.com/thumbrise/demo/golang-demo/internal/contracts"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/usecases"
@@ -27,14 +29,18 @@ func NewCommentsProduce(r *Comments, produce *usecases.CommentsCommandPublish) *
 	c := &cobra.Command{
 		Use: "produce",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			in := usecases.CommentsCommandPublishInput{}
+			in := usecases.CommentsCommandPublishInput{
+				UserUUID: uuid.New().String(),
+				PostUUID: uuid.New().String(),
+				Content:  faker.Paragraph(),
+			}
 
 			out, err := produce.Handle(cmd.Context(), in)
 			if err != nil {
 				return err
 			}
 
-			cmd.Printf("out: %+v\n", out)
+			cmd.Printf("out:\n\t%#v\n", out)
 
 			return nil
 		},

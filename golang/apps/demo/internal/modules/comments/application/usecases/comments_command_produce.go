@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -36,10 +35,10 @@ type CommentsCommandPublishOutput struct {
 const stream = "comments_unprocessed"
 
 type Comment struct {
-	UUID      string    `json:"uuid,omitempty"`
-	PostUUID  string    `json:"postUUID,omitempty"`
-	Content   string    `json:"content,omitempty"`
-	CreatedAt time.Time `json:"createdAt"`
+	UUID      string
+	PostUUID  string
+	Content   string
+	CreatedAt time.Time
 }
 
 func (c *CommentsCommandPublish) Handle(ctx context.Context, input CommentsCommandPublishInput) (*CommentsCommandPublishOutput, error) {
@@ -47,37 +46,26 @@ func (c *CommentsCommandPublish) Handle(ctx context.Context, input CommentsComma
 	// TODO: Добавить консюмера
 	// TODO: Вынести общую логику стриминга в инфраструктуру
 	// TODO: Добавить возможность настройки количества горутин. Обязательно с shared limiter
+	// TODO: Добавить валидацию
 	comment := &Comment{
 		UUID:      uuid.New().String(),
 		PostUUID:  input.PostUUID,
 		Content:   input.Content,
 		CreatedAt: time.Now(),
 	}
-	// values := map[string]interface{}{
-	//	"uuid":      "",
-	//	"timestamp": strconv.FormatInt(time.Now().Unix(), 10),
-	//	"post_uuid": input.PostUUID,
-	//	"content":   input.Content,
-	//}
-	var err error
-
-	values, err := json.Marshal(comment)
-	if err != nil {
-		c.logger.ErrorContext(ctx, "Error marshalling comment",
-			slog.String("error", err.Error()),
-			slog.Any("comment", comment),
-		)
-
-		return nil, err
+	redisRecord := map[string]interface{}{
+		"uuid":       comment.UUID,
+		"post_uuid":  comment.PostUUID,
+		"content":    comment.Content,
+		"created_at": comment.CreatedAt.Unix(),
 	}
-
-	_, err = c.redis.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+	_, err := c.redis.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
 		var err error
 
 		_, err = c.redis.XAdd(ctx, &redis.XAddArgs{
 			Stream: stream,
 			ID:     "*",
-			Values: values,
+			Values: redisRecord,
 		}).Result()
 		if err != nil {
 			return fmt.Errorf("redis xAdd error: %w", err)
@@ -85,7 +73,7 @@ func (c *CommentsCommandPublish) Handle(ctx context.Context, input CommentsComma
 
 		cacheKey := "comments:" + uuid.New().String()
 
-		err = c.redis.HSet(ctx, cacheKey, comment).Err()
+		err = c.redis.HSet(ctx, cacheKey, redisRecord).Err()
 		if err != nil {
 			return fmt.Errorf("redis hSet error: %w", err)
 		}
