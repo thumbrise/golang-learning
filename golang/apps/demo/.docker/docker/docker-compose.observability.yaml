@@ -42,7 +42,21 @@ services:
 #    ports:
 #      - "9121:9121"
 
+  redis-insight:
+    image: redis/redisinsight:3.2.0
+    ports:
+      - "127.0.0.1:${DOCKER_PORT_REDIS_INSIGHT:?}:5540"
+    volumes:
+      - redisinsight:/data
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "127.0.0.1", "5540" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
 
 volumes:
   grafana_data:
   prometheus_data:
+  redisinsight:
