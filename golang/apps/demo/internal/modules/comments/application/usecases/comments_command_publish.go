@@ -18,7 +18,7 @@ type CommentsCommandPublish struct {
 	redis  *redis.Client
 }
 
-func NewCommentsCommandProduce(logger *slog.Logger, redis *redis.Client) *CommentsCommandPublish {
+func NewCommentsCommandPublish(logger *slog.Logger, redis *redis.Client) *CommentsCommandPublish {
 	return &CommentsCommandPublish{logger: logger, redis: redis}
 }
 
@@ -59,6 +59,7 @@ func (c *CommentsCommandPublish) Handle(ctx context.Context, input CommentsComma
 		"content":    comment.Content,
 		"created_at": comment.CreatedAt.Unix(),
 	}
+
 	_, err := c.redis.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
 		var err error
 

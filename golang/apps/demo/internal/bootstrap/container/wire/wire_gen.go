@@ -24,8 +24,9 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/mailers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments"
-	cmd2 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/cmd"
 	usecases2 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/usecases"
+	cmd2 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/endpoints/cmd"
+	http5 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
 	http4 "github.com/thumbrise/demo/golang-demo/internal/modules/homepage/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage/infrastucture/generator"
@@ -134,9 +135,10 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	homePageRouter := http4.NewHomePageRouter(generatorGenerator, componentsKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
 	cmdComments := cmd2.NewComments(kernel)
-	commentsCommandPublish := usecases2.NewCommentsCommandProduce(slogLogger, client)
+	commentsCommandPublish := usecases2.NewCommentsCommandPublish(slogLogger, client)
 	commentsProduce := cmd2.NewCommentsProduce(cmdComments, commentsCommandPublish)
-	commentsModule := comments.NewModule(cmdComments, commentsProduce)
+	httpRouter := http5.NewRouter(commentsCommandPublish, componentsKernel)
+	commentsModule := comments.NewModule(cmdComments, commentsProduce, httpRouter)
 	v2 := internal.Modules(module, observabilityModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, authModule, homepageModule, commentsModule)
 	containerContainer := container.NewContainer(bootstrapper, kernel, v, componentsKernel, v2, runner)
 	return containerContainer, nil
