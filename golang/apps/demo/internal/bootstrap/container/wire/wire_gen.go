@@ -15,6 +15,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/app/core"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap"
 	"github.com/thumbrise/demo/golang-demo/internal/bootstrap/container"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/analytics"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/application/usecases"
 	http3 "github.com/thumbrise/demo/golang-demo/internal/modules/auth/endpoints/http"
@@ -110,7 +111,8 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisModule := redis.NewModule(client)
+	otelRegistrar := redis.NewOTELRegistrar(meterProvider, client, tracerProvider)
+	redisModule := redis.NewModule(otelRegistrar, client)
 	errorsMapMiddleware := http2.NewErrorsMapMiddleware(slogLogger)
 	errorsmapModule := errorsmap.NewModule(componentsKernel, errorsMapMiddleware)
 	swaggerRouter := swagger.NewSwaggerRouter(componentsKernel)
@@ -139,7 +141,9 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	commentsProduce := cmd2.NewCommentsProduce(cmdComments, commentsCommandPublish)
 	httpRouter := http5.NewRouter(commentsCommandPublish, componentsKernel)
 	commentsModule := comments.NewModule(cmdComments, commentsProduce, httpRouter)
-	v2 := internal.Modules(module, observabilityModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, authModule, homepageModule, commentsModule)
+	metrics := analytics.NewMetrics(provider, userRepository)
+	analyticsModule := analytics.NewModule(metrics)
+	v2 := internal.Modules(module, observabilityModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, authModule, homepageModule, commentsModule, analyticsModule)
 	containerContainer := container.NewContainer(bootstrapper, kernel, v, componentsKernel, v2, runner)
 	return containerContainer, nil
 }

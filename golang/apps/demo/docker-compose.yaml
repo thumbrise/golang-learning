@@ -61,24 +61,6 @@ services:
       retries: 5
       start_period: 10s
 
-  db-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
-    restart: unless-stopped
-    environment:
-      DATA_SOURCE_URI: "db:5432/${DB_DATABASE:?}?sslmode=disable"
-      DATA_SOURCE_USER: ${DB_USERNAME:?}
-      DATA_SOURCE_PASS: ${DB_PASSWORD:?}
-    ports:
-      - "127.0.0.1:${DOCKER_PORT_POSTGRES_EXPORTER:?}:9187"
-    depends_on:
-      db:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://localhost:9187/metrics" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
   adminer:
     env_file: .env
     image: adminer

@@ -48,6 +48,10 @@ receivers:
           scrape_interval: 10s
           static_configs:
             - targets: ['0.0.0.0:8888']
+  redis:
+    endpoint: ${REDIS_URL}
+    collection_interval: 10s
+    password: ${REDIS_PASSWORD}
 
 processors:
   resourcedetection:
@@ -86,7 +90,7 @@ service:
       processors: [batch]
       exporters: [otlp/uptrace]
     metrics/hostmetrics:
-      receivers: [hostmetrics, postgresql, httpcheck]
+      receivers: [hostmetrics, postgresql, httpcheck, redis]
       processors: [batch, resourcedetection]
       exporters: [otlp/uptrace]
     logs:

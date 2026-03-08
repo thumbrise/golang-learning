@@ -14,8 +14,8 @@ services:
     volumes:
       - ch_data:/var/lib/clickhouse
     ports:
-#      - '8123:8123' # api
-      - '${DOCKER_PORT_CLICKHOUSE_UI:?}:9000' # web
+       - '${DOCKER_PORT_CLICKHOUSE_UI:?}:8123'  # web
+      #      - '9000:9000' #api
 
   uptrace:
     image: 'uptrace/uptrace:2.1.0-beta'
