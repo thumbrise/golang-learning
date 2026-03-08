@@ -11,14 +11,16 @@ var Bindings = wire.NewSet(
 	NewModule,
 	NewConfig,
 	NewClient,
+	NewOTELRegistrar,
 )
 
 type Module struct {
-	redisClient *redis.Client
+	otelRegistrar *OTELRegistrar
+	redisClient   *redis.Client
 }
 
-func NewModule(redisClient *redis.Client) *Module {
-	return &Module{redisClient: redisClient}
+func NewModule(otelRegistrar *OTELRegistrar, redisClient *redis.Client) *Module {
+	return &Module{otelRegistrar: otelRegistrar, redisClient: redisClient}
 }
 
 func (m *Module) Name() string {
@@ -26,7 +28,7 @@ func (m *Module) Name() string {
 }
 
 func (m *Module) BeforeStart(ctx context.Context) error {
-	return nil
+	return m.otelRegistrar.Register()
 }
 
 func (m *Module) OnStart(ctx context.Context) error {

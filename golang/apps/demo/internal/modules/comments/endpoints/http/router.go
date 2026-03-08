@@ -42,7 +42,7 @@ func (h *Router) publish(grp gin.IRoutes) {
 			return
 		}
 
-		output, err := h.commentsCommandPublish.Handle(ctx, input)
+		output, err := h.commentsCommandPublish.Handle(ctx.Request.Context(), input)
 		if err != nil {
 			_ = ctx.Error(err)
 

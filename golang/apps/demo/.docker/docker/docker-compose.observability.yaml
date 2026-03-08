@@ -7,6 +7,42 @@ services:
     ports:
       - "127.0.0.1:${DOCKER_PORT_PYROSCOPE:?}:4040"
 
+  db-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_URI: "db:5432/${DB_DATABASE:?}?sslmode=disable"
+      DATA_SOURCE_USER: ${DB_USERNAME:?}
+      DATA_SOURCE_PASS: ${DB_PASSWORD:?}
+    ports:
+      - "127.0.0.1:${DOCKER_PORT_POSTGRES_EXPORTER:?}:9187"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:9187/metrics" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.81.0-alpine
+    restart: unless-stopped
+    environment:
+      - REDIS_ADDR=${REDIS_URL:?}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:9121/metrics" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+#    ports:
+#      - "9121:9121"
+
+
 volumes:
   grafana_data:
   prometheus_data:
