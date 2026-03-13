@@ -27,6 +27,10 @@ scrape_configs:
   - job_name: redis
     static_configs:
       - targets: [ 'redis-exporter:9121' ]
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'redis_stream_.*'
+        action: keep
 
 remote_write:
   - url: 'http://uptrace:80/api/v1/prometheus/write'
