@@ -26,6 +26,7 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/otp"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments"
 	usecases2 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/usecases"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/workers"
 	cmd2 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/endpoints/cmd"
 	http5 "github.com/thumbrise/demo/golang-demo/internal/modules/comments/endpoints/http"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/homepage"
@@ -137,10 +138,11 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	homePageRouter := http4.NewHomePageRouter(generatorGenerator, componentsKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
 	cmdComments := cmd2.NewComments(kernel)
+	commentsBatcher := workers.NewCommentsBatcher(slogLogger)
+	commentsBatch := cmd2.NewCommentsBatch(cmdComments, runner, commentsBatcher)
 	commentsCommandPublish := usecases2.NewCommentsCommandPublish(slogLogger, client)
-	commentsProduce := cmd2.NewCommentsProduce(cmdComments, commentsCommandPublish)
 	httpRouter := http5.NewRouter(commentsCommandPublish, componentsKernel)
-	commentsModule := comments.NewModule(cmdComments, commentsProduce, httpRouter)
+	commentsModule := comments.NewModule(cmdComments, commentsBatch, httpRouter)
 	metrics := analytics.NewMetrics(provider, userRepository)
 	analyticsModule := analytics.NewModule(metrics)
 	v2 := internal.Modules(module, observabilityModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, authModule, homepageModule, commentsModule, analyticsModule)
