@@ -5,23 +5,26 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/tracer"
 	"golang.org/x/time/rate"
 )
 
 type CommentsBatcher struct {
-	logger *slog.Logger
+	logger         *slog.Logger
+	tracerProvider *tracer.Provider
 }
 
-func NewCommentsBatcher(logger *slog.Logger) *CommentsBatcher {
-	return &CommentsBatcher{logger: logger}
+func NewCommentsBatcher(logger *slog.Logger, tracerProvider *tracer.Provider) *CommentsBatcher {
+	return &CommentsBatcher{logger: logger, tracerProvider: tracerProvider}
 }
 
-func (b *CommentsBatcher) Start(ctx context.Context) error {
+func (b *CommentsBatcher) Run(ctx context.Context) error {
 	// TODO: Вынести лимит в конфиг
 	// TODO: Добавить возможность настройки количества горутин. Обязательно с shared limiter
 
 	// temp
 	limiter := rate.NewLimiter(rate.Every(3*time.Second), 1)
+	trace := b.tracerProvider.Tracer()
 	tempResult := 1
 	for {
 		select {
@@ -33,10 +36,14 @@ func (b *CommentsBatcher) Start(ctx context.Context) error {
 			if err != nil {
 				return ctx.Err()
 			}
+			ctx, span := trace.Start(ctx, "worker comments batcher")
+
 			b.logger.InfoContext(ctx, "Processing comments",
 				slog.Int("comments", tempResult),
 			)
 			tempResult++
+
+			span.End()
 		}
 	}
 }
