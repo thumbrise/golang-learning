@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/wire"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/usecases"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/application/workers"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/endpoints/cmd"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/comments/endpoints/http"
 )
@@ -12,18 +13,19 @@ import (
 var Bindings = wire.NewSet(
 	NewModule,
 	cmd.NewComments,
-	cmd.NewCommentsProduce,
+	cmd.NewCommentsBatch,
 	usecases.NewCommentsCommandPublish,
 	http.NewRouter,
+	workers.NewCommentsBatcher,
 )
 
 type Module struct {
 	cmd        *cmd.Comments
-	cmdProduce *cmd.CommentsProduce
+	cmdProduce *cmd.CommentsBatch
 	router     *http.Router
 }
 
-func NewModule(cmd *cmd.Comments, cmdProduce *cmd.CommentsProduce, router *http.Router) *Module {
+func NewModule(cmd *cmd.Comments, cmdProduce *cmd.CommentsBatch, router *http.Router) *Module {
 	return &Module{
 		router:     router,
 		cmd:        cmd,

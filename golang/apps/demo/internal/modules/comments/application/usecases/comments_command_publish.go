@@ -42,10 +42,7 @@ type Comment struct {
 }
 
 func (c *CommentsCommandPublish) Handle(ctx context.Context, input CommentsCommandPublishInput) (*CommentsCommandPublishOutput, error) {
-	// TODO: Вынести лимит в конфиг
-	// TODO: Добавить консюмера
 	// TODO: Вынести общую логику стриминга в инфраструктуру
-	// TODO: Добавить возможность настройки количества горутин. Обязательно с shared limiter
 	// TODO: Добавить валидацию
 	comment := &Comment{
 		UUID:      uuid.New().String(),
