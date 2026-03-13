@@ -138,7 +138,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	homePageRouter := http4.NewHomePageRouter(generatorGenerator, componentsKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
 	cmdComments := cmd2.NewComments(kernel)
-	commentsBatcher := workers.NewCommentsBatcher(slogLogger)
+	commentsBatcher := workers.NewCommentsBatcher(slogLogger, provider2)
 	commentsBatch := cmd2.NewCommentsBatch(cmdComments, runner, commentsBatcher)
 	commentsCommandPublish := usecases2.NewCommentsCommandPublish(slogLogger, client)
 	httpRouter := http5.NewRouter(commentsCommandPublish, componentsKernel)

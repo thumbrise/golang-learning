@@ -20,7 +20,7 @@ func NewCommentsBatch(r *Comments, runner *bootstrap.Runner, batcher *workers.Co
 			p := &bootstrap.Process{
 				Name: "comments batcher",
 				Start: func(ctx context.Context) error {
-					return batcher.Start(ctx)
+					return batcher.Run(ctx)
 				},
 				Shutdown: func(ctx context.Context) error {
 					return nil
