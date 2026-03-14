@@ -25,11 +25,11 @@ func (m *Module) Name() string {
 
 func (m *Module) BeforeStart(ctx context.Context) error {
 	m.metrics.GaugeUsersTotal()
+
 	return nil
 }
 
 func (m *Module) OnStart(ctx context.Context) error {
-
 	return nil
 }
 

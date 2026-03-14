@@ -31,7 +31,6 @@ func NewCommentsBatch(r *Comments, runner *bootstrap.Runner, batcher *workers.Co
 				cmd.Context(),
 				p,
 			)
-
 		},
 	}
 	r.AddCommand(c)

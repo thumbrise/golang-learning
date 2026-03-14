@@ -30,7 +30,7 @@ services:
 
   redis:
     env_file: .env
-    image: redis:7.4.1-alpine
+    image: redis:8.6.1-alpine
     restart: unless-stopped
     ports:
       - "127.0.0.1:${DOCKER_PORT_REDIS:?}:6379"

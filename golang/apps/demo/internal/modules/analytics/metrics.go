@@ -21,6 +21,7 @@ func NewMetrics(p *meter.Provider, repository *dal.UserRepository) *Metrics {
 
 func (m *Metrics) GaugeUsersTotal() {
 	mtr := m.meterProvider.Meter()
+
 	var err error
 
 	m.usersTotal, err = mtr.Int64ObservableGauge(
@@ -32,11 +33,12 @@ func (m *Metrics) GaugeUsersTotal() {
 			if err != nil {
 				return err
 			}
+
 			observer.Observe(int64(count))
+
 			return nil
 		}),
 	)
-
 	if err != nil {
 		otel.Handle(err)
 	}
