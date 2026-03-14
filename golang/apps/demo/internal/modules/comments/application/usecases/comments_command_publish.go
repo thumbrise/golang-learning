@@ -11,6 +11,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+const (
+	stream     = "comments_unprocessed"
+	producerID = "global"
+)
+
 var ErrFailedToSaveComments = errors.New("failed to save comments")
 
 type CommentsCommandPublish struct {
@@ -31,8 +36,6 @@ type CommentsCommandPublishInput struct {
 type CommentsCommandPublishOutput struct {
 	Comment *Comment
 }
-
-const stream = "comments_unprocessed"
 
 type Comment struct {
 	UUID      string
@@ -64,6 +67,8 @@ func (c *CommentsCommandPublish) Handle(ctx context.Context, input CommentsComma
 			Stream: stream,
 			ID:     "*",
 			Values: redisRecord,
+			// IdempotentID: comment.UUID,
+			// ProducerID:   producerID,
 		}).Result()
 		if err != nil {
 			return fmt.Errorf("redis xAdd error: %w", err)

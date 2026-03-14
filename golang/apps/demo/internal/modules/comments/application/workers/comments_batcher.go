@@ -2,6 +2,7 @@ package workers
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/redis/go-redis/v9"
@@ -9,10 +10,24 @@ import (
 	"golang.org/x/time/rate"
 )
 
+// TODO: Вынести в конфиг
+const (
+	idNext           = ">"
+	idPending        = "0"
+	stream           = "comments_unprocessed"
+	group            = "test"
+	workerName       = "worker comments batcher"
+	rpsDatabaseLimit = 3000
+)
+
+// CommentsBatcher
+//
+// TODO: refactoring
 type CommentsBatcher struct {
 	logger         *slog.Logger
 	tracerProvider *tracer.Provider
 	redisClient    *redis.Client
+	handledPending bool
 }
 
 func NewCommentsBatcher(logger *slog.Logger, redisClient *redis.Client, tracerProvider *tracer.Provider) *CommentsBatcher {
@@ -20,13 +35,18 @@ func NewCommentsBatcher(logger *slog.Logger, redisClient *redis.Client, tracerPr
 }
 
 func (b *CommentsBatcher) Run(ctx context.Context) error {
-	// TODO: Вынести лимит в конфиг
 	// TODO: Добавить возможность настройки количества горутин. Обязательно с shared limiter
+	err := b.ensureGroupExists(ctx)
+	if err != nil {
+		return err
+	}
 
-	// temp
-	limiter := rate.NewLimiter(rate.Limit(3000), 1)
-	trace := b.tracerProvider.Tracer()
-	tempResult := 1
+	return b.loop(ctx)
+}
+
+func (b *CommentsBatcher) loop(ctx context.Context) error {
+	limiter := rate.NewLimiter(rate.Limit(rpsDatabaseLimit), 1)
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -37,46 +57,85 @@ func (b *CommentsBatcher) Run(ctx context.Context) error {
 			if err != nil {
 				return ctx.Err()
 			}
-			ctx, span := trace.Start(ctx, "worker comments batcher")
 
-			if err := b.process(ctx); err != nil {
-				b.logger.ErrorContext(ctx, "Error while processing comments batcher", slog.String("error", err.Error()))
+			ctx, span := b.tracerProvider.Tracer().Start(ctx, fmt.Sprintf("%s - %s", workerName, "process"))
+
+			processed, err := b.process(ctx)
+			if err != nil {
+				b.logger.ErrorContext(ctx, "process()", slog.String("error", err.Error()))
 				span.RecordError(err)
 			}
 
-			tempResult++
-
+			b.logger.InfoContext(ctx, "processed comments batcher", slog.Any("processed", processed))
 			span.End()
 		}
 	}
 }
 
-func (b *CommentsBatcher) process(ctx context.Context) error {
-	// TODO: Вынести в конфиг
-	// 	Сделать предсоздание группы
-	//  Сделать дочитывание при первом поднятии и при падениях
-	const group = "test"
-	result, err := b.redisClient.XReadGroup(ctx, &redis.XReadGroupArgs{
+func (b *CommentsBatcher) process(ctx context.Context) (int, error) {
+	if !b.handledPending {
+		processed, err := b.readBatch(ctx, idPending)
+		if err != nil {
+			return 0, err
+		}
+
+		if processed == 0 {
+			b.handledPending = true
+		}
+	}
+
+	return b.readBatch(ctx, idNext)
+}
+
+func (b *CommentsBatcher) ensureGroupExists(ctx context.Context) error {
+	ctx, span := b.tracerProvider.Tracer().Start(ctx, fmt.Sprintf("%s - %s", workerName, "process"))
+	defer span.End()
+
+	res, err := b.redisClient.XGroupCreate(ctx, stream, group, "0").Result()
+	if err != nil {
+		if redis.HasErrorPrefix(err, "BUSYGROUP") {
+			b.logger.DebugContext(ctx, "redisClient.XGroupCreate - group already exists", slog.String("res", res))
+
+			return nil
+		}
+
+		b.logger.ErrorContext(ctx, "", slog.String("error", err.Error()))
+		span.RecordError(err)
+
+		return err
+	}
+
+	b.logger.DebugContext(ctx, "redisClient.XGroupCreate", slog.String("res", res))
+
+	return nil
+}
+
+func (b *CommentsBatcher) readBatch(ctx context.Context, id string) (int, error) {
+	streams, err := b.redisClient.XReadGroup(ctx, &redis.XReadGroupArgs{
 		Group:    group,
 		Consumer: "1",
-		Streams:  []string{"comments_unprocessed", ">"},
-		Count:    3,
+		Streams:  []string{stream, id},
+		Count:    100,
 		Block:    0,
 		NoAck:    false,
 		Claim:    0,
 	}).Result()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	for _, stream := range result {
+	result := 0
+
+	for _, stream := range streams {
 		for _, message := range stream.Messages {
-			b.logger.InfoContext(ctx, "Processing comments batcher",
+			b.logger.DebugContext(ctx, "Processing comments batcher",
 				slog.Any("message", message),
 			)
-			b.redisClient.XAck(ctx, stream.Stream, group, message.ID)
+			b.redisClient.XAckDel(ctx, stream.Stream, group, "ACKED", message.ID)
+
+			result++
 		}
 	}
 
-	return nil
+	return result, nil
 }
