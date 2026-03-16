@@ -20,6 +20,7 @@ var Bindings = wire.NewSet(
 	observability.NewHealthRouter,
 	observability.NewOTELMiddleware,
 	observability.NewHTTPMetrics,
+	observability.NewOtelRecorder,
 )
 
 type Module struct {

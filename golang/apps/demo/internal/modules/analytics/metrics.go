@@ -3,24 +3,23 @@ package analytics
 import (
 	"context"
 
+	otelanalytics "github.com/thumbrise/demo/golang-demo/internal/modules/analytics/otel"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/auth/infrastructure/dal"
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/meter"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 )
 
 type Metrics struct {
-	meterProvider  *meter.Provider
 	userRepository *dal.UserRepository
 	usersTotal     metric.Int64ObservableGauge
 }
 
-func NewMetrics(p *meter.Provider, repository *dal.UserRepository) *Metrics {
-	return &Metrics{meterProvider: p, userRepository: repository}
+func NewMetrics(repository *dal.UserRepository) *Metrics {
+	return &Metrics{userRepository: repository}
 }
 
 func (m *Metrics) GaugeUsersTotal() {
-	mtr := m.meterProvider.Meter()
+	mtr := otelanalytics.Meter
 
 	var err error
 

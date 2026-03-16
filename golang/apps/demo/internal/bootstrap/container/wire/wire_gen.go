@@ -64,7 +64,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 		return nil, err
 	}
 	loggerProvider := logger.NewOTELSDKProvider(resource, exporter)
-	slogLogger := logger.NewLogger(config, loggerProvider)
+	slogLogger := logger.NewLogger(config, loggerProvider, resource)
 	eventLogger := bootstrap.NewEventLogger(slogLogger)
 	bootstrapper := bootstrap.NewBootstrapper(eventLogger)
 	kernel := core.NewKernel()
@@ -78,29 +78,24 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	routeList := cmds.NewRouteList(route, componentsKernel)
 	v := cmd.Commands(serve, route, routeList)
 	healthRouter := observability.NewHealthRouter(componentsKernel)
+	httpMetrics := observability.NewHTTPMetrics()
+	otelRecorder := observability.NewOtelRecorder(httpMetrics)
+	otelMiddleware := observability.NewOTELMiddleware(otelRecorder)
+	module := http.NewModule(healthRouter, componentsKernel, otelMiddleware)
+	errorHandler := components.NewErrorHandler(slogLogger)
+	profilerConfig := profiler.NewConfig(loader)
+	profilerProfiler := profiler.NewProfiler(config, profilerConfig, slogLogger)
 	otlpmetricgrpcExporter, err := meter.NewExporter(ctx, otlpConfig)
 	if err != nil {
 		return nil, err
 	}
 	meterProvider := meter.NewOTELSDKProvider(resource, otlpmetricgrpcExporter)
-	provider := meter.NewProvider(config, meterProvider)
-	httpMetrics := observability.NewHTTPMetrics(provider)
-	profilerConfig := profiler.NewConfig(loader)
-	profilerProfiler := profiler.NewProfiler(config, profilerConfig, slogLogger)
 	otlptraceExporter, err := tracer.NewOTELExporter(ctx, otlpConfig)
 	if err != nil {
 		return nil, err
 	}
 	sampler := tracer.NewOTELSampler()
-	stdouttraceExporter, err := tracer.NewStdOutExporter()
-	if err != nil {
-		return nil, err
-	}
-	tracerProvider := tracer.NewOTELSDKProvider(resource, otlptraceExporter, sampler, stdouttraceExporter)
-	provider2 := tracer.NewProvider(config, tracerProvider)
-	otelMiddleware := observability.NewOTELMiddleware(config, httpMetrics, slogLogger, profilerProfiler, provider2)
-	module := http.NewModule(healthRouter, componentsKernel, otelMiddleware)
-	errorHandler := components.NewErrorHandler(slogLogger)
+	tracerProvider := tracer.NewOTELSDKProvider(resource, otlptraceExporter, sampler)
 	registrar := components.NewRegistrar(config, errorHandler, profilerProfiler, loggerProvider, meterProvider, tracerProvider)
 	observabilityModule := observability2.NewModule(registrar, errorHandler)
 	databaseConfig := database.NewConfig(loader)
@@ -138,12 +133,13 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	homePageRouter := http4.NewHomePageRouter(generatorGenerator, componentsKernel)
 	homepageModule := homepage.NewModule(homePageRouter)
 	cmdComments := cmd2.NewComments(kernel)
-	commentsBatcher := workers.NewCommentsBatcher(slogLogger, client, provider2)
+	provider := tracer.NewProvider(config, tracerProvider)
+	commentsBatcher := workers.NewCommentsBatcher(slogLogger, client, provider)
 	commentsBatch := cmd2.NewCommentsBatch(cmdComments, runner, commentsBatcher)
 	commentsCommandPublish := usecases2.NewCommentsCommandPublish(slogLogger, client)
 	httpRouter := http5.NewRouter(commentsCommandPublish, componentsKernel)
 	commentsModule := comments.NewModule(cmdComments, commentsBatch, httpRouter)
-	metrics := analytics.NewMetrics(provider, userRepository)
+	metrics := analytics.NewMetrics(userRepository)
 	analyticsModule := analytics.NewModule(metrics)
 	v2 := internal.Modules(module, observabilityModule, databaseModule, mailModule, redisModule, errorsmapModule, swaggerModule, authModule, homepageModule, commentsModule, analyticsModule)
 	containerContainer := container.NewContainer(bootstrapper, kernel, v, componentsKernel, v2, runner)

@@ -29,7 +29,6 @@ var (
 
 		logger.NewLogger,
 		logger.NewOTELSDKProvider,
-		logger.NewProvider,
 		logger.NewExporter,
 
 		meter.NewOTELSDKProvider,

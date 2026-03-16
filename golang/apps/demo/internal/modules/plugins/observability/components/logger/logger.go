@@ -8,10 +8,10 @@ import (
 	"github.com/thumbrise/demo/golang-demo/internal/app"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
-	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	"go.opentelemetry.io/otel/sdk/resource"
 )
 
-func NewLogger(cfg app.Config, provider *sdklog.LoggerProvider) *slog.Logger {
+func NewLogger(cfg app.Config, provider *sdklog.LoggerProvider, res *resource.Resource) *slog.Logger {
 	lvl := slog.LevelInfo
 	if cfg.Debug {
 		lvl = slog.LevelDebug
@@ -30,14 +30,23 @@ func NewLogger(cfg app.Config, provider *sdklog.LoggerProvider) *slog.Logger {
 	handler := slogmulti.Fanout(
 		jsonHandler,
 		otelHandler,
-	)
+	).WithAttrs(resToAttributes(res))
 
-	logger := slog.New(handler).With(
-		slog.String(string(semconv.ServiceNameKey), cfg.Name),
-		slog.String(string(semconv.ServiceVersionKey), cfg.Version),
-		slog.String(string(semconv.DeploymentEnvironmentKey), cfg.Environment),
-	)
+	logger := slog.New(handler)
+
 	slog.SetDefault(logger)
 
 	return logger
+}
+
+func resToAttributes(res *resource.Resource) []slog.Attr {
+	result := make([]slog.Attr, 0, res.Len())
+
+	for iter := res.Iter(); iter.Next(); {
+		k := string(iter.Attribute().Key)
+		v := iter.Attribute().Value.AsString()
+		result = append(result, slog.Any(k, v))
+	}
+
+	return result
 }

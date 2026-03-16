@@ -2,98 +2,87 @@ package observability
 
 import (
 	"context"
+	"errors"
 	"time"
 
-	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/components/meter"
+	otelhttp "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/otel"
 	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/observability/histogram"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/semconv/v1.39.0/httpconv"
 )
 
 type HTTPMetrics struct {
 	requestsTotal   metric.Int64Counter
-	requestDuration metric.Float64Histogram
-	requestSize     metric.Float64Histogram
-	responseSize    metric.Float64Histogram
+	requestDuration httpconv.ServerRequestDuration
+	requestSize     httpconv.ServerRequestBodySize
+	responseSize    httpconv.ServerResponseBodySize
 }
 
-func NewHTTPMetrics(p *meter.Provider) *HTTPMetrics {
+func NewHTTPMetrics() *HTTPMetrics {
 	m := &HTTPMetrics{}
-	mtr := p.Meter()
+	mtr := otelhttp.Meter
 
-	var err error
+	var (
+		errs error
+		err  error
+	)
 
 	m.requestsTotal, err = mtr.Int64Counter(
 		"http_requests_total",
 		metric.WithDescription("Total number of HTTP requests"),
 	)
-	if err != nil {
-		otel.Handle(err)
-	}
+	errs = errors.Join(errs, err)
 
-	defBuckets := histogram.DefBuckets()
-
-	m.requestDuration, err = mtr.Float64Histogram(
-		"http_request_duration_seconds",
-		metric.WithDescription("Duration of HTTP requests in seconds"),
-		metric.WithUnit("s"),
-		metric.WithExplicitBucketBoundaries(defBuckets...),
+	m.requestDuration, err = httpconv.NewServerRequestDuration(
+		mtr,
+		metric.WithExplicitBucketBoundaries(histogram.DefBuckets()...),
 	)
-	if err != nil {
-		otel.Handle(err)
-	}
+	errs = errors.Join(errs, err)
 
 	// 100b to 1gb
 	sizeBuckets := histogram.ExponentialBuckets(100, 10, 8)
 
-	m.requestSize, err = mtr.Float64Histogram(
-		"http_request_size_bytes",
-		metric.WithDescription("HTTP request size in bytes"),
-		metric.WithUnit("By"),
+	m.requestSize, err = httpconv.NewServerRequestBodySize(
+		mtr,
 		metric.WithExplicitBucketBoundaries(sizeBuckets...),
 	)
-	if err != nil {
-		otel.Handle(err)
-	}
+	errs = errors.Join(errs, err)
 
-	m.responseSize, err = mtr.Float64Histogram(
-		"http_response_size_bytes",
-		metric.WithDescription("HTTP response size in bytes"),
-		metric.WithUnit("By"),
+	m.responseSize, err = httpconv.NewServerResponseBodySize(
+		mtr,
 		metric.WithExplicitBucketBoundaries(sizeBuckets...),
 	)
-	if err != nil {
-		otel.Handle(err)
+
+	errs = errors.Join(errs, err)
+	if errs != nil {
+		otel.Handle(errs)
 	}
 
 	return m
 }
 
 // AddRequest увеличивает счётчик запросов с заданными атрибутами.
-func (m *HTTPMetrics) AddRequest(ctx context.Context, attrs ...attribute.KeyValue) {
-	if m.requestsTotal != nil {
-		m.requestsTotal.Add(ctx, 1, metric.WithAttributes(attrs...))
-	}
+func (m *HTTPMetrics) AddRequest(ctx context.Context, attrs attribute.Set) {
+	m.requestsTotal.Add(ctx, 1, metric.WithAttributeSet(attrs))
 }
 
 // RecordDuration записывает длительность запроса.
-func (m *HTTPMetrics) RecordDuration(ctx context.Context, duration time.Duration, attrs ...attribute.KeyValue) {
-	if m.requestDuration != nil {
-		m.requestDuration.Record(ctx, duration.Seconds(), metric.WithAttributes(attrs...))
-	}
+func (m *HTTPMetrics) RecordDuration(ctx context.Context, duration time.Duration, attrs attribute.Set) {
+	m.requestDuration.RecordSet(
+		ctx,
+		duration.Seconds(),
+		attrs,
+	)
 }
 
 // RecordRequestSize записывает размер запроса.
-func (m *HTTPMetrics) RecordRequestSize(ctx context.Context, sizeBytes float64, attrs ...attribute.KeyValue) {
-	if m.requestSize != nil {
-		m.requestSize.Record(ctx, sizeBytes, metric.WithAttributes(attrs...))
-	}
+func (m *HTTPMetrics) RecordRequestSize(ctx context.Context, sizeBytes int64, attrs attribute.Set) {
+	m.requestSize.RecordSet(ctx, sizeBytes, attrs)
 }
 
 // RecordResponseSize записывает размер ответа.
-func (m *HTTPMetrics) RecordResponseSize(ctx context.Context, sizeBytes float64, attrs ...attribute.KeyValue) {
-	if m.responseSize != nil {
-		m.responseSize.Record(ctx, sizeBytes, metric.WithAttributes(attrs...))
-	}
+func (m *HTTPMetrics) RecordResponseSize(ctx context.Context, sizeBytes int64, attrs attribute.Set) {
+	m.responseSize.RecordSet(ctx, sizeBytes, attrs)
 }
