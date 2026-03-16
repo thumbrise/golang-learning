@@ -91,7 +91,7 @@ func (b *CommentsBatcher) ensureGroupExists(ctx context.Context) error {
 	ctx, span := b.tracerProvider.Tracer().Start(ctx, fmt.Sprintf("%s - %s", workerName, "process"))
 	defer span.End()
 
-	res, err := b.redisClient.XGroupCreate(ctx, stream, group, "0").Result()
+	res, err := b.redisClient.XGroupCreateMkStream(ctx, stream, group, "0").Result()
 	if err != nil {
 		if redis.HasErrorPrefix(err, "BUSYGROUP") {
 			b.logger.DebugContext(ctx, "redisClient.XGroupCreate - group already exists", slog.String("res", res))
