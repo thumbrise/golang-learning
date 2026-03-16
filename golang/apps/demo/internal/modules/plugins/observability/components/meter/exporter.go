@@ -12,5 +12,8 @@ func NewExporter(ctx context.Context, cfg components.OTLPConfig) (*otlpmetricgrp
 		otlpmetricgrpc.WithInsecure(),
 		otlpmetricgrpc.WithEndpoint(cfg.URL),
 		otlpmetricgrpc.WithCompressor("gzip"),
+		otlpmetricgrpc.WithHeaders(map[string]string{
+			cfg.TokenKey: cfg.TokenValue,
+		}),
 	)
 }

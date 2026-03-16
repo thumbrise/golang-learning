@@ -1,13 +1,13 @@
 name: "golang-demo"
 
 include:
-  - ./.docker/docker/docker-compose.observability.yaml
-  - ./.docker/docker/docker-compose.load.yaml
+  - docker-compose.observability.yaml
+  - docker-compose.load.yaml
 
 services:
   app:
     extends:
-      file: .docker/docker/docker-compose.common.yaml
+      file: docker-compose.common.yaml
       service: common_backend
     ports:
       - "127.0.0.1:${DOCKER_PORT_APP:?}:${HTTP_PORT:?}"
@@ -21,7 +21,7 @@ services:
 
   app_comments_batcher:
     extends:
-      file: .docker/docker/docker-compose.common.yaml
+      file: docker-compose.common.yaml
       service: common_backend
     command: go run . comments batch
     depends_on:
@@ -46,7 +46,7 @@ services:
       start_period: 10s
 
   db:
-    image: postgres:16.11
+    image: postgres:17.9-alpine
     environment:
       POSTGRES_USER: ${DB_USERNAME:?}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?}
@@ -69,18 +69,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-  adminer:
-    env_file: .env
-    image: adminer
-    restart: unless-stopped
-    command:
-      - /bin/sh
-      - -c
-      - |
-        exec php -S [::]:${DOCKER_PORT_ADMINER:?} -t /var/www/html
-    ports:
-      - "127.0.0.1:${DOCKER_PORT_ADMINER:?}:${DOCKER_PORT_ADMINER:?}"
 
   mailpit:
     image: axllent/mailpit

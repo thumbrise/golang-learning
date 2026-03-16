@@ -14,5 +14,8 @@ func NewExporter(ctx context.Context, cfg components.OTLPConfig) (*otlploggrpc.E
 		otlploggrpc.WithEndpoint(cfg.URL),
 		otlploggrpc.WithInsecure(),
 		otlploggrpc.WithTimeout(5*time.Second),
+		otlploggrpc.WithHeaders(map[string]string{
+			cfg.TokenKey: cfg.TokenValue,
+		}),
 	)
 }

@@ -1,9 +1,7 @@
-include:
-  - ../observability/docker-compose.yml
-
 services:
   pyroscope:
     image: grafana/pyroscope:latest
+    restart: unless-stopped
     ports:
       - "127.0.0.1:${DOCKER_PORT_PYROSCOPE:?}:4040"
 
@@ -40,11 +38,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-#    ports:
-#      - "9121:9121"
 
   redis-insight:
     image: redis/redisinsight:3.2.0
+    restart: unless-stopped
     ports:
       - "127.0.0.1:${DOCKER_PORT_REDIS_INSIGHT:?}:5540"
     volumes:
@@ -55,9 +52,21 @@ services:
       timeout: 5s
       retries: 3
 
+  scrapper:
+    image: victoriametrics/vmagent:latest
+    restart: unless-stopped
+    command:
+      - '-promscrape.config=/etc/vmagent/scrapper.yml'
+      - '-remoteWrite.url=${OBSERVABILITY_PROMETHEUS_REMOTE_WRITE_URL:?}'
+      - '-remoteWrite.headers=${OBSERVABILITY_OTLP_TOKEN_KEY}: ${OBSERVABILITY_OTLP_TOKEN_VALUE:?}'
+    volumes:
+      - ./.docker/observability/scrapper.yml:/etc/vmagent/scrapper.yml:ro
+    env_file:
+      - .env
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
 
 
 volumes:
-  grafana_data:
-  prometheus_data:
   redisinsight:
+  prometheus_data:

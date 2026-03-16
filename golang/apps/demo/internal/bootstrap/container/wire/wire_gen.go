@@ -71,7 +71,7 @@ func InitializeContainer(ctx context.Context) (*container.Container, error) {
 	runner := bootstrap.NewRunner(eventLogger)
 	componentsConfig := components2.NewConfig(loader)
 	slogginConfig := components2.NewSlogginConfig()
-	engine := components2.NewGinEngine(slogLogger, slogginConfig)
+	engine := components2.NewGinEngine(slogLogger, slogginConfig, config)
 	componentsKernel := components2.NewKernel(componentsConfig, slogLogger, engine)
 	serve := cmds.NewServe(kernel, runner, componentsKernel)
 	route := cmds.NewRoute(kernel)

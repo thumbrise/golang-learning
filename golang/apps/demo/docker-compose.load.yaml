@@ -13,4 +13,4 @@ services:
     profiles:
       - load
     volumes:
-      - ../../internal/tests/load:/app
+      - ./internal/tests/load:/app
