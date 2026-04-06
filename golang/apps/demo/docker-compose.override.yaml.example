@@ -1,3 +1,5 @@
 services:
   app:
     command: air -- serve
+  app_comments_batcher:
+    command: air -- comments batch

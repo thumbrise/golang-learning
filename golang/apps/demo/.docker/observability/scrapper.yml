@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+
+  external_labels:
+    monitor: %{APP_NAME}
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['localhost:8429']
+  - job_name: postgres
+    static_configs:
+      - targets: [ 'db-exporter:9187' ]
+  - job_name: redis
+    static_configs:
+      - targets: [ 'redis-exporter:9121' ]
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'redis_stream_.*'
+        action: keep

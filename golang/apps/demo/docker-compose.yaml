@@ -1,13 +1,13 @@
 name: "golang-demo"
 
 include:
-  - ./.docker/docker/docker-compose.observability.yaml
-  - ./.docker/docker/docker-compose.load.yaml
+  - docker-compose.observability.yaml
+  - docker-compose.load.yaml
 
 services:
   app:
     extends:
-      file: .docker/docker/docker-compose.common.yaml
+      file: docker-compose.common.yaml
       service: common_backend
     ports:
       - "127.0.0.1:${DOCKER_PORT_APP:?}:${HTTP_PORT:?}"
@@ -19,9 +19,18 @@ services:
       retries: 5
       start_period: 3s
 
+  app_comments_batcher:
+    extends:
+      file: docker-compose.common.yaml
+      service: common_backend
+    command: go run . comments batch
+    depends_on:
+      redis:
+        condition: service_healthy
+
   redis:
     env_file: .env
-    image: redis:7.4.1-alpine
+    image: redis:8.6.1-alpine
     restart: unless-stopped
     ports:
       - "127.0.0.1:${DOCKER_PORT_REDIS:?}:6379"
@@ -37,7 +46,7 @@ services:
       start_period: 10s
 
   db:
-    image: postgres:16.11
+    image: postgres:17.9-alpine
     environment:
       POSTGRES_USER: ${DB_USERNAME:?}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?}
@@ -60,36 +69,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-  db-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
-    restart: unless-stopped
-    environment:
-      DATA_SOURCE_URI: "db:5432/${DB_DATABASE:?}?sslmode=disable"
-      DATA_SOURCE_USER: ${DB_USERNAME:?}
-      DATA_SOURCE_PASS: ${DB_PASSWORD:?}
-    ports:
-      - "127.0.0.1:${DOCKER_PORT_POSTGRES_EXPORTER:?}:9187"
-    depends_on:
-      db:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://localhost:9187/metrics" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  adminer:
-    env_file: .env
-    image: adminer
-    restart: unless-stopped
-    command:
-      - /bin/sh
-      - -c
-      - |
-        exec php -S [::]:${DOCKER_PORT_ADMINER:?} -t /var/www/html
-    ports:
-      - "127.0.0.1:${DOCKER_PORT_ADMINER:?}:${DOCKER_PORT_ADMINER:?}"
 
   mailpit:
     image: axllent/mailpit

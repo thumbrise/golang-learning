@@ -173,6 +173,45 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/comments/publish": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Publish",
+                "parameters": [
+                    {
+                        "description": "input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/usecases.CommentsCommandPublishInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/usecases.CommentsCommandPublishOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/usecases.CommentsCommandPublishOutput"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -253,6 +292,45 @@ const docTemplate = `{
                 "message": {
                     "description": "Claims *components.JWTClaims",
                     "type": "string"
+                }
+            }
+        },
+        "usecases.Comment": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "postUUID": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecases.CommentsCommandPublishInput": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "postUUID": {
+                    "type": "string"
+                },
+                "userUUID": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecases.CommentsCommandPublishOutput": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "$ref": "#/definitions/usecases.Comment"
                 }
             }
         }

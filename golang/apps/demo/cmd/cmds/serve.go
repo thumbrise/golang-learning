@@ -16,23 +16,21 @@ type Serve struct {
 func NewServe(r contracts.CMDAdder, runner *bootstrap.Runner, httpKernel *components.Kernel) *Serve {
 	c := &cobra.Command{
 		Use:   "serve",
-		Short: "Start http server",
+		Short: "Run http server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			processes := []*bootstrap.Process{
-				{
-					Name: "http kernel",
-					Start: func(ctx context.Context) error {
-						return httpKernel.Start(ctx)
-					},
-					Shutdown: func(ctx context.Context) error {
-						return httpKernel.Shutdown(ctx)
-					},
+			p := &bootstrap.Process{
+				Name: "http kernel",
+				Start: func(ctx context.Context) error {
+					return httpKernel.Start(ctx)
+				},
+				Shutdown: func(ctx context.Context) error {
+					return httpKernel.Shutdown(ctx)
 				},
 			}
 
 			return runner.Run(
 				cmd.Context(),
-				processes,
+				p,
 			)
 		},
 	}

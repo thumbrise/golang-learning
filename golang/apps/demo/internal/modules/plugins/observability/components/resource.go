@@ -27,5 +27,5 @@ func NewResource(ctx context.Context, cfgApp app.Config) (*resource.Resource, er
 		return nil, fmt.Errorf("%w: %w", ErrResourceNew, err)
 	}
 
-	return res, err
+	return res, nil
 }

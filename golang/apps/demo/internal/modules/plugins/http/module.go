@@ -5,28 +5,31 @@ import (
 
 	"github.com/gin-contrib/pprof"
 	"github.com/google/wire"
-	components2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
-	observability2 "github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/observability"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/components"
+	"github.com/thumbrise/demo/golang-demo/internal/modules/plugins/http/observability"
 )
 
 var Bindings = wire.NewSet(
 	NewModule,
-	components2.NewGinEngine,
-	components2.NewKernel,
-	components2.NewConfig,
-	components2.NewSlogginConfig,
 
-	observability2.NewHealthRouter,
-	observability2.NewOTELMiddleware,
+	components.NewGinEngine,
+	components.NewKernel,
+	components.NewConfig,
+	components.NewSlogginConfig,
+
+	observability.NewHealthRouter,
+	observability.NewOTELMiddleware,
+	observability.NewHTTPMetrics,
+	observability.NewOtelRecorder,
 )
 
 type Module struct {
-	kernel         *components2.Kernel
-	healthRouter   *observability2.HealthRouter
-	otelMiddleware *observability2.OTELMiddleware
+	kernel         *components.Kernel
+	healthRouter   *observability.HealthRouter
+	otelMiddleware *observability.OTELMiddleware
 }
 
-func NewModule(healthRouter *observability2.HealthRouter, kernel *components2.Kernel, otelMiddleware *observability2.OTELMiddleware) *Module {
+func NewModule(healthRouter *observability.HealthRouter, kernel *components.Kernel, otelMiddleware *observability.OTELMiddleware) *Module {
 	return &Module{healthRouter: healthRouter, kernel: kernel, otelMiddleware: otelMiddleware}
 }
 

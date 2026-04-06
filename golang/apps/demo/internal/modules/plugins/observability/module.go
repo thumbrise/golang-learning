@@ -29,7 +29,6 @@ var (
 
 		logger.NewLogger,
 		logger.NewOTELSDKProvider,
-		logger.NewProvider,
 		logger.NewExporter,
 
 		meter.NewOTELSDKProvider,
@@ -41,8 +40,6 @@ var (
 		tracer.NewOTELExporter,
 		tracer.NewOTELSDKProvider,
 		tracer.NewStdOutExporter,
-
-		NewHTTPMetrics,
 	)
 )
 

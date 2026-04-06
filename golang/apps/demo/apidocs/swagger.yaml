@@ -52,6 +52,31 @@ definitions:
         description: Claims *components.JWTClaims
         type: string
     type: object
+  usecases.Comment:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      postUUID:
+        type: string
+      uuid:
+        type: string
+    type: object
+  usecases.CommentsCommandPublishInput:
+    properties:
+      content:
+        type: string
+      postUUID:
+        type: string
+      userUUID:
+        type: string
+    type: object
+  usecases.CommentsCommandPublishOutput:
+    properties:
+      comment:
+        $ref: '#/definitions/usecases.Comment'
+    type: object
 info:
   contact:
     email: support@swagger.io
@@ -160,6 +185,31 @@ paths:
       summary: Sign in
       tags:
       - Auth
+  /api/comments/publish:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/usecases.CommentsCommandPublishInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/usecases.CommentsCommandPublishOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/usecases.CommentsCommandPublishOutput'
+      summary: Publish
+      tags:
+      - Comments
 securityDefinitions:
   ApiKeyAuth:
     description: Type "Bearer" followed by a space and JWT token. <-- description

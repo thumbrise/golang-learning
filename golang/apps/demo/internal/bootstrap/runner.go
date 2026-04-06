@@ -30,7 +30,7 @@ type (
 	}
 )
 
-func (h *Runner) Run(ctx context.Context, processes []*Process) error {
+func (h *Runner) Run(ctx context.Context, processes ...*Process) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 	defer cancel()
 

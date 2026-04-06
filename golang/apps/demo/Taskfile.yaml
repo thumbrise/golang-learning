@@ -75,9 +75,9 @@ tasks:
       - go test ./internal/tests/e2e_test/... -tags=test
 
   load:
-    desc: Нагрузить систему
+    desc: Нагрузить систему. Например task load -- run api/comments/publish.ts
     interactive: true
-    cmd: task c -- --profile load up k6
+    cmd: task c -- run --rm -it k6 {{.CLI_ARGS}}
 
   redis:
     desc: redis cli

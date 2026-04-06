@@ -20,6 +20,6 @@ func (el *EventLogger) Log(ctx context.Context, kind, name, event string, err er
 		msg = fmt.Sprintf("%s ERROR: %s", msg, err)
 		el.logger.ErrorContext(ctx, msg)
 	} else {
-		el.logger.InfoContext(ctx, msg)
+		el.logger.DebugContext(ctx, msg)
 	}
 }

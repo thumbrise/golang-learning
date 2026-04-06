@@ -19,6 +19,9 @@ func NewOTELExporter(ctx context.Context, cfg components.OTLPConfig) (*otlptrace
 		otlptracegrpc.WithEndpoint(cfg.URL),
 		otlptracegrpc.WithInsecure(),
 		otlptracegrpc.WithTimeout(5*time.Second),
+		otlptracegrpc.WithHeaders(map[string]string{
+			cfg.TokenKey: cfg.TokenValue,
+		}),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrTraceExporterNew, err)
